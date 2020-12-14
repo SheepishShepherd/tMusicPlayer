@@ -1,0 +1,3 @@
+displayName = tMusicPlayer
+author = SheepishShepherd
+version = 0.1

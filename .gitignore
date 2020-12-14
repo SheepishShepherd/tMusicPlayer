@@ -5,3 +5,5 @@
 /.vs/tMusicPlayer
 /obj
 /Properties
+*.sln
+*.csproj

@@ -70,7 +70,7 @@ namespace tMusicPlayer
 					for (int j = 0; j < musicPlayerUI.canPlay.Count; j++) {
 						musicPlayerUI.canPlay[j] = true;
 					}
-					tMusicPlayer.SendDebugMessage("EnableAllMusicBoxes enabled. All music in canPlay set to true.", default);
+					tMusicPlayer.SendDebugText("EnableAllMusicBoxes enabled. All music in canPlay set to true.");
 				}
 				else {
 					MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();

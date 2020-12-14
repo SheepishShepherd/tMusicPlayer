@@ -1,1 +1,1 @@
-tMusicPlayer is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+tMusicPlayer gives players their own built-in Audio player. Automatically detects all registered Music Boxes and unlocks as you record them.

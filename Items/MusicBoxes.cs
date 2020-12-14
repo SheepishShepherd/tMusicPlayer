@@ -4,6 +4,8 @@ using Terraria.ID;
 
 namespace tMusicPlayer.Items
 {
+	// TODO: [1.4] Remove all items. No longer needed as the 1.4 update reimplements console music.
+	// TODO: [1.4] The Sounds folder will be removed as well
 	public class AncientWizardTech : ModItem
 	{
 		public override void SetStaticDefaults()
@@ -15,7 +17,7 @@ namespace tMusicPlayer.Items
 		{
 			item.width = 40;
 			item.height = 40;
-			item.value = Item.buyPrice(0, 1, 0, 0);
+			item.value = Item.buyPrice(0, 0, 0);
 			item.rare = ItemRarityID.Orange;
 		}
 	}
@@ -45,13 +47,13 @@ namespace tMusicPlayer.Items
 
 		public override void AddRecipes()
 		{
-			ModRecipe val = new ModRecipe(mod);
-			val.AddIngredient(ItemID.MusicBoxOcean, 1);
-			val.AddIngredient(ModContent.ItemType<AncientWizardTech>(), 1);
-			val.AddTile(TileID.Tables);
-			val.AddTile(TileID.Chairs);
-			val.SetResult(this, 1);
-			val.AddRecipe();
+			ModRecipe recipe = new ModRecipe(mod);
+			recipe.AddIngredient(ItemID.MusicBoxOcean);
+			recipe.AddIngredient(ModContent.ItemType<AncientWizardTech>());
+			recipe.AddTile(TileID.Tables);
+			recipe.AddTile(TileID.Chairs);
+			recipe.SetResult(this);
+			recipe.AddRecipe();
 		}
 	}
 
@@ -80,13 +82,13 @@ namespace tMusicPlayer.Items
 
 		public override void AddRecipes()
 		{
-			ModRecipe val = new ModRecipe(mod);
-			val.AddIngredient(ItemID.MusicBoxSpace, 1);
-			val.AddIngredient(ModContent.ItemType<AncientWizardTech>(), 1);
-			val.AddTile(TileID.Tables);
-			val.AddTile(TileID.Chairs);
-			val.SetResult(this, 1);
-			val.AddRecipe();
+			ModRecipe recipe = new ModRecipe(mod);
+			recipe.AddIngredient(ItemID.MusicBoxSpace);
+			recipe.AddIngredient(ModContent.ItemType<AncientWizardTech>());
+			recipe.AddTile(TileID.Tables);
+			recipe.AddTile(TileID.Chairs);
+			recipe.SetResult(this);
+			recipe.AddRecipe();
 		}
 	}
 
@@ -115,13 +117,13 @@ namespace tMusicPlayer.Items
 
 		public override void AddRecipes()
 		{
-			ModRecipe val = new ModRecipe(mod);
-			val.AddIngredient(ItemID.MusicBoxTitle, 1);
-			val.AddIngredient(ModContent.ItemType<AncientWizardTech>(), 1);
-			val.AddTile(TileID.Tables);
-			val.AddTile(TileID.Chairs);
-			val.SetResult(this, 1);
-			val.AddRecipe();
+			ModRecipe recipe = new ModRecipe(mod);
+			recipe.AddIngredient(ItemID.MusicBoxTitle);
+			recipe.AddIngredient(ModContent.ItemType<AncientWizardTech>());
+			recipe.AddTile(TileID.Tables);
+			recipe.AddTile(TileID.Chairs);
+			recipe.SetResult(this);
+			recipe.AddRecipe();
 		}
 	}
 
@@ -150,14 +152,14 @@ namespace tMusicPlayer.Items
 
 		public override void AddRecipes()
 		{
-			ModRecipe val = new ModRecipe(mod);
-			val.AddIngredient(ItemID.MusicBoxAltOverworldDay, 1);
-			val.AddIngredient(ItemID.MusicBoxAltUnderground, 1);
-			val.AddIngredient(ModContent.ItemType<AncientWizardTech>(), 1);
-			val.AddTile(TileID.Tables);
-			val.AddTile(TileID.Chairs);
-			val.SetResult(this, 1);
-			val.AddRecipe();
+			ModRecipe recipe = new ModRecipe(mod);
+			recipe.AddIngredient(ItemID.MusicBoxAltOverworldDay);
+			recipe.AddIngredient(ItemID.MusicBoxAltUnderground);
+			recipe.AddIngredient(ModContent.ItemType<AncientWizardTech>());
+			recipe.AddTile(TileID.Tables);
+			recipe.AddTile(TileID.Chairs);
+			recipe.SetResult(this);
+			recipe.AddRecipe();
 		}
 	}
 

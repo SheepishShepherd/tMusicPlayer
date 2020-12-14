@@ -27,12 +27,15 @@ namespace tMusicPlayer
 		
 		public override void Load()
 		{
+			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
 			HidePlayerHotkey = RegisterHotKey("Hide Music Player", "Up");
 			PlayStopHotkey = RegisterHotKey("Play/Stop Music", "Down");
 			PrevSongHotkey = RegisterHotKey("Previous Song", "Left");
 			NextSongHotkey = RegisterHotKey("Next Song", "Right");
 
+			// Register this mods music boxes.
+			// TODO: [1.4] Remove music boxes. The 1.4 update reimplements the console music.
 			if (!Main.dedServ) {
 				AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/ConsoleSpace"), ModContent.ItemType<Items.MusicBoxConsoleSpace>(), ModContent.TileType<Tiles.MusicBoxConsoleSpace>());
 				AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/ConsoleOcean"), ModContent.ItemType<Items.MusicBoxConsoleOcean>(), ModContent.TileType<Tiles.MusicBoxConsoleOcean>());
@@ -40,7 +43,8 @@ namespace tMusicPlayer
 				AddMusicBox(GetSoundSlot(SoundType.Music, "Sounds/Music/ConsoleTutorial"), ModContent.ItemType<Items.MusicBoxConsoleTutorial>(), ModContent.TileType<Tiles.MusicBoxConsoleTutorial>());
 			}
 
-			// TODO: [1.4] Magic numbers from decompiler... Thats ok, well update it when we add the 1.4 music boxes
+			// A list that contains all the MusicData we need, including mod and name.
+			// TODO: [1.4] Magic numbers from decompiler... Thats ok, we'll update it when we add the 1.4 music boxes.
 			AllMusic = new List<MusicData>
 			{
 				new MusicData(1, 562),
@@ -85,8 +89,12 @@ namespace tMusicPlayer
 				new MusicData(6, 565)
 			};
 
+			// Code provided by Jopojelly. Thank you, Jopo!
+			// This grabs the entire dictionary of MODDED music-to-musicbox correlations.
 			FieldInfo field = typeof(SoundLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
 			itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
+
+			// Setup the Music Player UI.
 			if (!Main.dedServ) {
 				MusicPlayerUI = new MusicPlayerUI();
 				MusicPlayerUI.Activate();
@@ -110,6 +118,8 @@ namespace tMusicPlayer
 
 		public override void PostAddRecipes()
 		{
+			// After all PostSetupContent has occured, setup all the MusicData.
+			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
 			foreach (int itemID in itemToMusicReference.Keys) {
 				Item item = new Item();
 				item.SetDefaults(itemID);
@@ -120,6 +130,8 @@ namespace tMusicPlayer
 					AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
 				}
 			}
+
+			// Setup the canPlay list to match thie size of AllMusic, as well as the UI's item slots.
 			if (!Main.dedServ) {
 				MusicPlayerUI.canPlay = new List<bool>();
 				foreach (MusicData item in AllMusic) {
@@ -132,6 +144,7 @@ namespace tMusicPlayer
 
 		public override void UpdateUI(GameTime gameTime)
 		{
+			// Update Music Player UI as long as it exists.
 			UserInterface mP_UserInterface = MP_UserInterface;
 			if (mP_UserInterface != null) {
 				mP_UserInterface.Update(gameTime);
@@ -140,6 +153,8 @@ namespace tMusicPlayer
 
 		public override void Close()
 		{
+			// A temporary fix for unloaded music still playing.
+			// TODO: [1.4] Remove since we will no longer have music boxes for this mod.
 			int[] array = new int[4]
 			{
 				GetSoundSlot(SoundType.Music, "Sounds/Music/ConsoleSpace"),
@@ -157,6 +172,7 @@ namespace tMusicPlayer
 
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
+			// Draws the Music Player UI.
 			int index = layers.FindIndex((GameInterfaceLayer layer) => layer.Name.Equals("Vanilla: Inventory"));
 			if (index != -1) {
 				layers.Insert(index, new LegacyGameInterfaceLayer(
@@ -184,7 +200,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public static void SendDebugMessage(string message, Color color = default)
+		public static void SendDebugText(string message, Color color = default)
 		{
 			if (tMPConfig.EnableDebugMode) {
 				Main.NewText(message, color);

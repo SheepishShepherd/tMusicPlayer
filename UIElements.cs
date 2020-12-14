@@ -39,14 +39,13 @@ namespace tMusicPlayer
 				innerDimensions = GetInnerDimensions();
 				spriteBatch.Draw(val, innerDimensions.ToRectangle(), Color.White);
 			}
-			Draw(spriteBatch);
+			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !tMusicPlayer.MusicPlayerUI.smallPanel) {
 				int musicBoxDisplayed = (tMusicPlayer.MusicPlayerUI.listening && tMusicPlayer.MusicPlayerUI.ListenDisplay != -1) ? tMusicPlayer.MusicPlayerUI.ListenDisplay : tMusicPlayer.MusicPlayerUI.DisplayBox;
 				MusicData musicRef = tMusicPlayer.AllMusic[musicBoxDisplayed];
 				innerDimensions = GetInnerDimensions();
 				Rectangle rect = innerDimensions.ToRectangle();
-				Vector2 pos = default(Vector2);
-				pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 10));
+				Vector2 pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 10));
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f, 0f, 0f, -1);
 				pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 30));
 				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f, 0f, 0f, -1);
@@ -281,7 +280,7 @@ namespace tMusicPlayer
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
 						tMusicPlayer.MusicPlayerUI.canPlay[tMusicPlayer.AllMusic.FindIndex((MusicData x) => x.musicbox == musicBox.type)] = true;
-						tMusicPlayer.SendDebugMessage($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
+						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < 5) {
 						modplayer.musicBoxesStored++;
@@ -313,7 +312,7 @@ namespace tMusicPlayer
 			}
 			Texture2D backup = Main.inventoryBack2Texture;
 			Main.inventoryBack2Texture = (isEntrySlot ? Main.inventoryBack7Texture : Main.inventoryBack3Texture);
-			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle), default(Color));
+			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle));
 			Main.inventoryBack2Texture = backup;
 			Main.inventoryScale = oldScale;
 			if (isSelectionSlot) {
@@ -322,7 +321,7 @@ namespace tMusicPlayer
 					if (modplayer.MusicBoxList.All(x => x.Type != refItem)) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(refItem));
 						tMusicPlayer.MusicPlayerUI.canPlay[index2] = true;
-						tMusicPlayer.SendDebugMessage($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
+						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
 					}
 					if (IsMouseHovering && Main.mouseRight) {
 						tMusicPlayer.MusicPlayerUI.ListenDisplay = -1;
@@ -334,7 +333,7 @@ namespace tMusicPlayer
 				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.MusicBoxList.Any(x => x.Type == refItem)) {
 					modplayer.MusicBoxList.RemoveAll(x => x.Type == refItem);
 					tMusicPlayer.MusicPlayerUI.canPlay[index2] = tMusicPlayer.tMPConfig.EnableAllMusicBoxes;
-					tMusicPlayer.SendDebugMessage($"Removed Music Box [ID#{refItem}]", Color.IndianRed);
+					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{refItem}]", Color.IndianRed);
 					if (!tMusicPlayer.MusicPlayerUI.canPlay[index2]) {
 						int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
 						int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
@@ -612,7 +611,7 @@ namespace tMusicPlayer
 				if (IsMouseHovering) {
 					Main.hoverItemName = text;
 				}
-				Draw(spriteBatch);
+				base.Draw(spriteBatch);
 				if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 					Main.LocalPlayer.mouseInterface = true;
 				}

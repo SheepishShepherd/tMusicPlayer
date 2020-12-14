@@ -1,13 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
@@ -519,7 +517,7 @@ namespace tMusicPlayer
 				if (tMusicPlayer.tMPConfig.EnableDebugMode) {
 					string green = Utils.Hex3(Color.ForestGreen);
 					string red = Utils.Hex3(Color.IndianRed);
-					tMusicPlayer.SendDebugMessage($"[c/{(playingMusic > -1 ? green : red)}:Playing] - [c/{(listening ? green : red)}:Listening] - [c/{(recording ? green : red)}:Recording]");
+					tMusicPlayer.SendDebugText($"[c/{(playingMusic > -1 ? green : red)}:Playing] - [c/{(listening ? green : red)}:Listening] - [c/{(recording ? green : red)}:Recording]");
 				}
 			}
 		}

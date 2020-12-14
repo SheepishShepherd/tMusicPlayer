@@ -6,6 +6,7 @@ using Terraria.ObjectData;
 
 namespace tMusicPlayer.Tiles
 {
+	// TODO: [1.4] Remove all tiles. No longer needed as the 1.4 update reimplements console music.
 	public class MusicBoxConsoleOcean : ModTile
 	{
 		public override void SetDefaults()
@@ -17,23 +18,23 @@ namespace tMusicPlayer.Tiles
 			TileObjectData.newTile.LavaDeath = false;
 			TileObjectData.newTile.DrawYOffset = 2;
 			TileObjectData.addTile((int)Type);
-			base.disableSmartCursor = true;
-			ModTranslation val = this.CreateMapEntryName((string)null);
-			val.SetDefault("Music Box");
-			this.AddMapEntry(new Color(200, 200, 200), val);
+			disableSmartCursor = true;
+			ModTranslation mapName = CreateMapEntryName();
+			mapName.SetDefault("Music Box");
+			AddMapEntry(new Color(200, 200, 200), mapName);
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleOcean>(), 1, false, 0, false, false);
+			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleOcean>());
 		}
 
 		public override void MouseOver(int i, int j)
 		{
-			Player localPlayer = Main.LocalPlayer;
-			localPlayer.noThrow = 2;
-			localPlayer.showItemIcon = true;
-			localPlayer.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleOcean>();
+			Player player = Main.LocalPlayer;
+			player.noThrow = 2;
+			player.showItemIcon = true;
+			player.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleOcean>();
 		}
 	}
 
@@ -48,23 +49,23 @@ namespace tMusicPlayer.Tiles
 			TileObjectData.newTile.LavaDeath = false;
 			TileObjectData.newTile.DrawYOffset = 2;
 			TileObjectData.addTile((int)Type);
-			base.disableSmartCursor = true;
-			ModTranslation val = this.CreateMapEntryName((string)null);
-			val.SetDefault("Music Box");
-			this.AddMapEntry(new Color(200, 200, 200), val);
+			disableSmartCursor = true;
+			ModTranslation mapName = CreateMapEntryName();
+			mapName.SetDefault("Music Box");
+			AddMapEntry(new Color(200, 200, 200), mapName);
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleSpace>(), 1, false, 0, false, false);
+			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleSpace>());
 		}
 
 		public override void MouseOver(int i, int j)
 		{
-			Player localPlayer = Main.LocalPlayer;
-			localPlayer.noThrow = 2;
-			localPlayer.showItemIcon = true;
-			localPlayer.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleSpace>();
+			Player player = Main.LocalPlayer;
+			player.noThrow = 2;
+			player.showItemIcon = true;
+			player.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleSpace>();
 		}
 	}
 
@@ -79,23 +80,23 @@ namespace tMusicPlayer.Tiles
 			TileObjectData.newTile.LavaDeath = false;
 			TileObjectData.newTile.DrawYOffset = 2;
 			TileObjectData.addTile((int)Type);
-			base.disableSmartCursor = true;
-			ModTranslation val = this.CreateMapEntryName((string)null);
-			val.SetDefault("Music Box");
-			this.AddMapEntry(new Color(200, 200, 200), val);
+			disableSmartCursor = true;
+			ModTranslation mapName = CreateMapEntryName();
+			mapName.SetDefault("Music Box");
+			AddMapEntry(new Color(200, 200, 200), mapName);
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleTitle>(), 1, false, 0, false, false);
+			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleTitle>());
 		}
 
 		public override void MouseOver(int i, int j)
 		{
-			Player localPlayer = Main.LocalPlayer;
-			localPlayer.noThrow = 2;
-			localPlayer.showItemIcon = true;
-			localPlayer.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleTitle>();
+			Player player = Main.LocalPlayer;
+			player.noThrow = 2;
+			player.showItemIcon = true;
+			player.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleTitle>();
 		}
 	}
 
@@ -110,23 +111,23 @@ namespace tMusicPlayer.Tiles
 			TileObjectData.newTile.LavaDeath = false;
 			TileObjectData.newTile.DrawYOffset = 2;
 			TileObjectData.addTile((int)Type);
-			base.disableSmartCursor = true;
-			ModTranslation val = this.CreateMapEntryName((string)null);
-			val.SetDefault("Music Box");
-			this.AddMapEntry(new Color(200, 200, 200), val);
+			disableSmartCursor = true;
+			ModTranslation mapName = CreateMapEntryName();
+			mapName.SetDefault("Music Box");
+			AddMapEntry(new Color(200, 200, 200), mapName);
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleTutorial>(), 1, false, 0, false, false);
+			Item.NewItem(i * 16, j * 16, 16, 48, ModContent.ItemType<Items.MusicBoxConsoleTutorial>());
 		}
 
 		public override void MouseOver(int i, int j)
 		{
-			Player localPlayer = Main.LocalPlayer;
-			localPlayer.noThrow = 2;
-			localPlayer.showItemIcon = true;
-			localPlayer.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleTutorial>();
+			Player player = Main.LocalPlayer;
+			player.noThrow = 2;
+			player.showItemIcon = true;
+			player.showItemIcon2 = ModContent.ItemType<Items.MusicBoxConsoleTutorial>();
 		}
 	}
 }

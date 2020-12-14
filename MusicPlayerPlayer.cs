@@ -36,6 +36,8 @@ namespace tMusicPlayer
 
 		public override void OnEnterWorld(Player player)
 		{
+			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
+			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
 			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
 			if (musicPlayerUI != null) {
 				for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
@@ -51,19 +53,25 @@ namespace tMusicPlayer
 
 		public override void PreUpdate()
 		{
+			// This code mimics the "Music Box Recording" process.
+			// Check if we have music boxes at the ready, if the player is in record mode and music is currently playing.
+			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			if (musicBoxesStored > 0 && tMusicPlayer.MusicPlayerUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
-				int index = tMusicPlayer.AllMusic.FindIndex((MusicData x) => x.music == Main.curMusic);
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
-					string name = tMusicPlayer.AllMusic[index].name;
-					Main.PlaySound(mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded"));
+					Main.PlaySound(mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
 					if (MusicBoxList.All(x => x.Type != musicBoxType)) {
+						// If we don't have it in our music player, automatically add it in.
 						MusicBoxList.Add(new ItemDefinition(musicBoxType));
 					}
 					else {
+						// If we do have it already, spawn the item.
 						player.QuickSpawnItem(musicBoxType);
 					}
-					tMusicPlayer.SendDebugMessage($"Music Box ({name}) obtained!", Color.BlanchedAlmond);
+					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
+
+					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
 					tMusicPlayer.MusicPlayerUI.recording = false;
 					musicBoxesStored--;
 				}
@@ -72,6 +80,9 @@ namespace tMusicPlayer
 
 		public override void PostUpdateEquips()
 		{
+			// Currently, the best way to override music is to equip a music box in one of your accessory slots.
+			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
+			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
 			if (!Main.gameMenu && tMusicPlayer.MusicPlayerUI != null && tMusicPlayer.MusicPlayerUI.playingMusic > -1) {
 				Main.musicBox2 = tMusicPlayer.AllMusic[tMusicPlayer.MusicPlayerUI.DisplayBox].music;
 			}

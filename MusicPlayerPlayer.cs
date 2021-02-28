@@ -84,7 +84,7 @@ namespace tMusicPlayer
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
 			if (!Main.gameMenu && tMusicPlayer.MusicPlayerUI != null && tMusicPlayer.MusicPlayerUI.playingMusic > -1) {
-				Main.musicBox2 = tMusicPlayer.AllMusic[tMusicPlayer.MusicPlayerUI.DisplayBox].music;
+				Main.musicBox2 = tMusicPlayer.MusicPlayerUI.playingMusic;
 			}
 		}
 	}

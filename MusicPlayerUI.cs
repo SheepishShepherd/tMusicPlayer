@@ -17,6 +17,7 @@ namespace tMusicPlayer
 		public bool mpToggleVisibility = true;
 		public MusicBoxSlot DisplayMusicSlot;
 
+		// Musicplayer buttons
 		public HoverButton prevButton;
 		public HoverButton playButton;
 		public HoverButton nextButton;
@@ -24,6 +25,12 @@ namespace tMusicPlayer
 		public HoverButton detectButton;
 		public HoverButton recordButton;
 		public HoverButton expandButton;
+
+		// Song selection buttons
+		public HoverButton sortButton;
+		public HoverButton filterModButton;
+		public HoverButton availabilityButton;
+		public HoverButton viewModeButton;
 
 		public bool smallPanel = true;
 		public bool listening = false;
@@ -35,7 +42,7 @@ namespace tMusicPlayer
 
 		public BackDrop selectionPanel;
 		public BackDrop searchBarPanel;
-
+		
 		public NewUITextBox searchBar;
 		public MusicBoxSlot AddMusicBoxSlot;
 		public ListenStorageSlot MusicStorageSlot;
@@ -44,10 +51,7 @@ namespace tMusicPlayer
 		public FixedUIScrollbar selectionScrollBar;
 		public MusicBoxSlot[] SelectionSlots;
 		internal List<bool> canPlay;
-
-		public UIFilter MusicSorter;
-		public UIFilter MusicFilter;
-		public UIFilter MusicFilter_Cycle;
+		internal bool viewMode = false;
 
 		public bool selectionVisible = false;
 
@@ -57,10 +61,11 @@ namespace tMusicPlayer
 		public static Texture2D closeTextures;
 		public static Texture2D[] filterTextures;
 
-		public SortBy sortType = SortBy.Music;
-		public FilterBy filterType = FilterBy.None;
-		public bool obtained;
-		public string FilterMod = "Terraria";
+		public SortBy sortType = SortBy.ID;
+		public ProgressBy availabililty = ProgressBy.None;
+		public string FilterMod = "";
+		internal List<string> ModList;
+
 
 		public override void OnInitialize()
 		{
@@ -164,7 +169,7 @@ namespace tMusicPlayer
 			expandButton.Top.Pixels = 4f;
 			expandButton.OnClick += (a, b) => SwapPanelSize();
 			MusicPlayerPanel.Append(expandButton);
-
+			
 			DisplayMusicSlot = new MusicBoxSlot(0, 1f) {
 				Id = "DisplaySlot"
 			};
@@ -182,6 +187,45 @@ namespace tMusicPlayer
 			searchBarPanel = new BackDrop(panelTextures[4]) {
 				Id = "SearchBar"
 			};
+
+			sortButton = new HoverButton(buttonTextures, new Rectangle(0, 48, 22, 22)) {
+				Id = "sortby"
+			};
+			sortButton.Width.Pixels = 22f;
+			sortButton.Height.Pixels = 22f;
+			sortButton.Left.Pixels = 0;
+			sortButton.Top.Pixels = 15;
+			sortButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, true);
+			sortButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, false);
+
+			filterModButton = new HoverButton(buttonTextures, new Rectangle(48, 48, 22, 22)) {
+				Id = "filtermod"
+			};
+			filterModButton.Width.Pixels = 22f;
+			filterModButton.Height.Pixels = 22f;
+			filterModButton.Left.Pixels = 24;
+			filterModButton.Top.Pixels = 15;
+			filterModButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.FilterMod, true);
+			filterModButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.FilterMod, false);
+
+			availabilityButton = new HoverButton(buttonTextures, new Rectangle(72, 48, 22, 22)) {
+				Id = "availability"
+			};
+			availabilityButton.Width.Pixels = 22f;
+			availabilityButton.Height.Pixels = 22f;
+			availabilityButton.Left.Pixels = 48;
+			availabilityButton.Top.Pixels = 15;
+			availabilityButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Availability, true);
+			availabilityButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Availability, false);
+
+			viewModeButton = new HoverButton(buttonTextures, new Rectangle(144, 48, 22, 22)) {
+				Id = "viewmode"
+			};
+			viewModeButton.Width.Pixels = 22f;
+			viewModeButton.Height.Pixels = 22f;
+			viewModeButton.Left.Pixels = 72;
+			viewModeButton.Top.Pixels = 15;
+			viewModeButton.OnClick += (a, b) => viewMode = !viewMode;
 
 			searchBarPanel.Width.Pixels = (float)panelTextures[4].Width;
 			searchBarPanel.Height.Pixels = (float)panelTextures[4].Height;
@@ -228,42 +272,16 @@ namespace tMusicPlayer
 			closeButton.Height.Pixels = 18f;
 			closeButton.Left.Pixels = selectionPanel.Width.Pixels - closeButton.Width.Pixels - 11f;
 			closeButton.Top.Pixels = 12f;
-			closeButton.OnClick += (a, b) => mpToggleVisibility = !mpToggleVisibility;
+			closeButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
 			selectionPanel.Append(closeButton);
-
-			MusicSorter = new UIFilter(filterTextures[3], 0);
-			MusicSorter.Width.Pixels = 30f;
-			MusicSorter.Height.Pixels = 30f;
-			MusicSorter.Left.Pixels = 20f;
-			MusicSorter.Top.Pixels = 15f;
-			MusicSorter.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, true);
-			MusicSorter.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, true);
-			selectionPanel.Append(MusicSorter);
-
-			MusicFilter = new UIFilter(filterTextures[3], 1);
-			MusicFilter.Width.Pixels = 30f;
-			MusicFilter.Height.Pixels = 30f;
-			MusicFilter.Left.Pixels = 55f;
-			MusicFilter.Top.Pixels = 15f;
-			MusicFilter.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Filter, true);
-			MusicFilter.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Filter, false);
-			selectionPanel.Append(MusicFilter);
-
-			MusicFilter_Cycle = new UIFilter(filterTextures[3], 2);
-			MusicFilter_Cycle.Width.Pixels = 30f;
-			MusicFilter_Cycle.Height.Pixels = 30f;
-			MusicFilter_Cycle.Left.Pixels = 90f;
-			MusicFilter_Cycle.Top.Pixels = 15f;
-			MusicFilter_Cycle.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.CycleFilter, true);
-			MusicFilter_Cycle.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.CycleFilter, true);
-			selectionPanel.Append(MusicFilter_Cycle);
 		}
 
 		public override void Update(GameTime gameTime)
 		{
-			Update(gameTime);
+			base.Update(gameTime);
 			if (Main.gameMenu) {
-				playingMusic = (ListenDisplay = -1);
+				playingMusic = -1;
+				ListenDisplay = -1;
 				listening = false;
 			}
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
@@ -285,7 +303,6 @@ namespace tMusicPlayer
 			this.AddOrRemoveChild(MusicPlayerPanel, Main.playerInventory && mpToggleVisibility);
 			this.AddOrRemoveChild(selectionPanel, selectionVisible);
 			this.AddOrRemoveChild(searchBarPanel, selectionVisible);
-			selectionPanel.AddOrRemoveChild(MusicFilter_Cycle, filterType != FilterBy.None);
 
 			searchBarPanel.Left.Pixels = selectionPanel.Left.Pixels + selectionPanel.Width.Pixels - searchBarPanel.Width.Pixels - 10f;
 			searchBarPanel.Top.Pixels = selectionPanel.Top.Pixels - searchBarPanel.Height.Pixels;
@@ -302,7 +319,7 @@ namespace tMusicPlayer
 			}
 			if (!selectionVisible) {
 				searchBar.currentString = "";
-				OrganizeSelection(new List<MusicData>(tMusicPlayer.AllMusic), sortType, filterType, false);
+				OrganizeSelection(null, sortType, false);
 			}
 		}
 
@@ -336,92 +353,62 @@ namespace tMusicPlayer
 			}
 		}
 
-		public void CycleModFilter(bool next)
-		{
-			List<MusicData> musicData = new List<MusicData>(tMusicPlayer.AllMusic);
-			List<string> mods = new List<string>();
-			foreach (MusicData item in musicData) {
-				if (!mods.Contains(item.mod)) {
-					mods.Add(item.mod);
-				}
-			}
-			mods.Sort();
-			mods.Remove("Terraria");
-			mods.Insert(0, "Terraria");
-			int indexOfCurrent = mods.IndexOf(FilterMod);
-			if (next && indexOfCurrent == mods.Count - 1) {
-				FilterMod = "Terraria";
-			}
-			else if (!next && indexOfCurrent == 0) {
-				FilterMod = mods[mods.Count - 1];
-			}
-			else {
-				FilterMod = mods[indexOfCurrent + 1];
-			}
-		}
-
 		public void ChangeSortOrFilter(ButtonType type, bool next)
 		{
-			switch (type) {
-				case ButtonType.Sort:
-					if (next) {
-						if (sortType == SortBy.Name) {
-							sortType = SortBy.Music;
-						}
-						else {
-							sortType++;
-						}
-					}
-					else if (sortType == SortBy.Music) {
-						sortType = SortBy.Name;
-					}
-					else {
-						sortType--;
-					}
-					break;
-				case ButtonType.Filter:
-					if (next) {
-						if (filterType == FilterBy.Availability) {
-							filterType = FilterBy.None;
-						}
-						else {
-							filterType++;
-						}
-					}
-					else if (filterType == FilterBy.None) {
-						filterType = FilterBy.Availability;
-					}
-					else {
-						filterType--;
-					}
-					if (filterType == FilterBy.Mod) {
-						FilterMod = "Terraria";
-					}
-					obtained = true;
-					break;
-				case ButtonType.CycleFilter:
-					if (filterType == FilterBy.Availability) {
-						obtained = !obtained;
-					}
-					else {
-						CycleModFilter(next);
-					}
-					break;
+			// TODO: recreate buttons to give this hook functionailty
+			if (type == ButtonType.Sort) {
+				if (sortType == SortBy.ID) {
+					sortType = SortBy.Name;
+				}
+				else {
+					sortType = SortBy.ID;
+				}
 			}
-			OrganizeSelection(new List<MusicData>(tMusicPlayer.AllMusic), sortType, filterType, false);
+			else if (type == ButtonType.FilterMod) {
+				int indexOfCurrent = ModList.IndexOf(FilterMod);
+				if (next && indexOfCurrent == ModList.Count - 1) {
+					FilterMod = "";
+				}
+				else if (!next && indexOfCurrent == 0) {
+					FilterMod = ModList[ModList.Count - 1];
+				}
+				else {
+					if (next) {
+						FilterMod = ModList[indexOfCurrent + 1];
+					}
+					else {
+						FilterMod = ModList[indexOfCurrent - 1];
+					}
+				}
+				tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
+			}
+			else if (type == ButtonType.Availability) {
+				if (availabililty == ProgressBy.None && !next) {
+					availabililty = ProgressBy.Unobtained;
+				}
+				else if (availabililty == ProgressBy.Unobtained && next) {
+					availabililty = ProgressBy.None;
+				}
+				else {
+					if (next) {
+						availabililty++;
+					}
+					else {
+						availabililty--;
+					}
+				}
+			}
+			OrganizeSelection(null, sortType, false);
 		}
 
-		internal void OrganizeSelection(List<MusicData> list, SortBy sort, FilterBy filter, bool initializing = false)
+		internal void OrganizeSelection(List<MusicData> list = null, SortBy sort = SortBy.ID, bool initializing = false)
 		{
 			if (list == null) {
 				list = new List<MusicData>(tMusicPlayer.AllMusic);
 			}
-
-			if (sort == SortBy.Music) {
-				list = list.OrderBy(x => x.music).ToList();
-			}
+			
 			if (sort == SortBy.ID) {
-				list = list.OrderBy(x => x.musicbox).ToList();
+				list = list.OrderBy(x => x.music).ToList();
 			}
 			if (sort == SortBy.Name) {
 				list = list.OrderBy(x => x.name).ToList();
@@ -431,9 +418,12 @@ namespace tMusicPlayer
 				selectionPanel.RemoveAllChildren();
 				selectionPanel.Append(AddMusicBoxSlot);
 				selectionPanel.Append(closeButton);
-				selectionPanel.Append(MusicSorter);
-				selectionPanel.Append(MusicFilter);
-				selectionPanel.Append(MusicFilter_Cycle);
+
+				selectionPanel.Append(sortButton);
+				selectionPanel.Append(filterModButton);
+				selectionPanel.Append(availabilityButton);
+				selectionPanel.Append(viewModeButton);
+
 				selectionPanel.Append(MusicStorageSlot);
 			}
 
@@ -445,16 +435,22 @@ namespace tMusicPlayer
 			};
 			int col = 0;
 			int row = 0;
-			for (int i = 0; i < SelectionSlots.Length; i++) {
+			for (int i = 0; i < list.Count; i++) {
+				// Check all the optional filters to see if one is active
+				// Filters will not apply during intialization
 				if (!initializing) {
 					MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-					if (filter == FilterBy.Mod && (list[i].mod.ToLower() == FilterMod.ToLower())) {
+
+					// Filter by Mod (or Vanilla)
+					if (FilterMod != "" && (list[i].mod.ToLower() != FilterMod.ToLower())) {
 						continue;
 					}
-					if (filter == FilterBy.Availability && obtained && modplayer.MusicBoxList.All(x => x.Type != list[i].musicbox)) {
+
+					// If Availability isn't 'None' check if the box is obtained or not
+					if (availabililty == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != list[i].musicbox)) {
 						continue;
 					}
-					if (filter == FilterBy.Availability && !obtained && modplayer.MusicBoxList.Any(x => x.Type == list[i].musicbox)) {
+					else if (availabililty == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == list[i].musicbox)) {
 						continue;
 					}
 				}
@@ -488,7 +484,7 @@ namespace tMusicPlayer
 				switch (type) {
 					case MusicMode.Play:
 						if (!listening) {
-							playingMusic = ((playingMusic == -1) ? DisplayBox : (-1));
+							playingMusic = (playingMusic == -1) ? DisplayBox : -1;
 							if (playingMusic != -1) {
 								listening = false;
 							}
@@ -561,14 +557,7 @@ namespace tMusicPlayer
 	public enum ButtonType
 	{
 		Sort,
-		Filter,
-		CycleFilter
-	}
-
-	public enum FilterBy
-	{
-		None,
-		Mod,
+		FilterMod,
 		Availability
 	}
 
@@ -581,9 +570,14 @@ namespace tMusicPlayer
 
 	public enum SortBy
 	{
-		Music,
 		ID,
 		Name
 	}
 
+	public enum ProgressBy
+	{
+		None,
+		Obtained,
+		Unobtained
+	}
 }

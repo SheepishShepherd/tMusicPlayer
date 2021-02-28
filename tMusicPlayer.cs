@@ -120,8 +120,8 @@ namespace tMusicPlayer
 		{
 			// After all PostSetupContent has occured, setup all the MusicData.
 			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
+			Item item = new Item();
 			foreach (int itemID in itemToMusicReference.Keys) {
-				Item item = new Item();
 				item.SetDefaults(itemID);
 				string displayName = item.modItem.mod.DisplayName;
 				string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
@@ -130,15 +130,30 @@ namespace tMusicPlayer
 					AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
 				}
 			}
+			item.TurnToAir();
 
 			// Setup the canPlay list to match thie size of AllMusic, as well as the UI's item slots.
 			if (!Main.dedServ) {
 				MusicPlayerUI.canPlay = new List<bool>();
-				foreach (MusicData item in AllMusic) {
+				foreach (MusicData box in AllMusic) {
 					MusicPlayerUI.canPlay.Add(false);
 				}
 				MusicPlayerUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-				MusicPlayerUI.OrganizeSelection(new List<MusicData>(AllMusic), SortBy.Music, FilterBy.None, true);
+				MusicPlayerUI.OrganizeSelection(null, SortBy.ID, true);
+				
+				// Setup the mod list for the Mod Filter
+				// Must occur after all other modded music is established
+				MusicPlayerUI.ModList = new List<string>();
+				List<MusicData> musicData = new List<MusicData>(tMusicPlayer.AllMusic);
+				foreach (MusicData box in musicData) {
+					if (!MusicPlayerUI.ModList.Contains(box.mod)) {
+						MusicPlayerUI.ModList.Add(box.mod);
+					}
+				}
+				MusicPlayerUI.ModList.Sort();
+				MusicPlayerUI.ModList.Remove("Terraria");
+				MusicPlayerUI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
+				MusicPlayerUI.ModList.Insert(0, ""); // Put 'default' aka no filter above all others
 			}
 		}
 

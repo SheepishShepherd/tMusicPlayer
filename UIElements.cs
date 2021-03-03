@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.ID;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
 
@@ -27,31 +28,38 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			CalculatedStyle innerDimensions;
+			Rectangle rect = GetInnerDimensions().ToRectangle();
 			if (Id == "SelectionPanel") {
-				Texture2D obj = MusicPlayerUI.panelTextures[3];
-				innerDimensions = GetInnerDimensions();
-				spriteBatch.Draw(obj, innerDimensions.ToRectangle(), Color.White);
+				Texture2D texture = MusicPlayerUI.panelTextures[3];
+				spriteBatch.Draw(texture, rect, Color.White);
 			}
 			else if (Id == "MusicPlayerPanel") {
 				Texture2D texture = tMusicPlayer.MusicPlayerUI.smallPanel ? MusicPlayerUI.panelTextures[1] : MusicPlayerUI.panelTextures[2];
-				Texture2D val = texture;
-				innerDimensions = GetInnerDimensions();
-				spriteBatch.Draw(val, innerDimensions.ToRectangle(), Color.White);
+				spriteBatch.Draw(texture, rect, Color.White);
+			}
+			else if (Id == "MusicEntry") {
+				Texture2D obj = MusicPlayerUI.panelTextures[1];
+				// TODO: Simplify/make better later
+				spriteBatch.Draw(obj, new Rectangle(rect.X + obj.Bounds.Height + 2, rect.Y, obj.Width, obj.Height), obj.Bounds, Color.White, MathHelper.ToRadians(90), Vector2.Zero, SpriteEffects.None, 0f);
 			}
 			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !tMusicPlayer.MusicPlayerUI.smallPanel) {
 				int musicBoxDisplayed = (tMusicPlayer.MusicPlayerUI.listening && tMusicPlayer.MusicPlayerUI.ListenDisplay != -1) ? tMusicPlayer.MusicPlayerUI.ListenDisplay : tMusicPlayer.MusicPlayerUI.DisplayBox;
 				MusicData musicRef = tMusicPlayer.AllMusic[musicBoxDisplayed];
-				innerDimensions = GetInnerDimensions();
-				Rectangle rect = innerDimensions.ToRectangle();
 				Vector2 pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 10));
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f, 0f, 0f, -1);
 				pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 30));
 				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f, 0f, 0f, -1);
-				if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-					Main.LocalPlayer.mouseInterface = true;
-				}
+			}
+			
+			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+				// Needed to remove mousetext from outside sources when using the Boss Log
+				Main.player[Main.myPlayer].mouseInterface = true;
+				Main.mouseText = true;
+				// Item icons such as hovering over a bed will not appear
+				Main.LocalPlayer.showItemIcon = false;
+				Main.LocalPlayer.showItemIcon2 = -1;
+				Main.ItemIconCacheUpdate(0);
 			}
 		}
 
@@ -147,9 +155,14 @@ namespace tMusicPlayer
 			this.src = src;
 		}
 
-		public bool UseAlternateTexture(string ID)
+		public bool UseAlternateTexture()
 		{
-			switch (ID) {
+			if (Id.Contains("altplay_")) {
+				int num = Convert.ToInt32(Parent.Id.Substring(Parent.Id.IndexOf("_") + 1));
+				// TODO: Remove '- 1' when MusicID issue is fixed
+				return tMusicPlayer.MusicPlayerUI.playingMusic - 1 == num;
+			}
+			switch (Id) {
 				case "expand":
 					return !tMusicPlayer.MusicPlayerUI.smallPanel;
 				case "play":
@@ -158,11 +171,8 @@ namespace tMusicPlayer
 					return tMusicPlayer.MusicPlayerUI.listening;
 				case "record":
 					return !tMusicPlayer.MusicPlayerUI.recording;
-				case "sortby":
-					return tMusicPlayer.MusicPlayerUI.sortType == SortBy.Name;
-				//TODO: Availability
 				case "viewmode":
-					return tMusicPlayer.MusicPlayerUI.viewMode;
+					return !tMusicPlayer.MusicPlayerUI.viewMode;
 				default:
 					return false;
 			}
@@ -170,7 +180,7 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			bool useAlt = UseAlternateTexture(Id);
+			bool useAlt = UseAlternateTexture();
 			bool firstOrLast = (Id == "prev" && tMusicPlayer.MusicPlayerUI.DisplayBox == 0) || (Id == "next" && tMusicPlayer.MusicPlayerUI.DisplayBox == tMusicPlayer.AllMusic.Count - 1);
 			int indexPrev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
 			int indexNext = tMusicPlayer.MusicPlayerUI.FindNextIndex();
@@ -179,7 +189,8 @@ namespace tMusicPlayer
 			bool recordUnavail = Id == "record" && modplayer.musicBoxesStored <= 0;
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && tMusicPlayer.MusicPlayerUI.listening;
 			bool musicAtZero = Id != "expand" && Id != "view" && Main.musicVolume <= 0f;
-			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero;
+			bool clearModDisabled = Id == "clearfiltermod" && tMusicPlayer.MusicPlayerUI.FilterMod == "";
+			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled;
 			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			Texture2D val = texture;
 			CalculatedStyle innerDimensions = GetInnerDimensions();
@@ -215,6 +226,8 @@ namespace tMusicPlayer
 					return $"Showing {(tMusicPlayer.MusicPlayerUI.FilterMod == "" ? "all " : "")}music boxes{(tMusicPlayer.MusicPlayerUI.FilterMod != "" ? " from " : "")}{tMusicPlayer.MusicPlayerUI.FilterMod}";
 				case "availability":
 					return $"Showing all {(tMusicPlayer.MusicPlayerUI.availabililty == ProgressBy.Obtained ? "obtained " : "")}{(tMusicPlayer.MusicPlayerUI.availabililty == ProgressBy.Unobtained ? "unobtained " : "")}music boxes";
+				case "viewmode":
+					return tMusicPlayer.MusicPlayerUI.viewMode ? "Change to Grid mode" : "Change to List mode";
 				default:
 					return "";
 			}
@@ -225,11 +238,11 @@ namespace tMusicPlayer
 	{
 		private int order;
 
-		public ItemSlotRow(int order)
+		public ItemSlotRow(int order, float width, float height)
 		{
 			this.order = order;
-			Height.Pixels = 50f;
 			Width.Pixels = 400f;
+			Height.Pixels = 50f;
 		}
 
 		public override int CompareTo(object obj)
@@ -334,7 +347,7 @@ namespace tMusicPlayer
 						tMusicPlayer.MusicPlayerUI.canPlay[index] = true;
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
 					}
-					if (IsMouseHovering && Main.mouseRight) {
+					if (IsMouseHovering && Main.mouseRight && Id.Contains("Grid")) {
 						tMusicPlayer.MusicPlayerUI.ListenDisplay = -1;
 						tMusicPlayer.MusicPlayerUI.listening = false;
 						tMusicPlayer.MusicPlayerUI.DisplayBox = index;
@@ -391,7 +404,7 @@ namespace tMusicPlayer
 	{
 		internal bool focused = false;
 
-		private int _maxLength = 60;
+		private int _maxLength = 40;
 		private string hintText;
 		internal string currentString = "";
 
@@ -399,13 +412,6 @@ namespace tMusicPlayer
 		private int textBlinkerState;
 		internal bool unfocusOnEnter = true;
 		internal bool unfocusOnTab = true;
-
-		public event Action OnFocus;
-		public event Action OnUnfocus;
-		public event Action OnTextChanged;
-		public event Action OnTabPressed;
-		public event Action OnEnterPressed;
-		public event Action OnEscPressed;
 
 		public NewUITextBox(string hintText, string text = "") : base(text)
 		{
@@ -424,14 +430,8 @@ namespace tMusicPlayer
 
 		public override void RightClick(UIMouseEvent evt)
 		{
-			RightClick(evt);
+			base.RightClick(evt);
 			SetText("");
-		}
-
-		public void SetUnfocusKeys(bool unfocusOnEnter, bool unfocusOnTab)
-		{
-			this.unfocusOnEnter = unfocusOnEnter;
-			this.unfocusOnTab = unfocusOnTab;
 		}
 
 		public void Unfocus()
@@ -439,7 +439,6 @@ namespace tMusicPlayer
 			if (focused) {
 				focused = false;
 				Main.blockInput = false;
-				OnUnfocus?.Invoke();
 			}
 		}
 
@@ -449,7 +448,6 @@ namespace tMusicPlayer
 				Main.clrInput();
 				focused = true;
 				Main.blockInput = true;
-				OnFocus?.Invoke();
 			}
 		}
 
@@ -471,7 +469,6 @@ namespace tMusicPlayer
 			}
 			if (currentString != text) {
 				currentString = text;
-				OnTextChanged?.Invoke();
 			}
 		}
 
@@ -484,7 +481,12 @@ namespace tMusicPlayer
 		{
 			CalculatedStyle innerDimensions = GetInnerDimensions();
 			Rectangle hitbox = innerDimensions.ToRectangle();
-			base.DrawSelf(spriteBatch);
+			//base.DrawSelf(spriteBatch);
+			Texture2D searchbar = ModContent.GetTexture("tMusicPlayer/UI/search");
+			spriteBatch.Draw(searchbar, GetDimensions().Position(), Color.White);
+			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+				Main.LocalPlayer.mouseInterface = true;
+			}
 			if (focused) {
 				PlayerInput.WritingText = true;
 				Main.instance.HandleIME();
@@ -492,7 +494,6 @@ namespace tMusicPlayer
 				if (Main.fontMouseText.MeasureString(newString.ToLower()).X < Width.Pixels - 10f) {
 					if (!newString.Equals(currentString)) {
 						currentString = newString.ToLower();
-						OnTextChanged?.Invoke();
 					}
 					else {
 						currentString = newString.ToLower();
@@ -500,54 +501,51 @@ namespace tMusicPlayer
 					MusicPlayerUI ui = tMusicPlayer.MusicPlayerUI;
 					if (currentString.Length > 0) {
 						List<MusicData> musicData = new List<MusicData>();
-						foreach (MusicData item in tMusicPlayer.AllMusic) {
+						foreach (MusicData item in tMusicPlayer.AllMusic.ToArray()) {
 							if (item.name.ToLower().Contains(currentString)) {
 								musicData.Add(item);
 							}
 						}
-						ui.OrganizeSelection(musicData, ui.sortType, false);
+						ui.OrganizeSelection(musicData, ui.sortType, ui.availabililty, ui.FilterMod);
 					}
 					else {
-						ui.OrganizeSelection(null, ui.sortType, false);
+						ui.OrganizeSelection(null, ui.sortType, ui.availabililty, ui.FilterMod);
 					}
 				}
 				if (JustPressed(Keys.Tab)) {
 					if (unfocusOnTab) {
 						Unfocus();
 					}
-					OnTabPressed?.Invoke();
 				}
 				if (JustPressed(Keys.Escape)) {
 					if (unfocusOnTab) {
 						Unfocus();
 					}
-					OnEscPressed?.Invoke();
 				}
 				if (JustPressed(Keys.Enter)) {
 					Main.drawingPlayerChat = false;
 					if (unfocusOnEnter) {
 						Unfocus();
 					}
-					OnEnterPressed?.Invoke();
 				}
 				if (++textBlinkerCount >= 20) {
 					textBlinkerState = (textBlinkerState + 1) % 2;
 					textBlinkerCount = 0;
 				}
-				Main.instance.DrawWindowsIMEPanel(new Vector2(98f, (float)(Main.screenHeight - 36)), 0f);
+				Main.instance.DrawWindowsIMEPanel(new Vector2(198f, (float)(Main.screenHeight - 36)), 0f);
 			}
 			string displayString = currentString;
 			if (textBlinkerState == 1 && focused) {
 				displayString += "|";
 			}
-			CalculatedStyle space = GetDimensions();
-			Color color2 = Color.Black;
-			Vector2 drawPos = space.Position() + new Vector2(4f, 2f);
+			Color color2 = Color.White;
+			Vector2 drawPos = GetDimensions().Position() + new Vector2(32f, 3f);
 			if (currentString.Length == 0 && !focused) {
-				color2 *= 0.5f;
+				color2 *= 0.6f;
 				DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, Main.fontMouseText, hintText, drawPos, color2);
 			}
 			else {
+				color2 *= 0.8f;
 				DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, Main.fontMouseText, displayString, drawPos, color2);
 			}
 		}

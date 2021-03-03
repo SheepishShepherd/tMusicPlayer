@@ -139,7 +139,7 @@ namespace tMusicPlayer
 					MusicPlayerUI.canPlay.Add(false);
 				}
 				MusicPlayerUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-				MusicPlayerUI.OrganizeSelection(null, SortBy.ID, true);
+				MusicPlayerUI.OrganizeSelection(null, SortBy.ID, ProgressBy.None, "", true);
 				
 				// Setup the mod list for the Mod Filter
 				// Must occur after all other modded music is established
@@ -200,7 +200,7 @@ namespace tMusicPlayer
 					},
 					InterfaceScaleType.UI)
 				);
-
+				/*
 				// TODO: reimplement right click to play song text in selection menu
 				layers.Insert(index + 1, new LegacyGameInterfaceLayer(
 					"tMusicPlayer: Right-click text",
@@ -212,6 +212,7 @@ namespace tMusicPlayer
 					},
 					InterfaceScaleType.UI)
 				);
+				*/
 			}
 		}
 

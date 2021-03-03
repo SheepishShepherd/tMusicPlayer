@@ -62,8 +62,8 @@ namespace tMusicPlayer
 					musicPlayerUI.MusicPlayerPanel.Top.Pixels = 6f;
 					musicPlayerUI.selectionPanel.Left.Pixels = (float)(Main.screenWidth / 2) - musicPlayerUI.selectionPanel.Width.Pixels / 2f;
 					musicPlayerUI.selectionPanel.Top.Pixels = (float)(Main.screenHeight / 2) - musicPlayerUI.selectionPanel.Height.Pixels / 2f;
-					musicPlayerUI.searchBarPanel.Left.Pixels = musicPlayerUI.selectionPanel.Left.Pixels + musicPlayerUI.selectionPanel.Width.Pixels - musicPlayerUI.searchBarPanel.Width.Pixels - 10f;
-					musicPlayerUI.searchBarPanel.Top.Pixels = musicPlayerUI.selectionPanel.Top.Pixels - musicPlayerUI.searchBarPanel.Height.Pixels;
+					musicPlayerUI.musicEntryPanel.Left.Pixels = musicPlayerUI.selectionPanel.Left.Pixels + musicPlayerUI.selectionPanel.Width.Pixels - musicPlayerUI.musicEntryPanel.Width.Pixels - 10f;
+					musicPlayerUI.musicEntryPanel.Top.Pixels = musicPlayerUI.selectionPanel.Top.Pixels - musicPlayerUI.musicEntryPanel.Height.Pixels;
 					ResettingPanels = false;
 				}
 				if (EnableAllMusicBoxes) {

@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -26,10 +28,14 @@ namespace tMusicPlayer
 		public HoverButton recordButton;
 		public HoverButton expandButton;
 
-		// Song selection buttons
-		public HoverButton sortButton;
+		// TODO: Update Filter Buttons and add functionality
+		public HoverButton sortIDButton;
+		public HoverButton sortNameButton;
 		public HoverButton filterModButton;
-		public HoverButton availabilityButton;
+		public HoverButton clearFilterModButton;
+		public HoverButton clearAvailabilityButton;
+		public HoverButton obtainedButton;
+		public HoverButton unobtainedButton;
 		public HoverButton viewModeButton;
 
 		public bool smallPanel = true;
@@ -41,7 +47,7 @@ namespace tMusicPlayer
 		public int playingMusic = -1;
 
 		public BackDrop selectionPanel;
-		public BackDrop searchBarPanel;
+		public BackDrop musicEntryPanel;
 		
 		public NewUITextBox searchBar;
 		public MusicBoxSlot AddMusicBoxSlot;
@@ -54,32 +60,28 @@ namespace tMusicPlayer
 		internal bool viewMode = false;
 
 		public bool selectionVisible = false;
-
-		public const string path = "tMusicPlayer/UI/";
+		
 		public static Texture2D[] panelTextures;
 		public static Texture2D buttonTextures;
 		public static Texture2D closeTextures;
-		public static Texture2D[] filterTextures;
 
 		public SortBy sortType = SortBy.ID;
 		public ProgressBy availabililty = ProgressBy.None;
 		public string FilterMod = "";
 		internal List<string> ModList;
-
-
+		
 		public override void OnInitialize()
 		{
-			panelTextures = new Texture2D[5]
-			{
-				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/backdrop"), new Rectangle(0, 0, 1, 1)),
+			panelTextures = new Texture2D[5] {
+				CropTexture(ModContent.GetTexture($"tMusicPlayer/UI/backdrop"), new Rectangle(0, 0, 1, 1)),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop"),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop2"),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop3"),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop4")
 			};
 
-			filterTextures = new Texture2D[9]
-			{
+			/*
+			filterTextures = new Texture2D[9] {
 				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/filters"), new Rectangle(0, 0, 30, 30)),
 				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/filters"), new Rectangle(32, 0, 30, 30)),
 				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/filters"), new Rectangle(64, 0, 30, 30)),
@@ -90,7 +92,8 @@ namespace tMusicPlayer
 				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/filters"), new Rectangle(32, 64, 30, 30)),
 				CropTexture(ModContent.GetTexture("tMusicPlayer/UI/filters"), new Rectangle(64, 64, 30, 30))
 			};
-
+			*/
+			
 			buttonTextures = ModContent.GetTexture("tMusicPlayer/UI/buttons");
 			closeTextures = ModContent.GetTexture("tMusicPlayer/UI/close");
 
@@ -184,85 +187,137 @@ namespace tMusicPlayer
 			selectionPanel.Height.Pixels = (float)panelTextures[3].Height;
 			selectionPanel.Left.Pixels = (float)(Main.screenWidth / 2) - selectionPanel.Width.Pixels / 2f;
 			selectionPanel.Top.Pixels = (float)(Main.screenHeight / 2) - selectionPanel.Height.Pixels / 2f;
-			searchBarPanel = new BackDrop(panelTextures[4]) {
-				Id = "SearchBar"
-			};
 
-			sortButton = new HoverButton(buttonTextures, new Rectangle(0, 48, 22, 22)) {
-				Id = "sortby"
-			};
-			sortButton.Width.Pixels = 22f;
-			sortButton.Height.Pixels = 22f;
-			sortButton.Left.Pixels = 0;
-			sortButton.Top.Pixels = 15;
-			sortButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, true);
-			sortButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Sort, false);
+			// Positioning base for filter buttons
+			float center = (selectionPanel.Width.Pixels / 2) - 11;
 
-			filterModButton = new HoverButton(buttonTextures, new Rectangle(48, 48, 22, 22)) {
+			sortIDButton = new HoverButton(buttonTextures, new Rectangle(0 * 24, 48, 22, 22)) {
+				Id = "sortid"
+			};
+			sortIDButton.Width.Pixels = 22f;
+			sortIDButton.Height.Pixels = 22f;
+			sortIDButton.Left.Pixels = center - (20 * 3) - 8;
+			sortIDButton.Top.Pixels = 42;
+			sortIDButton.OnClick += (a, b) => OrganizeSelection(null, SortBy.ID, availabililty, FilterMod);
+			selectionPanel.Append(sortIDButton);
+
+			sortNameButton = new HoverButton(buttonTextures, new Rectangle(1 * 24, 48, 22, 22)) {
+				Id = "sortname"
+			};
+			sortNameButton.Width.Pixels = 22f;
+			sortNameButton.Height.Pixels = 22f;
+			sortNameButton.Left.Pixels = center - (20 * 2) - 8;
+			sortNameButton.Top.Pixels = 42;
+			sortNameButton.OnClick += (a, b) => OrganizeSelection(null, SortBy.Name, availabililty, FilterMod);
+			selectionPanel.Append(sortNameButton);
+
+			filterModButton = new HoverButton(buttonTextures, new Rectangle(2 * 24, 48, 22, 22)) {
 				Id = "filtermod"
 			};
 			filterModButton.Width.Pixels = 22f;
 			filterModButton.Height.Pixels = 22f;
-			filterModButton.Left.Pixels = 24;
-			filterModButton.Top.Pixels = 15;
-			filterModButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.FilterMod, true);
-			filterModButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.FilterMod, false);
+			filterModButton.Left.Pixels = center - (20 * 1);
+			filterModButton.Top.Pixels = 42;
+			filterModButton.OnClick += (a, b) => OrganizeSelection(null, sortType, availabililty, UpdateModFilter(true));
+			filterModButton.OnRightClick += (a, b) => OrganizeSelection(null, sortType, availabililty, UpdateModFilter(false));
+			selectionPanel.Append(filterModButton);
 
-			availabilityButton = new HoverButton(buttonTextures, new Rectangle(72, 48, 22, 22)) {
-				Id = "availability"
+			clearFilterModButton = new HoverButton(buttonTextures, new Rectangle(3 * 24, 48, 22, 22)) {
+				Id = "clearfiltermod"
 			};
-			availabilityButton.Width.Pixels = 22f;
-			availabilityButton.Height.Pixels = 22f;
-			availabilityButton.Left.Pixels = 48;
-			availabilityButton.Top.Pixels = 15;
-			availabilityButton.OnClick += (a, b) => ChangeSortOrFilter(ButtonType.Availability, true);
-			availabilityButton.OnRightClick += (a, b) => ChangeSortOrFilter(ButtonType.Availability, false);
+			clearFilterModButton.Width.Pixels = 22f;
+			clearFilterModButton.Height.Pixels = 22f;
+			clearFilterModButton.Left.Pixels = center;
+			clearFilterModButton.Top.Pixels = 42;
+			clearFilterModButton.OnClick += (a, b) => OrganizeSelection(null, sortType, availabililty, ResetModFilter());
+			selectionPanel.Append(clearFilterModButton);
 
-			viewModeButton = new HoverButton(buttonTextures, new Rectangle(144, 48, 22, 22)) {
+			clearAvailabilityButton = new HoverButton(buttonTextures, new Rectangle(4 * 24, 48, 22, 22)) {
+				Id = "clearavailability"
+			};
+			clearAvailabilityButton.Width.Pixels = 22f;
+			clearAvailabilityButton.Height.Pixels = 22f;
+			clearAvailabilityButton.Left.Pixels = center + (20 * 1) + 8;
+			clearAvailabilityButton.Top.Pixels = 42;
+			clearAvailabilityButton.OnClick += (a, b) => OrganizeSelection(null, sortType, ProgressBy.None, FilterMod);
+			selectionPanel.Append(clearAvailabilityButton);
+
+			obtainedButton = new HoverButton(buttonTextures, new Rectangle(5 * 24, 48, 22, 22)) {
+				Id = "obtainedavailability"
+			};
+			obtainedButton.Width.Pixels = 22f;
+			obtainedButton.Height.Pixels = 22f;
+			obtainedButton.Left.Pixels = center + (20 * 2) + 8;
+			obtainedButton.Top.Pixels = 42;
+			obtainedButton.OnClick += (a, b) => OrganizeSelection(null, sortType, ProgressBy.Obtained, FilterMod);
+			selectionPanel.Append(obtainedButton);
+
+			unobtainedButton = new HoverButton(buttonTextures, new Rectangle(6 * 24, 48, 22, 22)) {
+				Id = "unobtainedavailability"
+			};
+			unobtainedButton.Width.Pixels = 22f;
+			unobtainedButton.Height.Pixels = 22f;
+			unobtainedButton.Left.Pixels = center + (20 * 3) + 8;
+			unobtainedButton.Top.Pixels = 42;
+			unobtainedButton.OnClick += (a, b) => OrganizeSelection(null, sortType, ProgressBy.Unobtained, FilterMod);
+			selectionPanel.Append(unobtainedButton);
+
+			viewModeButton = new HoverButton(buttonTextures, new Rectangle(7 * 24, 48, 22, 22)) {
 				Id = "viewmode"
 			};
 			viewModeButton.Width.Pixels = 22f;
 			viewModeButton.Height.Pixels = 22f;
-			viewModeButton.Left.Pixels = 72;
-			viewModeButton.Top.Pixels = 15;
-			viewModeButton.OnClick += (a, b) => viewMode = !viewMode;
+			viewModeButton.Left.Pixels = 10;
+			viewModeButton.Top.Pixels = 10;
+			viewModeButton.OnClick += (a, b) => UpdateViewMode();
+			selectionPanel.Append(viewModeButton);
 
-			searchBarPanel.Width.Pixels = (float)panelTextures[4].Width;
-			searchBarPanel.Height.Pixels = (float)panelTextures[4].Height;
-			searchBarPanel.Left.Pixels = selectionPanel.Left.Pixels + selectionPanel.Width.Pixels - searchBarPanel.Width.Pixels - 10f;
-			searchBarPanel.Top.Pixels = selectionPanel.Top.Pixels - searchBarPanel.Height.Pixels;
+			musicEntryPanel = new BackDrop(panelTextures[0]) {
+				Id = "MusicEntry"
+			};
+			musicEntryPanel.Width.Pixels = panelTextures[1].Height;
+			musicEntryPanel.Height.Pixels = panelTextures[1].Width;
+			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
+			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 
-			searchBar = new NewUITextBox("search...", "");
-			searchBar.Width.Pixels = 144f;
-			searchBar.Height.Pixels = 25f;
-			searchBar.Top.Pixels = 8f;
-			searchBar.Left.Pixels = 8f;
-			searchBarPanel.Append(searchBar);
+			searchBar = new NewUITextBox("Search...", "");
+			searchBar.Width.Pixels = 216f;
+			searchBar.Height.Pixels = 28f;
+			searchBar.Top.Pixels = 9f;
+			searchBar.Left.Pixels = (selectionPanel.Width.Pixels / 2f) - (searchBar.Width.Pixels / 2f);
+			selectionPanel.Append(searchBar);
+			
+			UIImage searchGlass = new UIImage(Main.cursorTextures[2]);
+			searchGlass.Top.Pixels = 1f;
+			searchGlass.Left.Pixels = 6;
+			searchBar.Append(searchGlass);
 
-			AddMusicBoxSlot = new MusicBoxSlot(2010, 0.85f) {
+			AddMusicBoxSlot = new MusicBoxSlot(ItemID.MusicBox, 0.85f) {
 				Id = "EntrySlot"
 			};
-			AddMusicBoxSlot.Top.Pixels = 10f;
-			AddMusicBoxSlot.Left.Pixels = selectionPanel.Width.Pixels - 84f;
-			selectionPanel.Append(AddMusicBoxSlot);
+			AddMusicBoxSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (AddMusicBoxSlot.Width.Pixels / 2);
+			AddMusicBoxSlot.Top.Pixels = 8f;
+			musicEntryPanel.Append(AddMusicBoxSlot);
 
-			MusicStorageSlot = new ListenStorageSlot(Main.itemTexture[576], 576);
-			MusicStorageSlot.Top.Pixels = 20f;
-			MusicStorageSlot.Left.Pixels = selectionPanel.Width.Pixels - 84f - MusicStorageSlot.Width.Pixels - 15f;
-			selectionPanel.Append(MusicStorageSlot);
+			MusicStorageSlot = new ListenStorageSlot(Main.itemTexture[ItemID.MusicBox], ItemID.MusicBox);
+			//TODO: Make vertical instead of horizontal
+			MusicStorageSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (MusicStorageSlot.Width.Pixels / 2);
+			MusicStorageSlot.Top.Pixels = AddMusicBoxSlot.Height.Pixels + 16f;
+			musicEntryPanel.Append(MusicStorageSlot);
 
 			selectionScrollBar = new FixedUIScrollbar();
 			selectionScrollBar.SetView(100f, 1000f);
-			selectionScrollBar.Top.Pixels = 50f;
+			selectionScrollBar.Top.Pixels = 76f;
 			selectionScrollBar.Left.Pixels = -10f;
-			selectionScrollBar.Height.Set(0f, 0.85f);
+			selectionScrollBar.Height.Set(0f, 0.75f);
 			selectionScrollBar.HAlign = 1f;
+			selectionPanel.Append(selectionScrollBar);
 
 			SelectionList = new UIList();
 			SelectionList.Width.Pixels = selectionPanel.Width.Pixels;
-			SelectionList.Height.Pixels = selectionPanel.Height.Pixels - 74f;
+			SelectionList.Height.Pixels = selectionPanel.Height.Pixels - 85f;
 			SelectionList.Left.Pixels = 0f;
-			SelectionList.Top.Pixels = 60f;
+			SelectionList.Top.Pixels = 72f;
 			selectionPanel.Append(SelectionList);
 
 			closeButton = new HoverButton(closeTextures, new Rectangle(0, 0, 18, 18)) {
@@ -301,15 +356,22 @@ namespace tMusicPlayer
 			}
 
 			this.AddOrRemoveChild(MusicPlayerPanel, Main.playerInventory && mpToggleVisibility);
+			this.AddOrRemoveChild(musicEntryPanel, selectionVisible);
 			this.AddOrRemoveChild(selectionPanel, selectionVisible);
-			this.AddOrRemoveChild(searchBarPanel, selectionVisible);
 
-			searchBarPanel.Left.Pixels = selectionPanel.Left.Pixels + selectionPanel.Width.Pixels - searchBarPanel.Width.Pixels - 10f;
-			searchBarPanel.Top.Pixels = selectionPanel.Top.Pixels - searchBarPanel.Height.Pixels;
+			// Update positions of UIElements that are not parented by the main SelectionPanel
 
-			if (selectionPanel.ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface && selectionVisible) {
-				Main.LocalPlayer.mouseInterface = true;
-			}
+			searchBar.Left.Pixels = 12f;
+
+			searchBar.RemoveAllChildren();
+
+			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
+			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
+			musicEntryPanel.Recalculate();
+
+			viewModeButton.Left.Pixels = selectionPanel.Width.Pixels - closeButton.Width.Pixels - 13f;
+			viewModeButton.Top.Pixels = closeButton.Top.Pixels + closeButton.Height.Pixels + 4;
+
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			if (!listening && !canPlay.Contains(true)) {
 				ToggleButton(MusicMode.Listen);
@@ -319,7 +381,7 @@ namespace tMusicPlayer
 			}
 			if (!selectionVisible) {
 				searchBar.currentString = "";
-				OrganizeSelection(null, sortType, false);
+				OrganizeSelection(null, sortType, availabililty, FilterMod);
 			}
 		}
 
@@ -353,9 +415,10 @@ namespace tMusicPlayer
 			}
 		}
 
-		public void ChangeSortOrFilter(ButtonType type, bool next)
+		// Out of date, reintroduce if bringing back the "cycle-button" feature
+		/*
+		public void ChangeSortOrFilter(SortBy sortBy, ProgressBy progressBy, string filterMod, bool next = true)
 		{
-			// TODO: recreate buttons to give this hook functionailty
 			if (type == ButtonType.Sort) {
 				if (sortType == SortBy.ID) {
 					sortType = SortBy.Name;
@@ -398,84 +461,174 @@ namespace tMusicPlayer
 					}
 				}
 			}
-			OrganizeSelection(null, sortType, false);
+			OrganizeSelection(null, false);
+		}
+		*/
+
+		internal string ResetModFilter()
+		{
+			FilterMod = "";
+			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
+			return FilterMod;
 		}
 
-		internal void OrganizeSelection(List<MusicData> list = null, SortBy sort = SortBy.ID, bool initializing = false)
+		internal string UpdateModFilter(bool next)
+		{
+			int indexOfCurrent = ModList.IndexOf(FilterMod);
+			if (next && indexOfCurrent == ModList.Count - 1) {
+				FilterMod = "";
+			}
+			else if (!next && indexOfCurrent == 0) {
+				FilterMod = ModList[ModList.Count - 1];
+			}
+			else {
+				if (next) {
+					FilterMod = ModList[indexOfCurrent + 1];
+				}
+				else {
+					FilterMod = ModList[indexOfCurrent - 1];
+				}
+			}
+			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
+			return FilterMod;
+		}
+
+		internal void UpdateViewMode()
+		{
+			viewMode = !viewMode;
+			OrganizeSelection(null, sortType, availabililty, FilterMod);
+		}
+
+		internal void OrganizeSelection(List<MusicData> list, SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false)
 		{
 			if (list == null) {
 				list = new List<MusicData>(tMusicPlayer.AllMusic);
 			}
 			
-			if (sort == SortBy.ID) {
+			if (sortBy == SortBy.ID) {
 				list = list.OrderBy(x => x.music).ToList();
 			}
-			if (sort == SortBy.Name) {
+			if (sortBy == SortBy.Name) {
 				list = list.OrderBy(x => x.name).ToList();
 			}
 
-			if (!initializing) {
-				selectionPanel.RemoveAllChildren();
-				selectionPanel.Append(AddMusicBoxSlot);
-				selectionPanel.Append(closeButton);
-
-				selectionPanel.Append(sortButton);
-				selectionPanel.Append(filterModButton);
-				selectionPanel.Append(availabilityButton);
-				selectionPanel.Append(viewModeButton);
-
-				selectionPanel.Append(MusicStorageSlot);
-			}
-
 			SelectionList.Clear();
-			selectionPanel.RemoveChild(SelectionList);
-
-			ItemSlotRow newRow = new ItemSlotRow(0) {
-				Id = "Loot0"
-			};
-			int col = 0;
-			int row = 0;
-			for (int i = 0; i < list.Count; i++) {
-				// Check all the optional filters to see if one is active
-				// Filters will not apply during intialization
-				if (!initializing) {
-					MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-
-					// Filter by Mod (or Vanilla)
-					if (FilterMod != "" && (list[i].mod.ToLower() != FilterMod.ToLower())) {
-						continue;
-					}
-
+			
+			if (!viewMode) {
+				// Current view mode is GRID
+				ItemSlotRow newRow = new ItemSlotRow(0, 400, 50) {
+					Id = "Loot_0"
+				};
+				int col = 0;
+				int row = 0;
+				for (int i = 0; i < list.Count; i++) {
+					// Filter checks do not happen when initializing
+					// Include all music boxes if FilterMod is left empty
+					// Otherwise find music boxes with the same mod name as the selected filter mod
 					// If Availability isn't 'None' check if the box is obtained or not
-					if (availabililty == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != list[i].musicbox)) {
-						continue;
-					}
-					else if (availabililty == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == list[i].musicbox)) {
-						continue;
-					}
-				}
+					if (!initializing) {
+						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+						bool CheckFilterMod = filterMod != "" && (list[i].mod != filterMod);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != list[i].musicbox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == list[i].musicbox);
 
-				SelectionSlots[i] = new MusicBoxSlot(list[i].musicbox, 0.85f);
-				SelectionSlots[i].Left.Pixels = 20f + (SelectionSlots[i].Width.Pixels + 10f) * (float)col;
-				SelectionSlots[i].Top.Pixels = 0f;
-				SelectionSlots[i].Id = $"SelectionSlot_{i}";
-				newRow.Append(SelectionSlots[i]);
-				col++;
-				if (col == 5) {
-					row++;
-					col = 0;
+						if (CheckFilterMod || CheckObtained || CheckUnobtained) {
+							continue;
+						}
+					}
+
+					SelectionSlots[i] = new MusicBoxSlot(list[i].musicbox, 0.85f);
+					SelectionSlots[i].Left.Pixels = 20f + (SelectionSlots[i].Width.Pixels + 10f) * (float)col;
+					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
+					SelectionSlots[i].Id = $"SelectionSlotGrid_{i}";
+					newRow.Append(SelectionSlots[i]);
+					col++;
+					if (col == 5) {
+						row++;
+						col = 0;
+						SelectionList.Add(newRow);
+						newRow = new ItemSlotRow(row, 400, 50) {
+							Id = $"Loot_{row}"
+						};
+					}
+				}
+				if (col != 0) {
+					// Add the last row if we did not complete it
 					SelectionList.Add(newRow);
-					newRow = new ItemSlotRow(row) {
-						Id = $"Loot{row}"
-					};
 				}
 			}
-			if (col != 0) {
-				SelectionList.Add(newRow);
+			else {
+				// Current view mode is LIST
+				ItemSlotRow newRow;
+				for (int i = 0; i < list.Count; i++) {
+					// Include all music boxes if FilterMod is left empty
+					// Otherwise find music boxes with the same mod name as the selected filter mod
+					// If Availability isn't 'None' check if the box is obtained or not
+					if (!initializing) {
+						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+						bool CheckFilterMod = filterMod != "" && (list[i].mod != filterMod);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != list[i].musicbox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == list[i].musicbox);
+
+						if (CheckFilterMod || CheckObtained || CheckUnobtained) {
+							continue;
+						}
+					}
+
+					newRow = new ItemSlotRow(i, panelTextures[2].Bounds.Width, panelTextures[2].Bounds.Height) {
+						Id = $"Loot_{i}"
+					};
+
+					// Item Slot
+					SelectionSlots[i] = new MusicBoxSlot(list[i].musicbox, 0.85f);
+					SelectionSlots[i].Left.Pixels = 20f;
+					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
+					SelectionSlots[i].Id = $"SelectionSlotList_{i}";
+					newRow.Append(SelectionSlots[i]);
+
+					//TODO: make item slots not play when right-clicking if in list mod
+
+					// Play button
+					HoverButton playSong = new HoverButton(buttonTextures, new Rectangle(24, 0, 22, 22)) {
+						Id = $"altplay_{i}",
+					};
+					playSong.Width.Pixels = 22f;
+					playSong.Height.Pixels = 22f;
+					playSong.Left.Pixels = SelectionSlots[i].Left.Pixels + SelectionSlots[i].Width.Pixels + 8f;
+					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
+					newRow.Append(playSong);
+					playSong.OnClick += (a, b) => ListViewPlaySong(list, playSong.Parent.Id);
+
+					// Song name and mod
+					UIText songName = new UIText(list[i].name, 0.85f);
+					songName.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
+					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
+					newRow.Append(songName);
+
+					UIText songMod = new UIText(list[i].mod, 0.85f);
+					songMod.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
+					songMod.Top.Pixels = (newRow.Height.Pixels / 2f) + 4f;
+					newRow.Append(songMod);
+
+					SelectionList.Add(newRow);
+				}
 			}
-			selectionPanel.Append(selectionScrollBar);
-			selectionPanel.Append(SelectionList);
+
 			SelectionList.SetScrollbar(selectionScrollBar);
+		}
+
+		private void ListViewPlaySong(List<MusicData> list, string Id)
+		{
+			int index = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
+			if (tMusicPlayer.MusicPlayerUI.playingMusic != list[index].music) {
+				tMusicPlayer.MusicPlayerUI.ListenDisplay = -1;
+				tMusicPlayer.MusicPlayerUI.listening = false;
+				tMusicPlayer.MusicPlayerUI.DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == list[index].music);
+				tMusicPlayer.MusicPlayerUI.playingMusic = list[index].music;
+			}
+			else {
+				tMusicPlayer.MusicPlayerUI.playingMusic = -1;
+			}
 		}
 
 		private void ToggleButton(MusicMode type)
@@ -552,13 +705,6 @@ namespace tMusicPlayer
 			croppedTexture.SetData<Color>(data);
 			return croppedTexture;
 		}
-	}
-
-	public enum ButtonType
-	{
-		Sort,
-		FilterMod,
-		Availability
 	}
 
 	public enum MusicMode

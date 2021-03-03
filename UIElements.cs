@@ -39,7 +39,7 @@ namespace tMusicPlayer
 			}
 			else if (Id == "MusicEntry") {
 				Texture2D obj = MusicPlayerUI.panelTextures[1];
-				// TODO: Simplify/make better later
+				// TODO[?]: Simplify/make better later
 				spriteBatch.Draw(obj, new Rectangle(rect.X + obj.Bounds.Height + 2, rect.Y, obj.Width, obj.Height), obj.Bounds, Color.White, MathHelper.ToRadians(90), Vector2.Zero, SpriteEffects.None, 0f);
 			}
 			base.Draw(spriteBatch);
@@ -66,7 +66,7 @@ namespace tMusicPlayer
 		public override void MouseDown(UIMouseEvent evt)
 		{
 			base.MouseDown(evt);
-			if (((IEnumerable<UIElement>)Elements).All<UIElement>((Func<UIElement, bool>)((UIElement x) => !x.IsMouseHovering))) {
+			if (((IEnumerable<UIElement>)Elements).All((UIElement x) => !x.IsMouseHovering)) {
 				DragStart(evt);
 			}
 		}
@@ -103,8 +103,8 @@ namespace tMusicPlayer
 				Main.LocalPlayer.mouseInterface = true;
 			}
 			if (dragging) {
-				Left.Set((float)Main.mouseX - offset.X, 0f);
-				Top.Set((float)Main.mouseY - offset.Y, 0f);
+				Left.Set(Main.mouseX - offset.X, 0f);
+				Top.Set(Main.mouseY - offset.Y, 0f);
 				Recalculate();
 			}
 			CalculatedStyle dimensions = Parent.GetDimensions();
@@ -404,14 +404,12 @@ namespace tMusicPlayer
 	{
 		internal bool focused = false;
 
-		private int _maxLength = 40;
-		private string hintText;
+		private readonly int _maxLength = 40;
+		private readonly string hintText;
 		internal string currentString = "";
 
 		private int textBlinkerCount;
 		private int textBlinkerState;
-		internal bool unfocusOnEnter = true;
-		internal bool unfocusOnTab = true;
 
 		public NewUITextBox(string hintText, string text = "") : base(text)
 		{
@@ -512,21 +510,12 @@ namespace tMusicPlayer
 						ui.OrganizeSelection(null, ui.sortType, ui.availabililty, ui.FilterMod);
 					}
 				}
-				if (JustPressed(Keys.Tab)) {
-					if (unfocusOnTab) {
-						Unfocus();
-					}
-				}
-				if (JustPressed(Keys.Escape)) {
-					if (unfocusOnTab) {
-						Unfocus();
-					}
+				if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape)) {
+					Unfocus();
 				}
 				if (JustPressed(Keys.Enter)) {
 					Main.drawingPlayerChat = false;
-					if (unfocusOnEnter) {
-						Unfocus();
-					}
+					Unfocus();
 				}
 				if (++textBlinkerCount >= 20) {
 					textBlinkerState = (textBlinkerState + 1) % 2;

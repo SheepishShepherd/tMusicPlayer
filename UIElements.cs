@@ -46,9 +46,9 @@ namespace tMusicPlayer
 			if (Id == "MusicPlayerPanel" && !tMusicPlayer.MusicPlayerUI.smallPanel) {
 				int musicBoxDisplayed = (tMusicPlayer.MusicPlayerUI.listening && tMusicPlayer.MusicPlayerUI.ListenDisplay != -1) ? tMusicPlayer.MusicPlayerUI.ListenDisplay : tMusicPlayer.MusicPlayerUI.DisplayBox;
 				MusicData musicRef = tMusicPlayer.AllMusic[musicBoxDisplayed];
-				Vector2 pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 10));
+				Vector2 pos = new Vector2((rect.X + 64), (rect.Y + 10));
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f, 0f, 0f, -1);
-				pos = new Vector2((float)(rect.X + 64), (float)(rect.Y + 30));
+				pos = new Vector2((rect.X + 64), (rect.Y + 30));
 				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f, 0f, 0f, -1);
 			}
 			
@@ -83,7 +83,7 @@ namespace tMusicPlayer
 		{
 			CalculatedStyle dimensions2 = GetDimensions();
 			Rectangle dimensions = dimensions2.ToRectangle();
-			offset = new Vector2(evt.MousePosition.X - (float)dimensions.Left, evt.MousePosition.Y - (float)dimensions.Top);
+			offset = new Vector2(evt.MousePosition.X - dimensions.Left, evt.MousePosition.Y - dimensions.Top);
 			dragging = true;
 		}
 
@@ -113,8 +113,8 @@ namespace tMusicPlayer
 			dimensions = GetDimensions();
 			Rectangle val = dimensions.ToRectangle();
 			if (val.Intersects(parentSpace) || !mouseRect.Intersects(parentSpace)) {
-				Left.Pixels = Utils.Clamp<float>(Left.Pixels, 0f, (float)parentSpace.Right - Width.Pixels);
-				Top.Pixels = Utils.Clamp<float>(Top.Pixels, 0f, (float)parentSpace.Bottom - Height.Pixels);
+				Left.Pixels = Utils.Clamp(Left.Pixels, 0f, parentSpace.Right - Width.Pixels);
+				Top.Pixels = Utils.Clamp(Top.Pixels, 0f, parentSpace.Bottom - Height.Pixels);
 				Recalculate();
 			}
 		}
@@ -451,7 +451,7 @@ namespace tMusicPlayer
 
 		public override void Update(GameTime gameTime)
 		{
-			Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
+			Vector2 MousePosition = new Vector2(Main.mouseX, Main.mouseY);
 			if (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight)) {
 				Unfocus();
 			}
@@ -504,10 +504,11 @@ namespace tMusicPlayer
 								musicData.Add(item);
 							}
 						}
-						ui.OrganizeSelection(musicData, ui.sortType, ui.availabililty, ui.FilterMod);
+						ui.musicData = musicData;
+						ui.OrganizeSelection(ui.sortType, ui.availabililty, ui.FilterMod);
 					}
 					else {
-						ui.OrganizeSelection(null, ui.sortType, ui.availabililty, ui.FilterMod);
+						ui.OrganizeSelection(ui.sortType, ui.availabililty, ui.FilterMod);
 					}
 				}
 				if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape)) {
@@ -521,7 +522,7 @@ namespace tMusicPlayer
 					textBlinkerState = (textBlinkerState + 1) % 2;
 					textBlinkerCount = 0;
 				}
-				Main.instance.DrawWindowsIMEPanel(new Vector2(198f, (float)(Main.screenHeight - 36)), 0f);
+				Main.instance.DrawWindowsIMEPanel(new Vector2(198f, Main.screenHeight - 36), 0f);
 			}
 			string displayString = currentString;
 			if (textBlinkerState == 1 && focused) {
@@ -601,7 +602,7 @@ namespace tMusicPlayer
 				}
 			}
 			base.DrawSelf(spriteBatch);
-			Vector2 pos = new Vector2((float)rectangle.X + Width.Pixels * 0.75f, (float)rectangle.Y + Height.Pixels * 0.75f);
+			Vector2 pos = new Vector2(rectangle.X + Width.Pixels * 0.75f, rectangle.Y + Height.Pixels * 0.75f);
 			Utils.DrawBorderString(spriteBatch, modplayer.musicBoxesStored.ToString(), pos, Color.White, 0.85f);
 		}
 	}

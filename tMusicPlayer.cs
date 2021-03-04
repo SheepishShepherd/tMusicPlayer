@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -132,6 +133,13 @@ namespace tMusicPlayer
 			}
 			item.TurnToAir();
 
+			if (MusicPlayerUI.sortType == SortBy.ID) {
+				AllMusic = AllMusic.OrderBy(x => x.music).ToList();
+			}
+			if (MusicPlayerUI.sortType == SortBy.Name) {
+				AllMusic = AllMusic.OrderBy(x => x.name).ToList();
+			}
+
 			// Setup the canPlay list to match thie size of AllMusic, as well as the UI's item slots.
 			if (!Main.dedServ) {
 				MusicPlayerUI.canPlay = new List<bool>();
@@ -139,13 +147,13 @@ namespace tMusicPlayer
 					MusicPlayerUI.canPlay.Add(false);
 				}
 				MusicPlayerUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-				MusicPlayerUI.OrganizeSelection(null, SortBy.ID, ProgressBy.None, "", true);
-				
+				MusicPlayerUI.musicData = new List<MusicData>(AllMusic);
+				MusicPlayerUI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
+
 				// Setup the mod list for the Mod Filter
 				// Must occur after all other modded music is established
 				MusicPlayerUI.ModList = new List<string>();
-				List<MusicData> musicData = new List<MusicData>(tMusicPlayer.AllMusic);
-				foreach (MusicData box in musicData) {
+				foreach (MusicData box in MusicPlayerUI.musicData) {
 					if (!MusicPlayerUI.ModList.Contains(box.mod)) {
 						MusicPlayerUI.ModList.Add(box.mod);
 					}

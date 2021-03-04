@@ -157,10 +157,9 @@ namespace tMusicPlayer
 
 		public bool UseAlternateTexture()
 		{
-			if (Id.Contains("altplay_")) {
-				int num = Convert.ToInt32(Parent.Id.Substring(Parent.Id.IndexOf("_") + 1));
-				// TODO: Remove '- 1' when MusicID issue is fixed
-				return tMusicPlayer.MusicPlayerUI.playingMusic - 1 == num;
+			if (Id.Contains("altplay")) {
+				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
+				return tMusicPlayer.MusicPlayerUI.playingMusic == num;
 			}
 			switch (Id) {
 				case "expand":
@@ -190,7 +189,8 @@ namespace tMusicPlayer
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && tMusicPlayer.MusicPlayerUI.listening;
 			bool musicAtZero = Id != "expand" && Id != "view" && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && tMusicPlayer.MusicPlayerUI.FilterMod == "";
-			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled;
+			bool cannotPlayListMusic = Id.Contains("altplay") && !tMusicPlayer.MusicPlayerUI.canPlay[tMusicPlayer.AllMusic.FindIndex(x => x.music == Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1)))];
+			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
 			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			Texture2D val = texture;
 			CalculatedStyle innerDimensions = GetInnerDimensions();
@@ -268,8 +268,8 @@ namespace tMusicPlayer
 			this.refItem = refItem;
 			musicBox = new Item();
 			musicBox.SetDefaults(0, false);
-			Width.Set((float)Main.inventoryBack9Texture.Width * scale, 0f);
-			Height.Set((float)Main.inventoryBack9Texture.Height * scale, 0f);
+			Width.Set(Main.inventoryBack9Texture.Width * scale, 0f);
+			Height.Set(Main.inventoryBack9Texture.Height * scale, 0f);
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
@@ -391,8 +391,8 @@ namespace tMusicPlayer
 					type = refItem;
 				}
 				if (type > 0) {
-					float x2 = (float)(rectangle.X + rectangle.Width / 2) - (float)Main.itemTexture[type].Width * scale / 2f;
-					float y2 = (float)(rectangle.Y + rectangle.Height / 2) - (float)Main.itemTexture[type].Height * scale / 2f;
+					float x2 = (rectangle.X + rectangle.Width / 2) - Main.itemTexture[type].Width * scale / 2f;
+					float y2 = (rectangle.Y + rectangle.Height / 2) - Main.itemTexture[type].Height * scale / 2f;
 					spriteBatch.Draw(Main.itemTexture[type], new Vector2(x2, y2), Main.itemTexture[type].Bounds, new Color(75, 75, 75, 75), 0f, Vector2.Zero, scale, 0, 0f);
 				}
 			}

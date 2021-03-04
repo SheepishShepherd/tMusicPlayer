@@ -62,7 +62,7 @@ namespace tMusicPlayer
 				new MusicData(MusicID.Jungle, ItemID.MusicBoxJungle),
 				new MusicData(MusicID.Corruption, ItemID.MusicBoxCorruption),
 				new MusicData(MusicID.UndergroundCorruption, ItemID.MusicBoxUndergroundCorruption),
-				new MusicData(MusicID.Crimson, ItemID.MusicBoxUndergroundCrimson),
+				new MusicData(MusicID.Crimson, ItemID.MusicBoxCrimson),
 				new MusicData(MusicID.UndergroundCrimson, ItemID.MusicBoxUndergroundCrimson),
 				new MusicData(MusicID.TheHallow, ItemID.MusicBoxTheHallow),
 				new MusicData(MusicID.UndergroundHallow, ItemID.MusicBoxUndergroundHallow),

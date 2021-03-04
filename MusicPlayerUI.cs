@@ -71,12 +71,11 @@ namespace tMusicPlayer
 		
 		public override void OnInitialize()
 		{
-			panelTextures = new Texture2D[5] {
+			panelTextures = new Texture2D[4] {
 				CropTexture(ModContent.GetTexture($"tMusicPlayer/UI/backdrop"), new Rectangle(0, 0, 1, 1)),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop"),
 				ModContent.GetTexture("tMusicPlayer/UI/backdrop2"),
-				ModContent.GetTexture("tMusicPlayer/UI/backdrop3"),
-				ModContent.GetTexture("tMusicPlayer/UI/backdrop4")
+				ModContent.GetTexture("tMusicPlayer/UI/backdrop3")
 			};
 			
 			buttonTextures = ModContent.GetTexture("tMusicPlayer/UI/buttons");
@@ -247,6 +246,16 @@ namespace tMusicPlayer
 			unobtainedButton.OnClick += (a, b) => OrganizeSelection(null, sortType, ProgressBy.Unobtained, FilterMod);
 			selectionPanel.Append(unobtainedButton);
 
+			closeButton = new HoverButton(closeTextures, new Rectangle(0, 0, 18, 18)) {
+				Id = "select_close"
+			};
+			closeButton.Width.Pixels = 18f;
+			closeButton.Height.Pixels = 18f;
+			closeButton.Left.Pixels = selectionPanel.Width.Pixels - closeButton.Width.Pixels - 11f;
+			closeButton.Top.Pixels = 12f;
+			closeButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
+			selectionPanel.Append(closeButton);
+
 			viewModeButton = new HoverButton(buttonTextures, new Rectangle(7 * 24, 48, 22, 22)) {
 				Id = "viewmode"
 			};
@@ -298,16 +307,6 @@ namespace tMusicPlayer
 			SelectionList.Left.Pixels = 0f;
 			SelectionList.Top.Pixels = 72f;
 			selectionPanel.Append(SelectionList);
-
-			closeButton = new HoverButton(closeTextures, new Rectangle(0, 0, 18, 18)) {
-				Id = "select_close"
-			};
-			closeButton.Width.Pixels = 18f;
-			closeButton.Height.Pixels = 18f;
-			closeButton.Left.Pixels = selectionPanel.Width.Pixels - closeButton.Width.Pixels - 11f;
-			closeButton.Top.Pixels = 12f;
-			closeButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
-			selectionPanel.Append(closeButton);
 		}
 
 		public override void Update(GameTime gameTime)
@@ -433,9 +432,7 @@ namespace tMusicPlayer
 			
 			if (!viewMode) {
 				// Current view mode is GRID
-				ItemSlotRow newRow = new ItemSlotRow(0, 400, 50) {
-					Id = "Loot_0"
-				};
+				ItemSlotRow newRow = new ItemSlotRow(0, 400, 50);
 				int col = 0;
 				int row = 0;
 				for (int i = 0; i < list.Count; i++) {
@@ -464,9 +461,7 @@ namespace tMusicPlayer
 						row++;
 						col = 0;
 						SelectionList.Add(newRow);
-						newRow = new ItemSlotRow(row, 400, 50) {
-							Id = $"Loot_{row}"
-						};
+						newRow = new ItemSlotRow(row, 400, 50);
 					}
 				}
 				if (col != 0) {
@@ -492,9 +487,7 @@ namespace tMusicPlayer
 						}
 					}
 
-					newRow = new ItemSlotRow(i, panelTextures[2].Bounds.Width, panelTextures[2].Bounds.Height) {
-						Id = $"Loot_{i}"
-					};
+					newRow = new ItemSlotRow(i, panelTextures[2].Bounds.Width, panelTextures[2].Bounds.Height);
 
 					// Item Slot
 					SelectionSlots[i] = new MusicBoxSlot(list[i].musicbox, 0.85f);
@@ -505,14 +498,14 @@ namespace tMusicPlayer
 					
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures, new Rectangle(24, 0, 22, 22)) {
-						Id = $"altplay_{i}",
+						Id = $"altplay_{list[i].music}",
 					};
 					playSong.Width.Pixels = 22f;
 					playSong.Height.Pixels = 22f;
 					playSong.Left.Pixels = SelectionSlots[i].Left.Pixels + SelectionSlots[i].Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
+					playSong.OnClick += (a, b) => ListViewPlaySong(playSong.Id);
 					newRow.Append(playSong);
-					playSong.OnClick += (a, b) => ListViewPlaySong(list, playSong.Parent.Id);
 
 					// Song name and mod
 					UIText songName = new UIText(list[i].name, 0.85f);
@@ -532,14 +525,18 @@ namespace tMusicPlayer
 			SelectionList.SetScrollbar(selectionScrollBar);
 		}
 
-		private void ListViewPlaySong(List<MusicData> list, string Id)
+		private void ListViewPlaySong(string Id)
 		{
-			int index = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-			if (tMusicPlayer.MusicPlayerUI.playingMusic != list[index].music) {
+			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
+			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
+			if (!canPlay[index]) {
+				return;
+			}
+			if (tMusicPlayer.MusicPlayerUI.playingMusic != musicID) {
 				tMusicPlayer.MusicPlayerUI.ListenDisplay = -1;
 				tMusicPlayer.MusicPlayerUI.listening = false;
-				tMusicPlayer.MusicPlayerUI.DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == list[index].music);
-				tMusicPlayer.MusicPlayerUI.playingMusic = list[index].music;
+				tMusicPlayer.MusicPlayerUI.DisplayBox = index;
+				tMusicPlayer.MusicPlayerUI.playingMusic = musicID;
 			}
 			else {
 				tMusicPlayer.MusicPlayerUI.playingMusic = -1;
@@ -548,7 +545,7 @@ namespace tMusicPlayer
 
 		private void ToggleButton(MusicMode type)
 		{
-			if (!(Main.musicVolume <= 0f)) {
+			if (Main.musicVolume > 0f) {
 				switch (type) {
 					case MusicMode.Play:
 						if (!listening) {

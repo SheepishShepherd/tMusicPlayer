@@ -83,8 +83,10 @@ namespace tMusicPlayer
 			// Currently, the best way to override music is to equip a music box in one of your accessory slots.
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
+			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
 			if (!Main.gameMenu && tMusicPlayer.MusicPlayerUI != null && tMusicPlayer.MusicPlayerUI.playingMusic > -1) {
-				Main.musicBox2 = tMusicPlayer.MusicPlayerUI.playingMusic;
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == tMusicPlayer.MusicPlayerUI.playingMusic);
+				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
 			}
 		}
 	}

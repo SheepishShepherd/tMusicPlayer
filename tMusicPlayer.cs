@@ -153,7 +153,6 @@ namespace tMusicPlayer
 				MusicPlayerUI.ModList.Sort();
 				MusicPlayerUI.ModList.Remove("Terraria");
 				MusicPlayerUI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
-				MusicPlayerUI.ModList.Insert(0, ""); // Put 'default' aka no filter above all others
 			}
 		}
 

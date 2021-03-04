@@ -396,7 +396,7 @@ namespace tMusicPlayer
 		{
 			int indexOfCurrent = ModList.IndexOf(FilterMod);
 			if (next && indexOfCurrent == ModList.Count - 1) {
-				FilterMod = "";
+				FilterMod = ModList[0];
 			}
 			else if (!next && indexOfCurrent == 0) {
 				FilterMod = ModList[ModList.Count - 1];

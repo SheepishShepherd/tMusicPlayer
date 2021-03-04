@@ -356,7 +356,7 @@ namespace tMusicPlayer
 				}
 				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.MusicBoxList.Any(x => x.Type == refItem)) {
 					modplayer.MusicBoxList.RemoveAll(x => x.Type == refItem);
-					tMusicPlayer.MusicPlayerUI.canPlay[index] = tMusicPlayer.tMPConfig.EnableAllMusicBoxes;
+					//tMusicPlayer.MusicPlayerUI.canPlay[index] = tMusicPlayer.tMPConfig.EnableAllMusicBoxes;
 					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{refItem}]", Color.IndianRed);
 					if (!tMusicPlayer.MusicPlayerUI.canPlay[index]) {
 						int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();

@@ -41,12 +41,16 @@ namespace tMusicPlayer
 			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
 			if (musicPlayerUI != null) {
 				for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
+					/*
 					if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) {
 						musicPlayerUI.canPlay[i] = true;
 					}
 					else {
 						musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
 					}
+					*/
+					musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
+					// Remove above line if bringing back EnableAllMusicBoxes
 				}
 			}
 		}

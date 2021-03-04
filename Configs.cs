@@ -18,11 +18,13 @@ namespace tMusicPlayer
 		[Tooltip("While smart cursor is toggled, most buttons show extra information about them")]
 		public bool EnableMoreTooltips { get; set; }
 
+		/*
 		[DefaultValue(false)]
 		[Label("Unlock all music in the selection list")]
 		[BackgroundColor(76, 168, 84, 255)]
 		[Tooltip("All music can be played from the MusicPlayer, regaurdless of whether it was obtained or not.")]
 		public bool EnableAllMusicBoxes { get; set; }
+		*/
 
 		[DefaultValue(false)]
 		[Label("Hide MusicPlayer until hotkey pressed")]
@@ -66,32 +68,34 @@ namespace tMusicPlayer
 					musicPlayerUI.musicEntryPanel.Top.Pixels = musicPlayerUI.selectionPanel.Top.Pixels - musicPlayerUI.musicEntryPanel.Height.Pixels;
 					ResettingPanels = false;
 				}
+				/*
 				if (EnableAllMusicBoxes) {
 					for (int j = 0; j < musicPlayerUI.canPlay.Count; j++) {
 						musicPlayerUI.canPlay[j] = true;
 					}
 					tMusicPlayer.SendDebugText("EnableAllMusicBoxes enabled. All music in canPlay set to true.");
 				}
-				else {
-					MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-					for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
-						musicPlayerUI.canPlay[i] = (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.AllMusic[i].musicbox) != -1);
+				else { // Do the code below 
+				*/
+				MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+				for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
+					musicPlayerUI.canPlay[i] = (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.AllMusic[i].musicbox) != -1);
+				}
+				Main.NewText("EnableAllMusicBoxes disabled. Music in canPlay restored appropriately", Color.White);
+				int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
+				int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
+				if (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.MusicPlayerUI.DisplayBox) == -1) {
+					if (next != -1) {
+						tMusicPlayer.MusicPlayerUI.DisplayBox = next;
 					}
-					Main.NewText("EnableAllMusicBoxes disabled. Music in canPlay restored appropriately", Color.White);
-					int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
-					int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
-					if (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.MusicPlayerUI.DisplayBox) == -1) {
-						if (next != -1) {
-							tMusicPlayer.MusicPlayerUI.DisplayBox = next;
-						}
-						else if (prev != -1) {
-							tMusicPlayer.MusicPlayerUI.DisplayBox = prev;
-						}
-						else {
-							musicPlayerUI.listening = true;
-						}
+					else if (prev != -1) {
+						tMusicPlayer.MusicPlayerUI.DisplayBox = prev;
+					}
+					else {
+						musicPlayerUI.listening = true;
 					}
 				}
+				// --end-- above code in else statement if bringing back EnableAllMusicBoxes
 			}
 		}
 	}

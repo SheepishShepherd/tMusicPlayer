@@ -75,27 +75,27 @@ namespace tMusicPlayer
 					}
 					tMusicPlayer.SendDebugText("EnableAllMusicBoxes enabled. All music in canPlay set to true.");
 				}
-				else { // Do the code below 
+				else {
+					MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+					for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
+						musicPlayerUI.canPlay[i] = (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.AllMusic[i].musicbox) != -1);
+					}
+					Main.NewText("EnableAllMusicBoxes disabled. Music in canPlay restored appropriately", Color.White);
+					int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
+					int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
+					if (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.MusicPlayerUI.DisplayBox) == -1) {
+						if (next != -1) {
+							tMusicPlayer.MusicPlayerUI.DisplayBox = next;
+						}
+						else if (prev != -1) {
+							tMusicPlayer.MusicPlayerUI.DisplayBox = prev;
+						}
+						else {
+							musicPlayerUI.listening = true;
+						}
+					}
+				}
 				*/
-				MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-				for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
-					musicPlayerUI.canPlay[i] = (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.AllMusic[i].musicbox) != -1);
-				}
-				Main.NewText("EnableAllMusicBoxes disabled. Music in canPlay restored appropriately", Color.White);
-				int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
-				int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
-				if (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.MusicPlayerUI.DisplayBox) == -1) {
-					if (next != -1) {
-						tMusicPlayer.MusicPlayerUI.DisplayBox = next;
-					}
-					else if (prev != -1) {
-						tMusicPlayer.MusicPlayerUI.DisplayBox = prev;
-					}
-					else {
-						musicPlayerUI.listening = true;
-					}
-				}
-				// --end-- above code in else statement if bringing back EnableAllMusicBoxes
 			}
 		}
 	}

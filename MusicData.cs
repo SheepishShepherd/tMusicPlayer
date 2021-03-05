@@ -35,7 +35,7 @@ namespace tMusicPlayer
 				mainMusicBox2 = musicbox - 562;
 			}
 			else if(musicbox >= 1596 && musicbox <= 1609) {
-				mainMusicBox2 = musicbox - 1586;
+				mainMusicBox2 = musicbox - 1596 + 13;
 			}
 			else if(musicbox == ItemID.MusicBoxMushrooms) {
 				mainMusicBox2 = 27;

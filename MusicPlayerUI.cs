@@ -55,7 +55,7 @@ namespace tMusicPlayer
 		public UIList SelectionList;
 		public FixedUIScrollbar selectionScrollBar;
 		public MusicBoxSlot[] SelectionSlots;
-		internal List<bool> canPlay;
+		internal List<int> canPlay;
 		internal bool viewMode = false;
 
 		public bool selectionVisible = false;
@@ -309,6 +309,8 @@ namespace tMusicPlayer
 			SelectionList.Left.Pixels = 0f;
 			SelectionList.Top.Pixels = 72f;
 			selectionPanel.Append(SelectionList);
+
+			canPlay = new List<int>();
 		}
 
 		public override void Update(GameTime gameTime)
@@ -345,7 +347,7 @@ namespace tMusicPlayer
 			musicEntryPanel.Recalculate();
 
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-			if (!listening && !canPlay.Contains(true)) {
+			if (!listening && canPlay.Count == 0) {
 				ToggleButton(MusicMode.Listen);
 			}
 			if (modplayer.musicBoxesStored <= 0) {
@@ -359,9 +361,9 @@ namespace tMusicPlayer
 
 		public int FindNextIndex()
 		{
-			// TODO: Fix navigation from going into songs not yet obtained if in SortBy.Name mode
-			for (int i = DisplayBox; i < canPlay.Count; i++) {
-				if (i != DisplayBox && canPlay[i]) {
+			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
+			for (int i = index; i < musicData.Count; i++) {
+				if (i != index && canPlay.Contains(musicData[i].music)) {
 					return i;
 				}
 			}
@@ -370,8 +372,9 @@ namespace tMusicPlayer
 
 		public int FindPrevIndex()
 		{
-			for (int i = DisplayBox; i >= 0; i--) {
-				if (i != DisplayBox && canPlay[i]) {
+			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
+			for (int i = index; i >= 0; i--) {
+				if (i != index && canPlay.Contains(musicData[i].music)) {
 					return i;
 				}
 			}
@@ -382,8 +385,11 @@ namespace tMusicPlayer
 		{
 			if (!listening) {
 				int newIndex = next ? FindNextIndex() : FindPrevIndex();
-				if (newIndex != -1) {
-					DisplayBox = newIndex;
+				if (newIndex != -1) { 
+					DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicData[newIndex].music);
+					if (playingMusic > -1) {
+						playingMusic = tMusicPlayer.AllMusic[DisplayBox].music;
+					}
 				}
 			}
 		}
@@ -423,15 +429,13 @@ namespace tMusicPlayer
 			int displayMusicID = tMusicPlayer.AllMusic[DisplayBox].music;
 			if (sortBy == SortBy.ID) {
 				musicData = musicData.OrderBy(x => x.music).ToList();
-				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
 			}
 			if (sortBy == SortBy.Name) {
 				musicData = musicData.OrderBy(x => x.name).ToList();
-				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
 			}
 
 			DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == displayMusicID);
-
+			
 			SelectionList.Clear();
 			
 			if (!viewMode) {
@@ -533,7 +537,7 @@ namespace tMusicPlayer
 		{
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
-			if (!canPlay[index]) {
+			if (canPlay.Contains(musicID)) {
 				return;
 			}
 			if (tMusicPlayer.MusicPlayerUI.playingMusic != musicID) {
@@ -553,7 +557,7 @@ namespace tMusicPlayer
 				switch (type) {
 					case MusicMode.Play:
 						if (!listening) {
-							playingMusic = (playingMusic == -1) ? DisplayBox : -1;
+							playingMusic = (playingMusic == -1) ? tMusicPlayer.AllMusic[DisplayBox].music : -1;
 							if (playingMusic != -1) {
 								listening = false;
 							}

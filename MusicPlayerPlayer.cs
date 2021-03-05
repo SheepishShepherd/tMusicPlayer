@@ -40,18 +40,20 @@ namespace tMusicPlayer
 			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
 			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
 			if (musicPlayerUI != null) {
-				for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
-					/*
-					if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) {
-						musicPlayerUI.canPlay[i] = true;
+				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
+					if (MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox)) {
+						musicPlayerUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
 					}
-					else {
-						musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
-					}
-					*/
-					musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
-					// Remove above line if bringing back EnableAllMusicBoxes
 				}
+				/*
+				if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) {
+					musicPlayerUI.canPlay[i] = true;
+				}
+				else {
+					musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
+				}
+				*/
+				// Remove above line if bringing back EnableAllMusicBoxes
 			}
 		}
 

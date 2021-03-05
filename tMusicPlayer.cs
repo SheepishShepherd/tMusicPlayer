@@ -140,12 +140,8 @@ namespace tMusicPlayer
 				AllMusic = AllMusic.OrderBy(x => x.name).ToList();
 			}
 
-			// Setup the canPlay list to match thie size of AllMusic, as well as the UI's item slots.
+			// Setup UI's item slot count.
 			if (!Main.dedServ) {
-				MusicPlayerUI.canPlay = new List<bool>();
-				foreach (MusicData box in AllMusic) {
-					MusicPlayerUI.canPlay.Add(false);
-				}
 				MusicPlayerUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
 				MusicPlayerUI.musicData = new List<MusicData>(AllMusic);
 				MusicPlayerUI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);

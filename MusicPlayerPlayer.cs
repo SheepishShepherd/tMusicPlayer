@@ -39,6 +39,7 @@ namespace tMusicPlayer
 			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
 			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
 			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
+			musicPlayerUI.smallPanel = tMusicPlayer.tMPConfig.StartWithSmall;
 			if (musicPlayerUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox)) {
@@ -46,12 +47,8 @@ namespace tMusicPlayer
 					}
 				}
 				/*
-				if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) {
-					musicPlayerUI.canPlay[i] = true;
-				}
-				else {
-					musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
-				}
+				if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) musicPlayerUI.canPlay[i] = true;
+				else musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
 				*/
 				// Remove above line if bringing back EnableAllMusicBoxes
 			}

@@ -39,7 +39,9 @@ namespace tMusicPlayer
 			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
 			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
 			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
-			musicPlayerUI.smallPanel = tMusicPlayer.tMPConfig.StartWithSmall;
+			if (tMusicPlayer.tMPConfig.StartWithSmall != tMusicPlayer.MusicPlayerUI.smallPanel) {
+				tMusicPlayer.MusicPlayerUI.SwapPanelSize();
+			}
 			if (musicPlayerUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox)) {
@@ -51,33 +53,6 @@ namespace tMusicPlayer
 				else musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
 				*/
 				// Remove above line if bringing back EnableAllMusicBoxes
-			}
-		}
-
-		public override void PreUpdate()
-		{
-			// This code mimics the "Music Box Recording" process.
-			// Check if we have music boxes at the ready, if the player is in record mode and music is currently playing.
-			// If all of those apply, we also go a rand check which will trigger the "recording" code.
-			if (musicBoxesStored > 0 && tMusicPlayer.MusicPlayerUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
-				if (index != -1) {
-					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
-					Main.PlaySound(mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
-					if (MusicBoxList.All(x => x.Type != musicBoxType)) {
-						// If we don't have it in our music player, automatically add it in.
-						MusicBoxList.Add(new ItemDefinition(musicBoxType));
-					}
-					else {
-						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(musicBoxType);
-					}
-					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
-
-					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					tMusicPlayer.MusicPlayerUI.recording = false;
-					musicBoxesStored--;
-				}
 			}
 		}
 

@@ -317,6 +317,9 @@ namespace tMusicPlayer
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
 				if (isSelectionSlot && (Main.mouseItem.type == refItem || Main.mouseItem.IsAir) && !Main.mouseRight) {
+					if (Main.mouseLeft) {
+						Main.playerInventory = true;
+					}
 					ItemSlot.Handle(ref musicBox, context);
 				}
 				else if (isEntrySlot) {

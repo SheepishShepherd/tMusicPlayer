@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
@@ -315,6 +316,31 @@ namespace tMusicPlayer
 
 		public override void Update(GameTime gameTime)
 		{
+			// This code mimics the "Music Box Recording" process.
+			// Check if we have music boxes at the ready, if the player is in record mode and music is currently playing.
+			// If all of those apply, we also go a rand check which will trigger the "recording" code.
+			Player player = Main.LocalPlayer;
+			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
+			if (modplayer.musicBoxesStored > 0 && tMusicPlayer.MusicPlayerUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
+				if (index != -1) {
+					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;					Main.PlaySound(SoundLoader.customSoundType, player.position, ModLoader.GetMod("tMusicPlayer").GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
+					if (modplayer.MusicBoxList.All(x => x.Type != musicBoxType)) {
+						// If we don't have it in our music player, automatically add it in.
+						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));
+					}
+					else {
+						// If we do have it already, spawn the item.
+						player.QuickSpawnItem(musicBoxType);
+					}
+					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
+
+					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
+					tMusicPlayer.MusicPlayerUI.recording = false;
+					modplayer.musicBoxesStored--;
+				}
+			}
+
 			base.Update(gameTime);
 			if (Main.gameMenu) {
 				playingMusic = -1;
@@ -323,6 +349,11 @@ namespace tMusicPlayer
 			}
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
 				mpToggleVisibility = !mpToggleVisibility;
+				if (mpToggleVisibility) {
+					if (tMusicPlayer.tMPConfig.StartWithSmall != tMusicPlayer.MusicPlayerUI.smallPanel) {
+						tMusicPlayer.MusicPlayerUI.SwapPanelSize();
+					}
+				}
 			}
 			if (tMusicPlayer.PlayStopHotkey.JustPressed) {
 				ToggleButton(MusicMode.Play);
@@ -333,11 +364,8 @@ namespace tMusicPlayer
 			if (tMusicPlayer.NextSongHotkey.JustPressed) {
 				ChangeDisplay(true, false);
 			}
-			if (!Main.playerInventory) {
-				selectionVisible = false;
-			}
 
-			this.AddOrRemoveChild(MusicPlayerPanel, Main.playerInventory && mpToggleVisibility);
+			this.AddOrRemoveChild(MusicPlayerPanel, mpToggleVisibility);
 			this.AddOrRemoveChild(musicEntryPanel, selectionVisible);
 			this.AddOrRemoveChild(selectionPanel, selectionVisible);
 
@@ -345,8 +373,7 @@ namespace tMusicPlayer
 			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
 			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 			musicEntryPanel.Recalculate();
-
-			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+			
 			if (!listening && canPlay.Count == 0) {
 				ToggleButton(MusicMode.Listen);
 			}
@@ -591,15 +618,15 @@ namespace tMusicPlayer
 			}
 		}
 
-		private void SwapPanelSize()
+		public void SwapPanelSize()
 		{
 			smallPanel = !smallPanel;
 
 			Texture2D size = smallPanel ? panelTextures[1] : panelTextures[2];
 			MusicPlayerPanel.Width.Pixels = size.Width;
 			MusicPlayerPanel.Height.Pixels = size.Height;
-			MusicPlayerPanel.Top.Pixels = 6f;
-			MusicPlayerPanel.Left.Pixels = 500f;
+			//MusicPlayerPanel.Top.Pixels = 6f;
+			//MusicPlayerPanel.Left.Pixels = 500f;
 
 			expandButton.Left.Pixels = size.Width - expandButton.Width.Pixels - 8f;
 			viewButton.Left.Pixels = (size.Width - 20 - 8);

@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Terraria;
 using Terraria.ModLoader.Config;
 
 namespace tMusicPlayer
 {
 	[BackgroundColor(55, 59, 80, 255)]
-	[Label("Configure your Music!")]
+	[Label("Personal Configs")]
 	public class TMPConfig : ModConfig
 	{
 		public override ConfigScope Mode => ConfigScope.ClientSide;
@@ -37,12 +36,6 @@ namespace tMusicPlayer
 		[BackgroundColor(76, 168, 84, 255)]
 		[Tooltip("")]
 		public bool StartWithSmall { get; set; }
-		
-		[DefaultValue(5)]
-		[Label("MusicPlayer maximum music boxes for recording")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("Set the maximum amount of music boxes able to be stored")]
-		public int MaxStorage { get; set; }
 
 		[Header("[i:3625] [c/ffeb6e:Debugging]")]
 		[DefaultValue(false)]
@@ -97,6 +90,26 @@ namespace tMusicPlayer
 				}
 				*/
 			}
+		}
+	}
+
+	[BackgroundColor(55, 59, 80, 255)]
+	[Label("Global Configs (Reloading Required)")]
+	public class TMPServerConfig : ModConfig
+	{
+		public override ConfigScope Mode => ConfigScope.ServerSide;
+
+		[ReloadRequired]
+		[Range(3, 20)]
+		[DefaultValue(5)]
+		[Label("MusicPlayer maximum music boxes for recording")]
+		[BackgroundColor(76, 168, 84, 255)]
+		[Tooltip("Set the maximum amount of music boxes able to be stored")]
+		public int MaxStorage { get; set; }
+
+		public override void OnChanged()
+		{
+
 		}
 	}
 }

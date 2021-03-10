@@ -324,7 +324,8 @@ namespace tMusicPlayer
 			if (modplayer.musicBoxesStored > 0 && tMusicPlayer.MusicPlayerUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
-					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;					Main.PlaySound(SoundLoader.customSoundType, player.position, ModLoader.GetMod("tMusicPlayer").GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
+					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
+					Main.PlaySound(SoundLoader.customSoundType, player.position, ModLoader.GetMod("tMusicPlayer").GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
 					if (modplayer.MusicBoxList.All(x => x.Type != musicBoxType)) {
 						// If we don't have it in our music player, automatically add it in.
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));
@@ -625,8 +626,6 @@ namespace tMusicPlayer
 			Texture2D size = smallPanel ? panelTextures[1] : panelTextures[2];
 			MusicPlayerPanel.Width.Pixels = size.Width;
 			MusicPlayerPanel.Height.Pixels = size.Height;
-			//MusicPlayerPanel.Top.Pixels = 6f;
-			//MusicPlayerPanel.Left.Pixels = 500f;
 
 			expandButton.Left.Pixels = size.Width - expandButton.Width.Pixels - 8f;
 			viewButton.Left.Pixels = (size.Width - 20 - 8);

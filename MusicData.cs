@@ -13,7 +13,7 @@ namespace tMusicPlayer
 
 		public override string ToString()
 		{
-			return $"{name} from {mod} -- [Item#{musicbox}] MusicID: {music}({mainMusicBox2})";
+			return $"{name} from {mod} -- [Item#{musicbox}] [MusicID#{music} -- Equip#{mainMusicBox2}]";
 		}
 
 		public MusicData(int music, int musicbox, string mod = "Terraria", string name = "Unknown")

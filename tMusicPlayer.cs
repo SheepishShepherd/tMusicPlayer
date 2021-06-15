@@ -19,6 +19,7 @@ namespace tMusicPlayer
 		public static Dictionary<int, int> itemToMusicReference;
 
 		public static TMPConfig tMPConfig;
+		public static TMPServerConfig tMPServerConfig;
 
 		internal static ModHotKey HidePlayerHotkey;
 		internal static ModHotKey PlayStopHotkey;
@@ -29,6 +30,7 @@ namespace tMusicPlayer
 		{
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
+			tMPServerConfig = ModContent.GetInstance<TMPServerConfig>();
 			HidePlayerHotkey = RegisterHotKey("Hide Music Player", "Up");
 			PlayStopHotkey = RegisterHotKey("Play/Stop Music", "Down");
 			PrevSongHotkey = RegisterHotKey("Previous Song", "Left");

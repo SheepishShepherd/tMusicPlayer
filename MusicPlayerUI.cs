@@ -454,6 +454,10 @@ namespace tMusicPlayer
 
 		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false)
 		{
+			sortType = sortBy;
+			availabililty = progressBy;
+			FilterMod = filterMod;
+
 			int displayMusicID = tMusicPlayer.AllMusic[DisplayBox].music;
 			if (sortBy == SortBy.ID) {
 				musicData = musicData.OrderBy(x => x.music).ToList();

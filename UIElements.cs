@@ -202,6 +202,9 @@ namespace tMusicPlayer
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorEnabled && !disabled) {
 					Main.hoverItemName = SetHoverItemName(Id);
 				}
+				else if (Id == "filtermod") {
+					Main.hoverItemName = $"{(tMusicPlayer.MusicPlayerUI.FilterMod == "" ? "Filter by Mod" : $"{tMusicPlayer.MusicPlayerUI.FilterMod}")}";
+				}
 			}
 		}
 
@@ -225,7 +228,9 @@ namespace tMusicPlayer
 				case "sortby":
 					return $"Sorted by {(tMusicPlayer.MusicPlayerUI.sortType == SortBy.ID ? "ID" : "Name")}";
 				case "filtermod":
-					return $"Showing {(tMusicPlayer.MusicPlayerUI.FilterMod == "" ? "all " : "")}music boxes{(tMusicPlayer.MusicPlayerUI.FilterMod != "" ? " from " : "")}{tMusicPlayer.MusicPlayerUI.FilterMod}";
+					return $"{(tMusicPlayer.MusicPlayerUI.FilterMod == "" ? "Filter by Mod" : $"{tMusicPlayer.MusicPlayerUI.FilterMod}")}";
+				case "clearfiltermod":
+					return "Clear mod filter";
 				case "availability":
 					return $"Showing all {(tMusicPlayer.MusicPlayerUI.availabililty == ProgressBy.Obtained ? "obtained " : "")}{(tMusicPlayer.MusicPlayerUI.availabililty == ProgressBy.Unobtained ? "unobtained " : "")}music boxes";
 				case "viewmode":
@@ -603,7 +608,7 @@ namespace tMusicPlayer
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorEnabled) {
 					Main.hoverItemName = 
 						"Stored music boxes record songs while recording is enabled\n" + 
-						$"Up to {tMusicPlayer.tMPConfig.MaxStorage} music boxes can be held at once\n" + 
+						$"Up to {tMusicPlayer.tMPServerConfig.MaxStorage} music boxes can be held at once\n" + 
 						"Right click to take out one music box\nLeft click to take all of them out";
 				}
 			}

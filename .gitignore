@@ -6,5 +6,4 @@
 /obj
 /Properties
 *.sln
-*.csproj
 /bin/Debug/net45

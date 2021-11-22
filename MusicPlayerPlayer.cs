@@ -18,17 +18,12 @@ namespace tMusicPlayer
 			musicBoxesStored = 0;
 		}
 
-		public override TagCompound Save()
-		{
-			TagCompound tag = new TagCompound {
-				{ "Music Boxes", MusicBoxList },
-				{ "Stored Boxes", musicBoxesStored }
-			};
-			return tag;
+        public override void SaveData(TagCompound tag) {
+			tag["Music Boxes"] = MusicBoxList;
+			tag["Stored Boxes"] = musicBoxesStored;
 		}
 
-		public override void Load(TagCompound tag)
-		{
+        public override void LoadData(TagCompound tag) {
 			MusicBoxList = tag.Get<List<ItemDefinition>>("Music Boxes");
 			musicBoxesStored = tag.Get<int>("Stored Boxes");
 		}
@@ -37,9 +32,9 @@ namespace tMusicPlayer
 		{
 			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
 			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
-			MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
-			if (tMusicPlayer.tMPConfig.StartWithSmall != tMusicPlayer.MusicPlayerUI.smallPanel) {
-				tMusicPlayer.MusicPlayerUI.SwapPanelSize();
+			MusicPlayerUI musicPlayerUI = MusicUISystem.MusicUI;
+			if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
+				MusicUISystem.MusicUI.SwapPanelSize();
 			}
 			if (musicPlayerUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
@@ -61,8 +56,8 @@ namespace tMusicPlayer
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
 			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
-			if (!Main.gameMenu && tMusicPlayer.MusicPlayerUI != null && tMusicPlayer.MusicPlayerUI.playingMusic > -1) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == tMusicPlayer.MusicPlayerUI.playingMusic);
+			if (!Main.gameMenu && MusicUISystem.MusicUI != null && MusicUISystem.MusicUI.playingMusic > -1) {
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == MusicUISystem.MusicUI.playingMusic);
 				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
 			}
 		}

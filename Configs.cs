@@ -51,14 +51,14 @@ namespace tMusicPlayer
 		public override void OnChanged()
 		{
 			if (!Main.gameMenu) {
-				MusicPlayerUI musicPlayerUI = tMusicPlayer.MusicPlayerUI;
+				MusicPlayerUI UI = MusicUISystem.MusicUI;
 				if (ResettingPanels) {
-					musicPlayerUI.MusicPlayerPanel.Left.Pixels = 500f;
-					musicPlayerUI.MusicPlayerPanel.Top.Pixels = 6f;
-					musicPlayerUI.selectionPanel.Left.Pixels = (Main.screenWidth / 2) - musicPlayerUI.selectionPanel.Width.Pixels / 2f;
-					musicPlayerUI.selectionPanel.Top.Pixels = (Main.screenHeight / 2) - musicPlayerUI.selectionPanel.Height.Pixels / 2f;
-					musicPlayerUI.musicEntryPanel.Left.Pixels = musicPlayerUI.selectionPanel.Left.Pixels + musicPlayerUI.selectionPanel.Width.Pixels - musicPlayerUI.musicEntryPanel.Width.Pixels - 10f;
-					musicPlayerUI.musicEntryPanel.Top.Pixels = musicPlayerUI.selectionPanel.Top.Pixels - musicPlayerUI.musicEntryPanel.Height.Pixels;
+					UI.MusicPlayerPanel.Left.Pixels = 1400f;
+					UI.MusicPlayerPanel.Top.Pixels = 100f;
+					UI.selectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.selectionPanel.Width.Pixels / 2f;
+					UI.selectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.selectionPanel.Height.Pixels / 2f;
+					UI.musicEntryPanel.Left.Pixels = UI.selectionPanel.Left.Pixels + UI.selectionPanel.Width.Pixels - UI.musicEntryPanel.Width.Pixels - 10f;
+					UI.musicEntryPanel.Top.Pixels = UI.selectionPanel.Top.Pixels - UI.musicEntryPanel.Height.Pixels;
 					ResettingPanels = false;
 				}
 				/*

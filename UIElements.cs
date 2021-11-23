@@ -317,8 +317,10 @@ namespace tMusicPlayer
 				}
 			}
 			if (!isEntrySlot) {
+				// TODO: Implement 'IncludeResearch' better?
+				bool isResearched = tMusicPlayer.tMPServerConfig.IncludeResearched && modplayer.Player.difficulty == PlayerDifficultyID.Creative && modplayer.Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(itemID);
 				bool HasMusicBox = modplayer.MusicBoxList.Any(item => item.Type == itemID);
-				musicBox.SetDefaults(HasMusicBox ? itemID : 0);
+				musicBox.SetDefaults(HasMusicBox || isResearched ? itemID : 0);
 			}
 			else {
 				if (!musicBox.IsAir) {

@@ -107,6 +107,12 @@ namespace tMusicPlayer
 		[Tooltip("Set the maximum amount of music boxes able to be stored")]
 		public int MaxStorage { get; set; }
 
+		[DefaultValue(false)]
+		[Label("MusicPlayer includes researched music boxes")]
+		[BackgroundColor(76, 168, 84, 255)]
+		[Tooltip("If you have researched a music box, it will automatically fill in!")]
+		public bool IncludeResearched { get; set; }
+
 		public override void OnChanged()
 		{
 

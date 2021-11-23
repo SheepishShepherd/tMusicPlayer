@@ -22,14 +22,13 @@ namespace tMusicPlayer
 			this.music = music;
 			this.musicbox = musicbox;
 			this.mainMusicBox2 = mainMusicBox2;
-			this.mod = "Terraria";
 
 			string itemNameValue = Lang.GetItemNameValue(musicbox);
 			if (itemNameValue.Contains("Otherworldly")) {
-				// TODO: [1.4] Add check for Otherworldly music boxes
+				this.mod = "Terraria Otherworld";
 			}
 			else {
-				// TODO: [1.4] Add check for Otherworldly music boxes
+				this.mod = "Terraria";
 			}
 			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
 		}

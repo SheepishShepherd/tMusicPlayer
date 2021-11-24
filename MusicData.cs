@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.ID;
 
 namespace tMusicPlayer
 {
@@ -11,11 +10,8 @@ namespace tMusicPlayer
 		internal string name;
 		internal int mainMusicBox2;
 
-		public override string ToString()
-		{
-			return $"{name} from {mod} [Item#{musicbox}] -- [MusicID#{music}]";
-		}
-
+		public override string ToString() => $"{name} from {mod} [Item#{musicbox}] -- [MusicID#{music}]";
+		
 		// Vanilla method
 		internal MusicData(int music, int musicbox, int mainMusicBox2)
         {
@@ -33,6 +29,7 @@ namespace tMusicPlayer
 			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
 		}
 
+		// Mod method
 		public MusicData(int music, int musicbox, string mod, string name)
 		{
 			this.music = music;

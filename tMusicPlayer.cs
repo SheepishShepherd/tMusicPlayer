@@ -1,12 +1,10 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace tMusicPlayer
 {

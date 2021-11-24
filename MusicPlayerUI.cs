@@ -324,11 +324,11 @@ namespace tMusicPlayer
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (modplayer.musicBoxesStored > 0 && MusicUISystem.MusicUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
+			if (modplayer.musicBoxesStored > 0 && MusicUISystem.MusicUI.recording && Main.curMusic > 0 && Main.rand.Next(540) == 0) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
-                    SoundEngine.PlaySound(SoundID.Trackable);
+                    SoundEngine.PlaySound(SoundID.Item166);
 					if (modplayer.MusicBoxList.All(x => x.Type != musicBoxType)) {
 						// If we don't have it in our music player, automatically add it in.
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));

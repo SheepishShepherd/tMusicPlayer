@@ -537,7 +537,7 @@ namespace tMusicPlayer
                         }
 					}
 					MusicPlayerUI UI = MusicUISystem.MusicUI;
-					if (currentString.Length > 0) {
+					if (currentString.Length >= 0) {
 						List<MusicData> musicData = new List<MusicData>();
 						foreach (MusicData item in tMusicPlayer.AllMusic.ToArray()) {
 							if (item.name.ToLower().Contains(currentString)) {

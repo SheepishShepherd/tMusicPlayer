@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.ID;
 
 namespace tMusicPlayer
 {
@@ -11,73 +10,34 @@ namespace tMusicPlayer
 		internal string name;
 		internal int mainMusicBox2;
 
-		public override string ToString()
-		{
-			return $"{name} from {mod} -- [Item#{musicbox}] [MusicID#{music} -- Equip#{mainMusicBox2}]";
+		public override string ToString() => $"{name} from {mod} [Item#{musicbox}] -- [MusicID#{music}]";
+		
+		// Vanilla method
+		internal MusicData(int music, int musicbox, int mainMusicBox2)
+        {
+			this.music = music;
+			this.musicbox = musicbox;
+			this.mainMusicBox2 = mainMusicBox2;
+
+			string itemNameValue = Lang.GetItemNameValue(musicbox);
+			if (itemNameValue.Contains("Otherworldly")) {
+				this.mod = "Terraria Otherworld";
+			}
+			else {
+				this.mod = "Terraria";
+			}
+			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
 		}
 
-		public MusicData(int music, int musicbox, string mod = "Terraria", string name = "Unknown")
+		// Mod method
+		public MusicData(int music, int musicbox, string mod, string name)
 		{
 			this.music = music;
 			this.musicbox = musicbox;
 			this.mod = mod;
-			if (mod == "Terraria") {
-				string itemNameValue = Lang.GetItemNameValue(musicbox);
-				this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
-				// TODO: [1.4] Add check for Otherworldly music boxes
-			}
-			else {
-				this.name = name;
-			}
+			this.name = name;
 
-			if (musicbox >= 562 && musicbox <= 574) {
-				mainMusicBox2 = musicbox - 562;
-			}
-			else if(musicbox >= 1596 && musicbox <= 1609) {
-				mainMusicBox2 = musicbox - 1596 + 13;
-			}
-			else if(musicbox == ItemID.MusicBoxMushrooms) {
-				mainMusicBox2 = 27;
-			}
-			else if(musicbox == ItemID.MusicBoxPumpkinMoon) {
-				mainMusicBox2 = 28;
-			}
-			else if(musicbox == ItemID.MusicBoxAltUnderground) {
-				mainMusicBox2 = 29;
-			}
-			else if(musicbox == ItemID.MusicBoxFrostMoon) {
-				mainMusicBox2 = 30;
-			}
-			else if(musicbox == ItemID.MusicBoxUndergroundCrimson) {
-				mainMusicBox2 = 31;
-			}
-			else if(musicbox == ItemID.MusicBoxLunarBoss) {
-				mainMusicBox2 = 32;
-			}
-			else if(musicbox == ItemID.MusicBoxMartians) {
-				mainMusicBox2 = 33;
-			}
-			else if(musicbox == ItemID.MusicBoxPirates) {
-				mainMusicBox2 = 34;
-			}
-			else if(musicbox == ItemID.MusicBoxHell) {
-				mainMusicBox2 = 35;
-			}
-			else if(musicbox == ItemID.MusicBoxTowers) {
-				mainMusicBox2 = 36;
-			}
-			else if(musicbox == ItemID.MusicBoxGoblins) {
-				mainMusicBox2 = 37;
-			}
-			else if(musicbox == ItemID.MusicBoxSandstorm) {
-				mainMusicBox2 = 38;
-			}
-			else if(musicbox == ItemID.MusicBoxDD2) {
-				mainMusicBox2 = 39;
-			}
-			else {
-				mainMusicBox2 = music;
-			}
+			mainMusicBox2 = music;
 		}
 	}
 }

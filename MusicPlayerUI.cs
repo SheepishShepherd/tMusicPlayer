@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -61,9 +64,9 @@ namespace tMusicPlayer
 
 		public bool selectionVisible = false;
 		
-		public static Texture2D[] panelTextures;
-		public static Texture2D buttonTextures;
-		public static Texture2D closeTextures;
+		public static Asset<Texture2D>[] panelTextures;
+		public static Asset<Texture2D> buttonTextures;
+		public static Asset<Texture2D> closeTextures;
 
 		public SortBy sortType = SortBy.ID;
 		public ProgressBy availabililty = ProgressBy.None;
@@ -74,25 +77,25 @@ namespace tMusicPlayer
 		
 		public override void OnInitialize()
 		{
-			panelTextures = new Texture2D[4] {
-				CropTexture(ModContent.GetTexture($"tMusicPlayer/UI/backdrop"), new Rectangle(0, 0, 1, 1)),
-				ModContent.GetTexture("tMusicPlayer/UI/backdrop"),
-				ModContent.GetTexture("tMusicPlayer/UI/backdrop2"),
-				ModContent.GetTexture("tMusicPlayer/UI/backdrop3")
+			panelTextures = new Asset<Texture2D>[4] {
+				TextureAssets.MagicPixel,
+				ModContent.Request<Texture2D>("tMusicPlayer/UI/backdrop", AssetRequestMode.ImmediateLoad),
+				ModContent.Request<Texture2D>("tMusicPlayer/UI/backdrop2", AssetRequestMode.ImmediateLoad),
+				ModContent.Request<Texture2D>("tMusicPlayer/UI/backdrop3", AssetRequestMode.ImmediateLoad)
 			};
 			
-			buttonTextures = ModContent.GetTexture("tMusicPlayer/UI/buttons");
-			closeTextures = ModContent.GetTexture("tMusicPlayer/UI/close");
+			buttonTextures = ModContent.Request<Texture2D>("tMusicPlayer/UI/buttons", AssetRequestMode.ImmediateLoad);
+			closeTextures = ModContent.Request<Texture2D>("tMusicPlayer/UI/close", AssetRequestMode.ImmediateLoad);
 
-			MusicPlayerPanel = new BackDrop(panelTextures[0]) {
-				Id = "MusicPlayerPanel"
+			MusicPlayerPanel = new BackDrop() {
+				Id = "MusicPlayerPanel",
 			};
-			MusicPlayerPanel.Width.Pixels = panelTextures[1].Width;
-			MusicPlayerPanel.Height.Pixels = panelTextures[1].Height;
-			MusicPlayerPanel.Left.Pixels = 500f;
-			MusicPlayerPanel.Top.Pixels = 6f;
+			MusicPlayerPanel.Width.Pixels = panelTextures[1].Value.Width;
+			MusicPlayerPanel.Height.Pixels = panelTextures[1].Value.Height;
+			MusicPlayerPanel.Left.Pixels = 1115f;
+			MusicPlayerPanel.Top.Pixels = 16f;
 
-			prevButton = new HoverButton(buttonTextures, new Rectangle(0, 0, 22, 22)) {
+			prevButton = new HoverButton(buttonTextures.Value, new Rectangle(0, 0, 22, 22)) {
 				Id = "prev"
 			};
 			prevButton.Width.Pixels = 22f;
@@ -102,7 +105,7 @@ namespace tMusicPlayer
 			prevButton.OnClick += (a, b) => ChangeDisplay(false);
 			prevButton.OnRightClick += (a, b) => ChangeDisplay(false, true);
 
-			playButton = new HoverButton(buttonTextures, new Rectangle(24, 0, 22, 22)) {
+			playButton = new HoverButton(buttonTextures.Value, new Rectangle(24, 0, 22, 22)) {
 				Id = "play"
 			};
 			playButton.Width.Pixels = 22f;
@@ -112,7 +115,7 @@ namespace tMusicPlayer
 			playButton.OnClick += (a, b) => ToggleButton(MusicMode.Play);
 			MusicPlayerPanel.Append(playButton);
 
-			nextButton = new HoverButton(buttonTextures, new Rectangle(72, 0, 22, 22)) {
+			nextButton = new HoverButton(buttonTextures.Value, new Rectangle(72, 0, 22, 22)) {
 				Id = "next"
 			};
 			nextButton.Width.Pixels = 22f;
@@ -122,17 +125,17 @@ namespace tMusicPlayer
 			nextButton.OnClick += (a, b) => ChangeDisplay(true);
 			nextButton.OnRightClick += (a, b) => ChangeDisplay(true, true);
 
-			viewButton = new HoverButton(buttonTextures, new Rectangle(144, 0, 22, 22)) {
+			viewButton = new HoverButton(buttonTextures.Value, new Rectangle(144, 0, 22, 22)) {
 				Id = "view"
 			};
 			viewButton.Width.Pixels = 22f;
 			viewButton.Height.Pixels = 22f;
 			viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - viewButton.Width.Pixels - 6f;
 			viewButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - viewButton.Height.Pixels - 4f;
-			viewButton.OnClick += (a, b) => selectionVisible = true;
+			viewButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
 			MusicPlayerPanel.Append(viewButton);
 
-			detectButton = new HoverButton(buttonTextures, new Rectangle(96, 0, 22, 22)) {
+			detectButton = new HoverButton(buttonTextures.Value, new Rectangle(96, 0, 22, 22)) {
 				Id = "listen"
 			};
 			detectButton.Width.Pixels = 22f;
@@ -141,7 +144,7 @@ namespace tMusicPlayer
 			detectButton.Top.Pixels = viewButton.Top.Pixels;
 			detectButton.OnClick += (a, b) => ToggleButton(MusicMode.Listen);
 
-			recordButton = new HoverButton(buttonTextures, new Rectangle(168, 0, 22, 22)) {
+			recordButton = new HoverButton(buttonTextures.Value, new Rectangle(168, 0, 22, 22)) {
 				Id = "record"
 			};
 			recordButton.Width.Pixels = 22f;
@@ -150,7 +153,7 @@ namespace tMusicPlayer
 			recordButton.Top.Pixels = viewButton.Top.Pixels;
 			recordButton.OnClick += (a, b) => ToggleButton(MusicMode.Record);
 
-			expandButton = new HoverButton(closeTextures, new Rectangle(20, 0, 18, 18)) {
+			expandButton = new HoverButton(closeTextures.Value, new Rectangle(20, 0, 18, 18)) {
 				Id = "expand"
 			};
 			expandButton.Width.Pixels = 18f;
@@ -164,21 +167,21 @@ namespace tMusicPlayer
 				Id = "DisplaySlot"
 			};
 			DisplayMusicSlot.Left.Pixels = 8f;
-			DisplayMusicSlot.Top.Pixels = MusicPlayerPanel.Height.Pixels / 2f - (Main.inventoryBackTexture.Height / 2);
+			DisplayMusicSlot.Top.Pixels = MusicPlayerPanel.Height.Pixels / 2f - TextureAssets.InventoryBack.Value.Height / 2;
 			MusicPlayerPanel.Append(DisplayMusicSlot);
 
-			selectionPanel = new BackDrop(panelTextures[0]) {
+			selectionPanel = new BackDrop() {
 				Id = "SelectionPanel"
 			};
-			selectionPanel.Width.Pixels = panelTextures[3].Width;
-			selectionPanel.Height.Pixels = panelTextures[3].Height;
+			selectionPanel.Width.Pixels = panelTextures[3].Value.Width;
+			selectionPanel.Height.Pixels = panelTextures[3].Value.Height;
 			selectionPanel.Left.Pixels = (Main.screenWidth / 2) - selectionPanel.Width.Pixels / 2f;
 			selectionPanel.Top.Pixels = (Main.screenHeight / 2) - selectionPanel.Height.Pixels / 2f;
 
 			// Positioning base for filter buttons
 			float center = (selectionPanel.Width.Pixels / 2) - 11;
 
-			sortIDButton = new HoverButton(buttonTextures, new Rectangle(0 * 24, 48, 22, 22)) {
+			sortIDButton = new HoverButton(buttonTextures.Value, new Rectangle(0 * 24, 48, 22, 22)) {
 				Id = "sortid"
 			};
 			sortIDButton.Width.Pixels = 22f;
@@ -188,7 +191,7 @@ namespace tMusicPlayer
 			sortIDButton.OnClick += (a, b) => OrganizeSelection(SortBy.ID, availabililty, FilterMod);
 			selectionPanel.Append(sortIDButton);
 
-			sortNameButton = new HoverButton(buttonTextures, new Rectangle(1 * 24, 48, 22, 22)) {
+			sortNameButton = new HoverButton(buttonTextures.Value, new Rectangle(1 * 24, 48, 22, 22)) {
 				Id = "sortname"
 			};
 			sortNameButton.Width.Pixels = 22f;
@@ -198,7 +201,7 @@ namespace tMusicPlayer
 			sortNameButton.OnClick += (a, b) => OrganizeSelection(SortBy.Name, availabililty, FilterMod);
 			selectionPanel.Append(sortNameButton);
 
-			filterModButton = new HoverButton(buttonTextures, new Rectangle(2 * 24, 48, 22, 22)) {
+			filterModButton = new HoverButton(buttonTextures.Value, new Rectangle(2 * 24, 48, 22, 22)) {
 				Id = "filtermod"
 			};
 			filterModButton.Width.Pixels = 22f;
@@ -209,7 +212,7 @@ namespace tMusicPlayer
 			filterModButton.OnRightClick += (a, b) => OrganizeSelection(sortType, availabililty, UpdateModFilter(false));
 			selectionPanel.Append(filterModButton);
 
-			clearFilterModButton = new HoverButton(buttonTextures, new Rectangle(3 * 24, 48, 22, 22)) {
+			clearFilterModButton = new HoverButton(buttonTextures.Value, new Rectangle(3 * 24, 48, 22, 22)) {
 				Id = "clearfiltermod"
 			};
 			clearFilterModButton.Width.Pixels = 22f;
@@ -219,7 +222,7 @@ namespace tMusicPlayer
 			clearFilterModButton.OnClick += (a, b) => OrganizeSelection(sortType, availabililty, ResetModFilter());
 			selectionPanel.Append(clearFilterModButton);
 
-			clearAvailabilityButton = new HoverButton(buttonTextures, new Rectangle(4 * 24, 48, 22, 22)) {
+			clearAvailabilityButton = new HoverButton(buttonTextures.Value, new Rectangle(4 * 24, 48, 22, 22)) {
 				Id = "clearavailability"
 			};
 			clearAvailabilityButton.Width.Pixels = 22f;
@@ -229,7 +232,7 @@ namespace tMusicPlayer
 			clearAvailabilityButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.None, FilterMod);
 			selectionPanel.Append(clearAvailabilityButton);
 
-			obtainedButton = new HoverButton(buttonTextures, new Rectangle(5 * 24, 48, 22, 22)) {
+			obtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(5 * 24, 48, 22, 22)) {
 				Id = "obtainedavailability"
 			};
 			obtainedButton.Width.Pixels = 22f;
@@ -239,7 +242,7 @@ namespace tMusicPlayer
 			obtainedButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.Obtained, FilterMod);
 			selectionPanel.Append(obtainedButton);
 
-			unobtainedButton = new HoverButton(buttonTextures, new Rectangle(6 * 24, 48, 22, 22)) {
+			unobtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(6 * 24, 48, 22, 22)) {
 				Id = "unobtainedavailability"
 			};
 			unobtainedButton.Width.Pixels = 22f;
@@ -249,7 +252,7 @@ namespace tMusicPlayer
 			unobtainedButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.Unobtained, FilterMod);
 			selectionPanel.Append(unobtainedButton);
 
-			closeButton = new HoverButton(closeTextures, new Rectangle(0, 0, 18, 18)) {
+			closeButton = new HoverButton(closeTextures.Value, new Rectangle(0, 0, 18, 18)) {
 				Id = "select_close"
 			};
 			closeButton.Width.Pixels = 18f;
@@ -259,7 +262,7 @@ namespace tMusicPlayer
 			closeButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
 			selectionPanel.Append(closeButton);
 
-			viewModeButton = new HoverButton(buttonTextures, new Rectangle(7 * 24, 48, 22, 22)) {
+			viewModeButton = new HoverButton(buttonTextures.Value, new Rectangle(7 * 24, 48, 22, 22)) {
 				Id = "viewmode"
 			};
 			viewModeButton.Width.Pixels = 22f;
@@ -269,11 +272,11 @@ namespace tMusicPlayer
 			viewModeButton.OnClick += (a, b) => UpdateViewMode();
 			selectionPanel.Append(viewModeButton);
 
-			musicEntryPanel = new BackDrop(panelTextures[0]) {
+			musicEntryPanel = new BackDrop() {
 				Id = "MusicEntry"
 			};
-			musicEntryPanel.Width.Pixels = panelTextures[1].Height;
-			musicEntryPanel.Height.Pixels = panelTextures[1].Width;
+			musicEntryPanel.Width.Pixels = panelTextures[1].Value.Height;
+			musicEntryPanel.Height.Pixels = panelTextures[1].Value.Width;
 			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
 			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 
@@ -291,7 +294,7 @@ namespace tMusicPlayer
 			AddMusicBoxSlot.Top.Pixels = 8f;
 			musicEntryPanel.Append(AddMusicBoxSlot);
 
-			MusicStorageSlot = new ListenStorageSlot(Main.itemTexture[ItemID.MusicBox], ItemID.MusicBox);
+			MusicStorageSlot = new ListenStorageSlot(TextureAssets.Item[ItemID.MusicBox].Value, ItemID.MusicBox);
 			MusicStorageSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (MusicStorageSlot.Width.Pixels / 2);
 			MusicStorageSlot.Top.Pixels = AddMusicBoxSlot.Height.Pixels + 16f;
 			musicEntryPanel.Append(MusicStorageSlot);
@@ -321,11 +324,11 @@ namespace tMusicPlayer
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (modplayer.musicBoxesStored > 0 && tMusicPlayer.MusicPlayerUI.recording && Main.curMusic > 0 && Main.rand.Next(2700) == 0) {
+			if (modplayer.musicBoxesStored > 0 && MusicUISystem.MusicUI.recording && Main.curMusic > 0 && Main.rand.Next(540) == 0) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
-					Main.PlaySound(SoundLoader.customSoundType, player.position, ModLoader.GetMod("tMusicPlayer").GetSoundSlot(SoundType.Custom, "Sounds/Custom/recorded")); // TODO: [1.4] Proper PlaySound
+                    SoundEngine.PlaySound(SoundID.Item166);
 					if (modplayer.MusicBoxList.All(x => x.Type != musicBoxType)) {
 						// If we don't have it in our music player, automatically add it in.
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));
@@ -337,7 +340,7 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
 
 					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					tMusicPlayer.MusicPlayerUI.recording = false;
+					MusicUISystem.MusicUI.recording = false;
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -351,8 +354,8 @@ namespace tMusicPlayer
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
 				mpToggleVisibility = !mpToggleVisibility;
 				if (mpToggleVisibility) {
-					if (tMusicPlayer.tMPConfig.StartWithSmall != tMusicPlayer.MusicPlayerUI.smallPanel) {
-						tMusicPlayer.MusicPlayerUI.SwapPanelSize();
+					if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
+						MusicUISystem.MusicUI.SwapPanelSize();
 					}
 				}
 			}
@@ -527,7 +530,7 @@ namespace tMusicPlayer
 						}
 					}
 
-					newRow = new ItemSlotRow(i, panelTextures[2].Bounds.Width, panelTextures[2].Bounds.Height);
+					newRow = new ItemSlotRow(i, panelTextures[2].Value.Bounds.Width, panelTextures[2].Value.Bounds.Height);
 
 					// Item Slot
 					SelectionSlots[i] = new MusicBoxSlot(musicData[i].musicbox, 0.85f);
@@ -537,7 +540,7 @@ namespace tMusicPlayer
 					newRow.Append(SelectionSlots[i]);
 					
 					// Play button
-					HoverButton playSong = new HoverButton(buttonTextures, new Rectangle(24, 0, 22, 22)) {
+					HoverButton playSong = new HoverButton(buttonTextures.Value, new Rectangle(24, 0, 22, 22)) {
 						Id = $"altplay_{musicData[i].music}",
 					};
 					playSong.Width.Pixels = 22f;
@@ -569,17 +572,17 @@ namespace tMusicPlayer
 		{
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
-			if (canPlay.Contains(musicID)) {
+			if (!canPlay.Contains(musicID)) {
 				return;
 			}
-			if (tMusicPlayer.MusicPlayerUI.playingMusic != musicID) {
-				tMusicPlayer.MusicPlayerUI.ListenDisplay = -1;
-				tMusicPlayer.MusicPlayerUI.listening = false;
-				tMusicPlayer.MusicPlayerUI.DisplayBox = index;
-				tMusicPlayer.MusicPlayerUI.playingMusic = musicID;
+			if (MusicUISystem.MusicUI.playingMusic != musicID) {
+				MusicUISystem.MusicUI.ListenDisplay = -1;
+				MusicUISystem.MusicUI.listening = false;
+				MusicUISystem.MusicUI.DisplayBox = index;
+				MusicUISystem.MusicUI.playingMusic = musicID;
 			}
 			else {
-				tMusicPlayer.MusicPlayerUI.playingMusic = -1;
+				MusicUISystem.MusicUI.playingMusic = -1;
 			}
 		}
 
@@ -627,7 +630,7 @@ namespace tMusicPlayer
 		{
 			smallPanel = !smallPanel;
 
-			Texture2D size = smallPanel ? panelTextures[1] : panelTextures[2];
+			Texture2D size = smallPanel ? panelTextures[1].Value : panelTextures[2].Value;
 			MusicPlayerPanel.Width.Pixels = size.Width;
 			MusicPlayerPanel.Height.Pixels = size.Height;
 
@@ -645,16 +648,6 @@ namespace tMusicPlayer
 
 			nextButton.Left.Pixels = playButton.Left.Pixels + nextButton.Width.Pixels - 2f;
 			MusicPlayerPanel.AddOrRemoveChild(nextButton, !smallPanel);
-		}
-
-		//TODO: Currently broken, but only used for an invisible image so its fine for now
-		public static Texture2D CropTexture(Texture2D texture, Rectangle snippet)
-		{
-			Texture2D croppedTexture = new Texture2D(Main.graphics.GraphicsDevice, snippet.Width, snippet.Height);
-			Color[] data = new Color[snippet.Width * snippet.Height];
-			texture.GetData<Color>(0, (Rectangle?)snippet, data, 0, data.Length);
-			croppedTexture.SetData<Color>(data);
-			return croppedTexture;
 		}
 	}
 

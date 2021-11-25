@@ -521,10 +521,20 @@ namespace tMusicPlayer
 				string newString = Main.GetInputText(currentString);
 				if (FontAssets.MouseText.Value.MeasureString(newString.ToLower()).X < Width.Pixels - 10f) {
 					if (!newString.Equals(currentString)) {
-						currentString = newString.ToLower();
-					}
-					else {
-						currentString = newString.ToLower();
+						// Stops the user from typing a name that doesn't exist. Prevents a gamebreaking hard-lock.
+						bool nameCheck = false;
+						foreach (MusicData item in tMusicPlayer.AllMusic.ToArray()) {
+							if (item.name.ToLower().Contains(newString)) {
+								nameCheck = true;
+								break;
+							}
+						}
+						if (nameCheck) {
+							currentString = newString.ToLower();
+						}
+						else {
+							newString = currentString;
+                        }
 					}
 					MusicPlayerUI UI = MusicUISystem.MusicUI;
 					if (currentString.Length > 0) {

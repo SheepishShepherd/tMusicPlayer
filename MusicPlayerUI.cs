@@ -92,8 +92,8 @@ namespace tMusicPlayer
 			};
 			MusicPlayerPanel.Width.Pixels = panelTextures[1].Value.Width;
 			MusicPlayerPanel.Height.Pixels = panelTextures[1].Value.Height;
-			MusicPlayerPanel.Left.Pixels = 1400f;
-			MusicPlayerPanel.Top.Pixels = 100f;
+			MusicPlayerPanel.Left.Pixels = 1115f;
+			MusicPlayerPanel.Top.Pixels = 16f;
 
 			prevButton = new HoverButton(buttonTextures.Value, new Rectangle(0, 0, 22, 22)) {
 				Id = "prev"
@@ -132,7 +132,7 @@ namespace tMusicPlayer
 			viewButton.Height.Pixels = 22f;
 			viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - viewButton.Width.Pixels - 6f;
 			viewButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - viewButton.Height.Pixels - 4f;
-			viewButton.OnClick += (a, b) => selectionVisible = true;
+			viewButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
 			MusicPlayerPanel.Append(viewButton);
 
 			detectButton = new HoverButton(buttonTextures.Value, new Rectangle(96, 0, 22, 22)) {
@@ -572,7 +572,7 @@ namespace tMusicPlayer
 		{
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
-			if (canPlay.Contains(musicID)) {
+			if (!canPlay.Contains(musicID)) {
 				return;
 			}
 			if (MusicUISystem.MusicUI.playingMusic != musicID) {

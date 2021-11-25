@@ -53,8 +53,8 @@ namespace tMusicPlayer
 			if (!Main.gameMenu) {
 				MusicPlayerUI UI = MusicUISystem.MusicUI;
 				if (ResettingPanels) {
-					UI.MusicPlayerPanel.Left.Pixels = 1400f;
-					UI.MusicPlayerPanel.Top.Pixels = 100f;
+					UI.MusicPlayerPanel.Left.Pixels = 1115f;
+					UI.MusicPlayerPanel.Top.Pixels = 16f;
 					UI.selectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.selectionPanel.Width.Pixels / 2f;
 					UI.selectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.selectionPanel.Height.Pixels / 2f;
 					UI.musicEntryPanel.Left.Pixels = UI.selectionPanel.Left.Pixels + UI.selectionPanel.Width.Pixels - UI.musicEntryPanel.Width.Pixels - 10f;

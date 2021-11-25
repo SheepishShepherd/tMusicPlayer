@@ -147,7 +147,6 @@ namespace tMusicPlayer
 		}
 	}
 	
-
 	internal class HoverButton : UIImage
 	{
 		public string Id { get; init; } = "";

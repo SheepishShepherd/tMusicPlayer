@@ -6,4 +6,6 @@
 /obj
 /Properties
 *.sln
+*.mdp
+workshop.json
 /bin/Debug/net45

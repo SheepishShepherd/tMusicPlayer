@@ -182,7 +182,7 @@ namespace tMusicPlayer
 			float center = (selectionPanel.Width.Pixels / 2) - 11;
 
 			sortIDButton = new HoverButton(buttonTextures.Value, new Rectangle(0 * 24, 48, 22, 22)) {
-				Id = "sortid"
+				Id = "sortbyid"
 			};
 			sortIDButton.Width.Pixels = 22f;
 			sortIDButton.Height.Pixels = 22f;
@@ -192,7 +192,7 @@ namespace tMusicPlayer
 			selectionPanel.Append(sortIDButton);
 
 			sortNameButton = new HoverButton(buttonTextures.Value, new Rectangle(1 * 24, 48, 22, 22)) {
-				Id = "sortname"
+				Id = "sortbyname"
 			};
 			sortNameButton.Width.Pixels = 22f;
 			sortNameButton.Height.Pixels = 22f;
@@ -233,7 +233,7 @@ namespace tMusicPlayer
 			selectionPanel.Append(clearAvailabilityButton);
 
 			obtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(5 * 24, 48, 22, 22)) {
-				Id = "obtainedavailability"
+				Id = "availability"
 			};
 			obtainedButton.Width.Pixels = 22f;
 			obtainedButton.Height.Pixels = 22f;
@@ -243,7 +243,7 @@ namespace tMusicPlayer
 			selectionPanel.Append(obtainedButton);
 
 			unobtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(6 * 24, 48, 22, 22)) {
-				Id = "unobtainedavailability"
+				Id = "unavailability"
 			};
 			unobtainedButton.Width.Pixels = 22f;
 			unobtainedButton.Height.Pixels = 22f;

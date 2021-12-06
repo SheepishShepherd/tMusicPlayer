@@ -135,13 +135,16 @@ namespace tMusicPlayer
 
 		public override void Unload()
 		{
+			AllMusic = null;
+			itemToMusicReference = null;
+
 			tMPConfig = null;
+			tMPServerConfig = null;
+
 			HidePlayerHotkey = null;
 			PlayStopHotkey = null;
 			PrevSongHotkey = null;
 			NextSongHotkey = null;
-			AllMusic = null;
-			itemToMusicReference = null;
 		}
 
 		public override void PostAddRecipes()

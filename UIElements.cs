@@ -199,8 +199,9 @@ namespace tMusicPlayer
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
 			bool musicAtZero = Id != "expand" && Id != "view" && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
+			bool clearAvailDisabled = Id == "clearavailability" && UI.availabililty == ProgressBy.None;
 			bool cannotPlayListMusic = Id.Contains("altplay") && !UI.canPlay.Contains(Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1)));
-			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
+			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic | clearAvailDisabled;
 			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			CalculatedStyle innerDimensions = GetInnerDimensions();
 			spriteBatch.Draw(texture, innerDimensions.ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
@@ -233,14 +234,20 @@ namespace tMusicPlayer
 					return "Next Song";
 				case "view":
 					return (UI.selectionVisible ? "Close" : "Open") + " Selection List";
-				case "sortby":
-					return $"Sorted by {(UI.sortType == SortBy.ID ? "ID" : "Name")}";
+				case "sortbyid":
+					return "Sort by ID";
+				case "sortbyname":
+					return "Sort by name";
 				case "filtermod":
 					return $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}";
 				case "clearfiltermod":
 					return "Clear mod filter";
 				case "availability":
-					return $"Showing all {(UI.availabililty == ProgressBy.Obtained ? "obtained " : "")}{(UI.availabililty == ProgressBy.Unobtained ? "unobtained " : "")}music boxes";
+					return "Show all obtained music boxes";
+				case "unavailability":
+					return "Show all unobtained music boxes";
+				case "clearavailability":
+					return "Clear availability filter";
 				case "viewmode":
 					return UI.viewMode ? "Change to Grid mode" : "Change to List mode";
 				default:

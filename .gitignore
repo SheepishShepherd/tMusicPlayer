@@ -8,4 +8,4 @@
 *.sln
 *.mdp
 workshop.json
-/bin/Debug/net45
+/bin/Debug/

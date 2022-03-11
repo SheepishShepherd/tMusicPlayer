@@ -294,7 +294,10 @@ namespace tMusicPlayer
 			AddMusicBoxSlot.Top.Pixels = 8f;
 			musicEntryPanel.Append(AddMusicBoxSlot);
 
+			Asset<Texture2D> texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad);
 			MusicStorageSlot = new ListenStorageSlot(ItemID.MusicBox);
+			MusicStorageSlot.Width.Pixels = texture.Value.Width;
+			MusicStorageSlot.Height.Pixels = texture.Value.Height;
 			MusicStorageSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (MusicStorageSlot.Width.Pixels / 2);
 			MusicStorageSlot.Top.Pixels = AddMusicBoxSlot.Height.Pixels + 16f;
 			musicEntryPanel.Append(MusicStorageSlot);
@@ -335,7 +338,7 @@ namespace tMusicPlayer
 					}
 					else {
 						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(musicBoxType);
+						player.QuickSpawnItem(player.GetItemSource_OpenItem(musicBoxType), musicBoxType);
 					}
 					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
 

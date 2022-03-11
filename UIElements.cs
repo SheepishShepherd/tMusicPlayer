@@ -569,15 +569,11 @@ namespace tMusicPlayer
 	{
 		public string Id { get; init; } = "";
 
-		private readonly Texture2D texture;
 		private readonly int itemID;
 
 		public ListenStorageSlot(int itemID)
 		{
 			this.itemID = itemID;
-			texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{itemID}", AssetRequestMode.ImmediateLoad).Value;
-			Width.Pixels = texture.Bounds.Width;
-			Height.Pixels = texture.Bounds.Height;
 		}
 
 		public override void Click(UIMouseEvent evt)
@@ -628,8 +624,12 @@ namespace tMusicPlayer
 				}
 			}
 			base.DrawSelf(spriteBatch);
-			Vector2 pos = new Vector2(rectangle.X + Width.Pixels * 0.75f, rectangle.Y + Height.Pixels * 0.75f);
-			Utils.DrawBorderString(spriteBatch, modplayer.musicBoxesStored.ToString(), pos, Color.White, 0.85f);
+			Rectangle inner = GetInnerDimensions().ToRectangle();
+			Asset<Texture2D> texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad);
+			spriteBatch.Draw(texture.Value, inner, Color.White);
+
+			Vector2 pos2 = new Vector2(rectangle.X + inner.Width * 0.75f, rectangle.Y + inner.Height * 0.75f);
+			Utils.DrawBorderString(spriteBatch, modplayer.musicBoxesStored.ToString(), pos2, Color.White, 0.85f);
 		}
 	}
 

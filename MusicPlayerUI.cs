@@ -294,7 +294,7 @@ namespace tMusicPlayer
 			AddMusicBoxSlot.Top.Pixels = 8f;
 			musicEntryPanel.Append(AddMusicBoxSlot);
 
-			MusicStorageSlot = new ListenStorageSlot(TextureAssets.Item[ItemID.MusicBox].Value, ItemID.MusicBox);
+			MusicStorageSlot = new ListenStorageSlot(ItemID.MusicBox);
 			MusicStorageSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (MusicStorageSlot.Width.Pixels / 2);
 			MusicStorageSlot.Top.Pixels = AddMusicBoxSlot.Height.Pixels + 16f;
 			musicEntryPanel.Append(MusicStorageSlot);

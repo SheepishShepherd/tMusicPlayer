@@ -48,14 +48,14 @@ namespace tMusicPlayer
 			if (Id == "MusicPlayerPanel" && !UI.smallPanel) {
 				int musicBoxDisplayed = (UI.listening && UI.ListenDisplay != -1) ? UI.ListenDisplay : UI.DisplayBox;
 				MusicData musicRef = tMusicPlayer.AllMusic[musicBoxDisplayed];
-				Vector2 pos = new Vector2((rect.X + 64), (rect.Y + 10));
+				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f, 0f, 0f, -1);
-				pos = new Vector2((rect.X + 64), (rect.Y + 30));
+				pos = new Vector2(rect.X + 64, rect.Y + 30);
 				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f, 0f, 0f, -1);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-				// Needed to remove mousetext from outside sources when using the Boss Log
+				// Needed to remove mousetext from outside sources when using the UI
 				Main.player[Main.myPlayer].mouseInterface = true;
 				Main.mouseText = true;
 				// Item icons such as hovering over a bed will not appear
@@ -167,21 +167,15 @@ namespace tMusicPlayer
 				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 				return UI.playingMusic == num;
 			}
-			switch (Id) {
-				case "expand":
-					return !UI.smallPanel;
-				case "play":
-					return UI.playingMusic > -1;
-				case "listen":
-					return UI.listening;
-				case "record":
-					return !UI.recording;
-				case "viewmode":
-					return !UI.viewMode;
-				default:
-					return false;
-			}
-		}
+            return Id switch {
+                "expand" => !UI.smallPanel,
+                "play" => UI.playingMusic > -1,
+                "listen" => UI.listening,
+                "record" => !UI.recording,
+                "viewmode" => !UI.viewMode,
+                _ => false,
+            };
+        }
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
@@ -207,7 +201,7 @@ namespace tMusicPlayer
 			spriteBatch.Draw(texture, innerDimensions.ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
-				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorEnabled && !disabled) {
+				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !disabled) {
 					Main.hoverItemName = SetHoverItemName(Id);
 				}
 				else if (Id == "filtermod") {
@@ -219,41 +213,25 @@ namespace tMusicPlayer
 		public string SetHoverItemName(string ID)
 		{
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
-			switch (ID) {
-				case "expand":
-					return (UI.smallPanel ? "Maximize" : "Minimize") ?? "";
-				case "play":
-					return ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "";
-				case "listen":
-					return ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "";
-				case "record":
-					return (UI.listening ? "Disable" : "Enable") + " Listening";
-				case "prev":
-					return "Previous Song";
-				case "next":
-					return "Next Song";
-				case "view":
-					return (UI.selectionVisible ? "Close" : "Open") + " Selection List";
-				case "sortbyid":
-					return "Sort by ID";
-				case "sortbyname":
-					return "Sort by name";
-				case "filtermod":
-					return $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}";
-				case "clearfiltermod":
-					return "Clear mod filter";
-				case "availability":
-					return "Show all obtained music boxes";
-				case "unavailability":
-					return "Show all unobtained music boxes";
-				case "clearavailability":
-					return "Clear availability filter";
-				case "viewmode":
-					return UI.viewMode ? "Change to Grid mode" : "Change to List mode";
-				default:
-					return "";
-			}
-		}
+            return ID switch {
+                "expand" => (UI.smallPanel ? "Maximize" : "Minimize") ?? "",
+                "play" => ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "",
+                "listen" => ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "",
+                "record" => (UI.listening ? "Disable" : "Enable") + " Listening",
+                "prev" => "Previous Song",
+                "next" => "Next Song",
+                "view" => (UI.selectionVisible ? "Close" : "Open") + " Selection List",
+                "sortbyid" => "Sort by ID",
+                "sortbyname" => "Sort by name",
+                "filtermod" => $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}",
+                "clearfiltermod" => "Clear mod filter",
+                "availability" => "Show all obtained music boxes",
+                "unavailability" => "Show all unobtained music boxes",
+                "clearavailability" => "Clear availability filter",
+                "viewmode" => UI.viewMode ? "Change to Grid mode" : "Change to List mode",
+                _ => "",
+            };
+        }
 	}
 
 	internal class ItemSlotRow : UIElement
@@ -361,7 +339,7 @@ namespace tMusicPlayer
 					else {
 						ItemSlot.Handle(ref musicBox, context);
 					}
-					if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorEnabled) {
+					if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
 						Main.hoverItemName = "Insert a music box you do not already own!";
 					}
 				}
@@ -587,17 +565,17 @@ namespace tMusicPlayer
 		}
 	}
 
-	internal class ListenStorageSlot : UIImage
+	internal class ListenStorageSlot : UIElement
 	{
 		public string Id { get; init; } = "";
 
 		private readonly Texture2D texture;
 		private readonly int itemID;
 
-		public ListenStorageSlot(Texture2D texture, int itemID) : base(texture)
+		public ListenStorageSlot(int itemID)
 		{
-			this.texture = texture;
 			this.itemID = itemID;
+			texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{itemID}", AssetRequestMode.ImmediateLoad).Value;
 			Width.Pixels = texture.Bounds.Width;
 			Height.Pixels = texture.Bounds.Height;
 		}
@@ -612,7 +590,7 @@ namespace tMusicPlayer
 					modplayer.musicBoxesStored--;
 				}
 				while (modplayer.musicBoxesStored > 0) {
-					player.QuickSpawnItem(itemID, 1);
+					player.QuickSpawnItem(player.GetItemSource_OpenItem(itemID), itemID, 1);
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -629,7 +607,7 @@ namespace tMusicPlayer
 					SoundEngine.PlaySound(SoundID.Grab);
 				}
 				else {
-					player.QuickSpawnItem(itemID, 1);
+					player.QuickSpawnItem(player.GetItemSource_OpenItem(itemID), itemID, 1);
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -642,7 +620,7 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
-				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorEnabled) {
+				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
 					Main.hoverItemName = 
 						"Stored music boxes record songs while recording is enabled\n" + 
 						$"Up to {tMusicPlayer.tMPServerConfig.MaxStorage} music boxes can be held at once\n" + 

@@ -401,8 +401,15 @@ namespace tMusicPlayer
 				else {
 					type = refItem;
 				}
-				if (type > 0) {
-					Texture2D texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{type}", AssetRequestMode.ImmediateLoad).Value;
+				if (type > 0)
+				{
+					Texture2D texture;
+					if (type < ItemID.Count) {
+						texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{type}", AssetRequestMode.ImmediateLoad).Value;
+					}
+                    else {
+						texture = ModContent.Request<Texture2D>(ItemLoader.GetItem(type).Texture, AssetRequestMode.ImmediateLoad).Value;
+					}
 					float x2 = (rectangle.X + rectangle.Width / 2) - texture.Width * scale / 2f;
 					float y2 = (rectangle.Y + rectangle.Height / 2) - texture.Height * scale / 2f;
 					spriteBatch.Draw(texture, new Vector2(x2, y2), texture.Bounds, new Color(75, 75, 75, 75), 0f, Vector2.Zero, scale, 0, 0f);

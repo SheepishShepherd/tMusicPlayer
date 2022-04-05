@@ -387,7 +387,7 @@ namespace tMusicPlayer
 			if (modplayer.musicBoxesStored <= 0) {
 				recording = false;
 			}
-			if (!selectionVisible) {
+			if (!selectionVisible && searchBar.currentString != "") {
 				searchBar.currentString = "";
 				OrganizeSelection(sortType, availabililty, FilterMod);
 			}

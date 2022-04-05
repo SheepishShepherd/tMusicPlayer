@@ -49,9 +49,9 @@ namespace tMusicPlayer
 				int musicBoxDisplayed = (UI.listening && UI.ListenDisplay != -1) ? UI.ListenDisplay : UI.DisplayBox;
 				MusicData musicRef = tMusicPlayer.AllMusic[musicBoxDisplayed];
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
-				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f, 0f, 0f, -1);
+				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 30);
-				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f, 0f, 0f, -1);
+				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {

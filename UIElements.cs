@@ -419,7 +419,7 @@ namespace tMusicPlayer
 		}
 	}
 
-	internal class NewUITextBox : UITextBox
+	internal class SearchBar : UITextBox
 	{
 		public string Id { get; init; } = "";
 
@@ -432,7 +432,7 @@ namespace tMusicPlayer
 		private int textBlinkerCount;
 		private int textBlinkerState;
 
-		public NewUITextBox(string hintText, string text = "") : base(text)
+		public SearchBar(string hintText, string text = "") : base(text)
 		{
 			this.hintText = hintText;
 			currentString = text;
@@ -444,12 +444,10 @@ namespace tMusicPlayer
 		public override void Click(UIMouseEvent evt)
 		{
 			Focus();
-			base.Click(evt);
 		}
 
 		public override void RightClick(UIMouseEvent evt)
 		{
-			base.RightClick(evt);
 			SetText("");
 		}
 

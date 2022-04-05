@@ -52,7 +52,7 @@ namespace tMusicPlayer
 		public BackDrop selectionPanel;
 		public BackDrop musicEntryPanel;
 		
-		public NewUITextBox searchBar;
+		public SearchBar searchBar;
 		public MusicBoxSlot AddMusicBoxSlot;
 		public ListenStorageSlot MusicStorageSlot;
 		public HoverButton closeButton;
@@ -280,7 +280,7 @@ namespace tMusicPlayer
 			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
 			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 
-			searchBar = new NewUITextBox("Search...", "");
+			searchBar = new SearchBar("Search...", "");
 			searchBar.Width.Pixels = 216f;
 			searchBar.Height.Pixels = 28f;
 			searchBar.Top.Pixels = 9f;

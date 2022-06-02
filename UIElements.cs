@@ -591,7 +591,7 @@ namespace tMusicPlayer
 					modplayer.musicBoxesStored--;
 				}
 				while (modplayer.musicBoxesStored > 0) {
-					player.QuickSpawnItem(player.GetItemSource_OpenItem(itemID), itemID, 1);
+					player.QuickSpawnItem(player.GetSource_OpenItem(itemID), itemID, 1);
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -608,7 +608,7 @@ namespace tMusicPlayer
 					SoundEngine.PlaySound(SoundID.Grab);
 				}
 				else {
-					player.QuickSpawnItem(player.GetItemSource_OpenItem(itemID), itemID, 1);
+					player.QuickSpawnItem(player.GetSource_OpenItem(itemID), itemID, 1);
 					modplayer.musicBoxesStored--;
 				}
 			}

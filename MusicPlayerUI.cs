@@ -338,7 +338,7 @@ namespace tMusicPlayer
 					}
 					else {
 						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(player.GetItemSource_OpenItem(musicBoxType), musicBoxType);
+						player.QuickSpawnItem(player.GetSource_OpenItem(musicBoxType), musicBoxType);
 					}
 					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
 

@@ -75,8 +75,7 @@ namespace tMusicPlayer
 
 		internal List<MusicData> musicData;
 		
-		public override void OnInitialize()
-		{
+		public override void OnInitialize() {
 			panelTextures = new Asset<Texture2D>[4] {
 				TextureAssets.MagicPixel,
 				ModContent.Request<Texture2D>("tMusicPlayer/UI/backdrop", AssetRequestMode.ImmediateLoad),
@@ -320,8 +319,7 @@ namespace tMusicPlayer
 			canPlay = new List<int>();
 		}
 
-		public override void Update(GameTime gameTime)
-		{
+		public override void Update(GameTime gameTime) {
 			// This code mimics the "Music Box Recording" process.
 			// Check if we have music boxes at the ready, if the player is in record mode and music is currently playing.
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
@@ -393,8 +391,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public int FindNextIndex()
-		{
+		public int FindNextIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i < musicData.Count; i++) {
 				if (i != index && canPlay.Contains(musicData[i].music)) {
@@ -404,8 +401,7 @@ namespace tMusicPlayer
 			return -1;
 		}
 
-		public int FindPrevIndex()
-		{
+		public int FindPrevIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i >= 0; i--) {
 				if (i != index && canPlay.Contains(musicData[i].music)) {
@@ -415,8 +411,7 @@ namespace tMusicPlayer
 			return -1;
 		}
 
-		private void ChangeDisplay(bool next, bool jumpToEnd = false)
-		{
+		private void ChangeDisplay(bool next, bool jumpToEnd = false) {
 			if (!listening) {
 				int newIndex = next ? FindNextIndex() : FindPrevIndex();
 				if (newIndex != -1) { 
@@ -428,15 +423,13 @@ namespace tMusicPlayer
 			}
 		}
 
-		internal string ResetModFilter()
-		{
+		internal string ResetModFilter() {
 			FilterMod = "";
 			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
 			return FilterMod;
 		}
 
-		internal string UpdateModFilter(bool next)
-		{
+		internal string UpdateModFilter(bool next) {
 			int indexOfCurrent = ModList.IndexOf(FilterMod);
 			if (next && indexOfCurrent == ModList.Count - 1) {
 				FilterMod = ModList[0];
@@ -452,14 +445,12 @@ namespace tMusicPlayer
 			return FilterMod;
 		}
 
-		internal void UpdateViewMode()
-		{
+		internal void UpdateViewMode() {
 			viewMode = !viewMode;
 			OrganizeSelection(sortType, availabililty, FilterMod);
 		}
 
-		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false)
-		{
+		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false) {
 			sortType = sortBy;
 			availabililty = progressBy;
 			FilterMod = filterMod;
@@ -571,8 +562,7 @@ namespace tMusicPlayer
 			SelectionList.SetScrollbar(selectionScrollBar);
 		}
 
-		private void ListViewPlaySong(string Id)
-		{
+		private void ListViewPlaySong(string Id) {
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
 			if (!canPlay.Contains(musicID)) {
@@ -589,8 +579,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		private void ToggleButton(MusicMode type)
-		{
+		private void ToggleButton(MusicMode type) {
 			if (Main.musicVolume > 0f) {
 				switch (type) {
 					case MusicMode.Play:
@@ -629,8 +618,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public void SwapPanelSize()
-		{
+		public void SwapPanelSize() {
 			smallPanel = !smallPanel;
 
 			Texture2D size = smallPanel ? panelTextures[1].Value : panelTextures[2].Value;

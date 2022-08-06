@@ -48,8 +48,7 @@ namespace tMusicPlayer
 		[BackgroundColor(189, 183, 107, 255)]
 		public bool ResettingPanels { get; set; }
 
-		public override void OnChanged()
-		{
+		public override void OnChanged() {
 			if (!Main.gameMenu) {
 				MusicPlayerUI UI = MusicUISystem.MusicUI;
 				if (ResettingPanels) {
@@ -113,8 +112,7 @@ namespace tMusicPlayer
 		[Tooltip("If you have researched a music box, it will automatically fill in!")]
 		public bool IncludeResearched { get; set; }
 
-		public override void OnChanged()
-		{
+		public override void OnChanged() {
 
 		}
 	}

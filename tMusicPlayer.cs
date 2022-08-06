@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -21,8 +20,7 @@ namespace tMusicPlayer
 		internal static ModKeybind PrevSongHotkey;
 		internal static ModKeybind NextSongHotkey;
 		
-		public override void Load()
-		{
+		public override void Load() {
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
 			tMPServerConfig = ModContent.GetInstance<TMPServerConfig>();
@@ -133,8 +131,7 @@ namespace tMusicPlayer
 			itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
 		}
 
-		public override void Unload()
-		{
+		public override void Unload() {
 			AllMusic = null;
 			itemToMusicReference = null;
 
@@ -147,53 +144,7 @@ namespace tMusicPlayer
 			NextSongHotkey = null;
 		}
 
-		public override void PostAddRecipes()
-		{
-			// After all PostSetupContent has occured, setup all the MusicData.
-			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
-			Item item = new Item();
-			foreach (int itemID in itemToMusicReference.Keys) {
-				item.SetDefaults(itemID);
-				string displayName = item.ModItem.Mod.DisplayName;
-				string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
-				int musicID = itemToMusicReference.TryGetValue(itemID, out int num) ? num : (-1);
-				if (musicID != -1) {
-					AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
-				}
-			}
-			item.TurnToAir();
-
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
-
-			if (UI.sortType == SortBy.ID) {
-				AllMusic = AllMusic.OrderBy(x => x.music).ToList();
-			}
-			if (UI.sortType == SortBy.Name) {
-				AllMusic = AllMusic.OrderBy(x => x.name).ToList();
-			}
-
-			// Setup UI's item slot count.
-			if (!Main.dedServ) {
-				UI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-				UI.musicData = new List<MusicData>(AllMusic);
-				UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
-
-				// Setup the mod list for the Mod Filter
-				// Must occur after all other modded music is established
-				UI.ModList = new List<string>();
-				foreach (MusicData box in UI.musicData) {
-					if (!UI.ModList.Contains(box.mod)) {
-						UI.ModList.Add(box.mod);
-					}
-				}
-				UI.ModList.Sort();
-				UI.ModList.Remove("Terraria");
-				UI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
-			}
-		}
-
-		public static void SendDebugText(string message, Color color = default)
-		{
+		public static void SendDebugText(string message, Color color = default) {
 			if (tMPConfig.EnableDebugMode) {
 				Main.NewText(message, color);
 			}

@@ -13,8 +13,7 @@ namespace tMusicPlayer
 		public override string ToString() => $"{name} from {mod} [Item#{musicbox}] -- [MusicID#{music}]";
 		
 		// Vanilla method
-		internal MusicData(int music, int musicbox, int mainMusicBox2)
-        {
+		internal MusicData(int music, int musicbox, int mainMusicBox2) {
 			this.music = music;
 			this.musicbox = musicbox;
 			this.mainMusicBox2 = mainMusicBox2;
@@ -30,8 +29,7 @@ namespace tMusicPlayer
 		}
 
 		// Mod method
-		public MusicData(int music, int musicbox, string mod, string name)
-		{
+		public MusicData(int music, int musicbox, string mod, string name) {
 			this.music = music;
 			this.musicbox = musicbox;
 			this.mod = mod;

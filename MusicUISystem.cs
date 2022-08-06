@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -28,6 +30,49 @@ namespace tMusicPlayer
 		{
 			MP_UserInterface = null;
 			MusicUI = null;
+		}
+
+		public override void PostAddRecipes()
+		{
+			// After all PostSetupContent has occured, setup all the MusicData.
+			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
+			foreach (int itemID in tMusicPlayer.itemToMusicReference.Keys) {
+				Item item = ContentSamples.ItemsByType[itemID];
+				string displayName = item.ModItem.Mod.DisplayName;
+				string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
+				int musicID = tMusicPlayer.itemToMusicReference.TryGetValue(itemID, out int num) ? num : (-1);
+				if (musicID != -1) {
+					tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
+				}
+			}
+
+			MusicPlayerUI UI = MusicUISystem.MusicUI;
+
+			if (UI.sortType == SortBy.ID) {
+				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
+			}
+			if (UI.sortType == SortBy.Name) {
+				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
+			}
+
+			// Setup UI's item slot count.
+			if (!Main.dedServ) {
+				UI.SelectionSlots = new MusicBoxSlot[tMusicPlayer.AllMusic.Count];
+				UI.musicData = new List<MusicData>(tMusicPlayer.AllMusic);
+				UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
+
+				// Setup the mod list for the Mod Filter
+				// Must occur after all other modded music is established
+				UI.ModList = new List<string>();
+				foreach (MusicData box in UI.musicData) {
+					if (!UI.ModList.Contains(box.mod)) {
+						UI.ModList.Add(box.mod);
+					}
+				}
+				UI.ModList.Sort();
+				UI.ModList.Remove("Terraria");
+				UI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
+			}
 		}
 
 		public override void UpdateUI(GameTime gameTime)

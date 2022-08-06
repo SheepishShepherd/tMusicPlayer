@@ -27,8 +27,7 @@ namespace tMusicPlayer
 
 		public BackDrop() { }
 
-		public override void Draw(SpriteBatch spriteBatch)
-		{
+		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
 			Rectangle rect = GetInnerDimensions().ToRectangle();
 			if (Id == "SelectionPanel") {
@@ -65,32 +64,28 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void MouseDown(UIMouseEvent evt)
-		{
+		public override void MouseDown(UIMouseEvent evt) {
 			base.MouseDown(evt);
 			if (((IEnumerable<UIElement>)Elements).All((UIElement x) => !x.IsMouseHovering)) {
 				DragStart(evt);
 			}
 		}
 
-		public override void MouseUp(UIMouseEvent evt)
-		{
+		public override void MouseUp(UIMouseEvent evt) {
 			base.MouseUp(evt);
 			if (dragging) {
 				DragEnd(evt);
 			}
 		}
 
-		private void DragStart(UIMouseEvent evt)
-		{
+		private void DragStart(UIMouseEvent evt) {
 			CalculatedStyle dimensions2 = GetDimensions();
 			Rectangle dimensions = dimensions2.ToRectangle();
 			offset = new Vector2(evt.MousePosition.X - dimensions.Left, evt.MousePosition.Y - dimensions.Top);
 			dragging = true;
 		}
 
-		private void DragEnd(UIMouseEvent evt)
-		{
+		private void DragEnd(UIMouseEvent evt) {
 			Vector2 end = evt.MousePosition;
 			dragging = false;
 			Left.Set(end.X - offset.X, 0f);
@@ -98,8 +93,7 @@ namespace tMusicPlayer
 			Recalculate();
 		}
 
-		public override void Update(GameTime gameTime)
-		{
+		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
 			if (ContainsPoint(Main.MouseScreen)) {
 				Main.LocalPlayer.mouseInterface = true;
@@ -126,20 +120,18 @@ namespace tMusicPlayer
 	{
 		public string Id { get; init; } = "";
 
-		public FixedUIScrollbar()
-		{
+		public FixedUIScrollbar() {
+
 		}
 
-		protected override void DrawSelf(SpriteBatch spriteBatch)
-		{
+		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			UserInterface temp = UserInterface.ActiveInstance;
 			UserInterface.ActiveInstance = MusicUISystem.MP_UserInterface;
 			base.DrawSelf(spriteBatch);
 			UserInterface.ActiveInstance = temp;
 		}
 
-		public override void MouseDown(UIMouseEvent evt)
-		{
+		public override void MouseDown(UIMouseEvent evt) {
 			UserInterface temp = UserInterface.ActiveInstance;
 			UserInterface.ActiveInstance = MusicUISystem.MP_UserInterface;
 			base.MouseDown(evt);
@@ -154,14 +146,12 @@ namespace tMusicPlayer
 		internal Texture2D texture;
 		internal Rectangle src;
 
-		public HoverButton(Texture2D texture, Rectangle src) : base(texture)
-		{
+		public HoverButton(Texture2D texture, Rectangle src) : base(texture) {
 			this.texture = texture;
 			this.src = src;
 		}
 
-		public bool UseAlternateTexture()
-		{
+		public bool UseAlternateTexture() {
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
 			if (Id.Contains("altplay")) {
 				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
@@ -177,8 +167,7 @@ namespace tMusicPlayer
             };
         }
 
-		public override void Draw(SpriteBatch spriteBatch)
-		{
+		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
 			bool useAlt = UseAlternateTexture();
 			int selectedMusic = tMusicPlayer.AllMusic[UI.DisplayBox].music;
@@ -210,8 +199,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public string SetHoverItemName(string ID)
-		{
+		public string SetHoverItemName(string ID) {
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
             return ID switch {
                 "expand" => (UI.smallPanel ? "Maximize" : "Minimize") ?? "",
@@ -240,15 +228,13 @@ namespace tMusicPlayer
 
 		private int order;
 
-		public ItemSlotRow(int order, float width, float height)
-		{
+		public ItemSlotRow(int order, float width, float height) {
 			this.order = order;
 			Width.Pixels = 400f;
 			Height.Pixels = 50f;
 		}
 
-		public override int CompareTo(object obj)
-		{
+		public override int CompareTo(object obj) {
 			ItemSlotRow other = obj as ItemSlotRow;
 			return order.CompareTo(other.order);
 		}
@@ -264,8 +250,7 @@ namespace tMusicPlayer
 		private readonly int context;
 		private readonly float scale;
 
-		public MusicBoxSlot(int refItem, float scale)
-		{
+		public MusicBoxSlot(int refItem, float scale) {
 			context = 4;
 			this.scale = scale;
 			itemID = refItem;
@@ -276,8 +261,7 @@ namespace tMusicPlayer
 			Height.Set(TextureAssets.InventoryBack.Value.Height * scale, 0f);
 		}
 
-		public override void Draw(SpriteBatch spriteBatch)
-		{
+		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
 			bool isSelectionSlot = Id.Contains("SelectionSlot");
 			bool isDisplaySlot = Id == "DisplaySlot";
@@ -432,8 +416,7 @@ namespace tMusicPlayer
 		private int textBlinkerCount;
 		private int textBlinkerState;
 
-		public SearchBar(string hintText, string text = "") : base(text)
-		{
+		public SearchBar(string hintText, string text = "") : base(text) {
 			this.hintText = hintText;
 			currentString = text;
 			SetPadding(0f);
@@ -441,26 +424,22 @@ namespace tMusicPlayer
 			BorderColor = Color.White;
 		}
 
-		public override void Click(UIMouseEvent evt)
-		{
+		public override void Click(UIMouseEvent evt) {
 			Focus();
 		}
 
-		public override void RightClick(UIMouseEvent evt)
-		{
+		public override void RightClick(UIMouseEvent evt) {
 			SetText("");
 		}
 
-		public void Unfocus()
-		{
+		public void Unfocus() {
 			if (focused) {
 				focused = false;
 				Main.blockInput = false;
 			}
 		}
 
-		public void Focus()
-		{
+		public void Focus() {
 			if (!focused) {
 				Main.clrInput();
 				focused = true;
@@ -468,8 +447,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void Update(GameTime gameTime)
-		{
+		public override void Update(GameTime gameTime) {
 			Vector2 MousePosition = new Vector2(Main.mouseX, Main.mouseY);
 			if (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight)) {
 				Unfocus();
@@ -477,10 +455,10 @@ namespace tMusicPlayer
 			base.Update(gameTime);
 		}
 
-		public override void SetText(string text, float textScale, bool large)
-		{
+		public override void SetText(string text, float textScale, bool large) {
 			if (text == null)
 				return;
+
 			if (text.ToString().Length > _maxLength) {
 				text = text.ToString().Substring(0, _maxLength);
 			}
@@ -489,13 +467,11 @@ namespace tMusicPlayer
 			}
 		}
 
-		private static bool JustPressed(Keys key)
-		{
+		private static bool JustPressed(Keys key) {
 			return Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
 		}
 
-		protected override void DrawSelf(SpriteBatch spriteBatch)
-		{
+		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			CalculatedStyle innerDimensions = GetInnerDimensions();
 			Rectangle hitbox = innerDimensions.ToRectangle();
 			//base.DrawSelf(spriteBatch);
@@ -576,13 +552,11 @@ namespace tMusicPlayer
 
 		private readonly int itemID;
 
-		public ListenStorageSlot(int itemID)
-		{
+		public ListenStorageSlot(int itemID) {
 			this.itemID = itemID;
 		}
 
-		public override void Click(UIMouseEvent evt)
-		{
+		public override void Click(UIMouseEvent evt) {
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 			if (IsMouseHovering && modplayer.musicBoxesStored > 0) {
@@ -597,8 +571,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void RightClick(UIMouseEvent evt)
-		{
+		public override void RightClick(UIMouseEvent evt) {
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 			if (IsMouseHovering && modplayer.musicBoxesStored > 0) {
@@ -614,8 +587,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		protected override void DrawSelf(SpriteBatch spriteBatch)
-		{
+		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			CalculatedStyle dimensions = GetDimensions();
 			Rectangle rectangle = dimensions.ToRectangle();
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
@@ -637,5 +609,4 @@ namespace tMusicPlayer
 			Utils.DrawBorderString(spriteBatch, modplayer.musicBoxesStored.ToString(), pos2, Color.White, 0.85f);
 		}
 	}
-
 }

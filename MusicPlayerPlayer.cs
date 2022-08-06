@@ -12,8 +12,7 @@ namespace tMusicPlayer
 		public List<ItemDefinition> MusicBoxList;
 		public int musicBoxesStored;
 
-		public override void Initialize()
-		{
+		public override void Initialize() {
 			MusicBoxList = new List<ItemDefinition>();
 			musicBoxesStored = 0;
 		}
@@ -28,8 +27,7 @@ namespace tMusicPlayer
 			musicBoxesStored = tag.Get<int>("Stored Boxes");
 		}
 
-		public override void OnEnterWorld(Player player)
-		{
+		public override void OnEnterWorld(Player player) {
 			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
 			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
 			MusicPlayerUI musicPlayerUI = MusicUISystem.MusicUI;
@@ -50,8 +48,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void PostUpdateEquips()
-		{
+		public override void PostUpdateEquips() {
 			// Currently, the best way to override music is to equip a music box in one of your accessory slots.
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.

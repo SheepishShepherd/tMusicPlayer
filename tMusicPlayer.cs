@@ -117,7 +117,7 @@ namespace tMusicPlayer
 				new MusicData(MusicID.OtherworldlyBoss2, ItemID.MusicBoxOWBoss2, 76),
 				new MusicData(MusicID.OtherworldlyBoss1, ItemID.MusicBoxOWBoss1, 77),
 				new MusicData(MusicID.OtherworldlyInvasion, ItemID.MusicBoxOWInvasion, 78),
-				new MusicData(MusicID.OtherworldlyTowers, ItemID.MusicBoxOWTowers, 78),
+				new MusicData(MusicID.OtherworldlyTowers, ItemID.MusicBoxOWTowers, 79),
 				new MusicData(MusicID.OtherworldlyLunarBoss, ItemID.MusicBoxOWMoonLord, 80),
 				new MusicData(MusicID.OtherworldlyPlantera, ItemID.MusicBoxOWPlantera, 81),
 				new MusicData(MusicID.OtherworldlyJungle, ItemID.MusicBoxOWJungle, 82),

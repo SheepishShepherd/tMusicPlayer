@@ -49,7 +49,7 @@ namespace tMusicPlayer
 		public bool ResettingPanels { get; set; }
 
 		public override void OnChanged() {
-			if (!Main.gameMenu) {
+			if (!Main.gameMenu && !Main.dedServ) {
 				MusicPlayerUI UI = MusicUISystem.MusicUI;
 				if (ResettingPanels) {
 					UI.MusicPlayerPanel.Left.Pixels = 1115f;

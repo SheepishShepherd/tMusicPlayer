@@ -46,17 +46,17 @@ namespace tMusicPlayer
 				}
 			}
 
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
-
-			if (UI.sortType == SortBy.ID) {
-				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
-			}
-			if (UI.sortType == SortBy.Name) {
-				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
-			}
-
 			// Setup UI's item slot count.
 			if (!Main.dedServ) {
+				MusicPlayerUI UI = MusicUISystem.MusicUI;
+
+				if (UI.sortType == SortBy.ID) {
+					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
+				}
+				if (UI.sortType == SortBy.Name) {
+					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
+				}
+				
 				UI.SelectionSlots = new MusicBoxSlot[tMusicPlayer.AllMusic.Count];
 				UI.musicData = new List<MusicData>(tMusicPlayer.AllMusic);
 				UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);

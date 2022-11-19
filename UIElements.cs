@@ -66,7 +66,7 @@ namespace tMusicPlayer
 
 		public override void MouseDown(UIMouseEvent evt) {
 			base.MouseDown(evt);
-			if (((IEnumerable<UIElement>)Elements).All((UIElement x) => !x.IsMouseHovering)) {
+			if (Elements.All((UIElement x) => !x.IsMouseHovering)) {
 				DragStart(evt);
 			}
 		}
@@ -95,8 +95,8 @@ namespace tMusicPlayer
 
 		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
-			if (ContainsPoint(Main.MouseScreen)) {
-				Main.LocalPlayer.mouseInterface = true;
+			if (IsMouseHovering) {
+				PlayerInput.LockVanillaMouseScroll("tMusicPlayer panel");
 			}
 			if (dragging) {
 				Left.Set(Main.mouseX - offset.X, 0f);
@@ -209,7 +209,8 @@ namespace tMusicPlayer
                 "prev" => "Previous Song",
                 "next" => "Next Song",
                 "view" => (UI.selectionVisible ? "Close" : "Open") + " Selection List",
-                "sortbyid" => "Sort by ID",
+				"showFavorites" => "Show favorited music",
+				"sortbyid" => "Sort by ID",
                 "sortbyname" => "Sort by name",
                 "filtermod" => $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}",
                 "clearfiltermod" => "Clear mod filter",
@@ -244,21 +245,33 @@ namespace tMusicPlayer
 	{
 		public string Id { get; set; } = "";
 
-		internal Item musicBox;
-		internal int itemID;
-		internal int refItem;
+		internal Item musicBox; // The item in this slot
+		internal int displayID; // What the slot should display (only for the Display Slot in the small musicplayer)
+		internal int slotItemID; // What the item id the slot is assigned to
 		private readonly int context;
 		private readonly float scale;
 
 		public MusicBoxSlot(int refItem, float scale) {
 			context = 4;
 			this.scale = scale;
-			itemID = refItem;
-			this.refItem = refItem;
+			displayID = refItem;
+			this.slotItemID = refItem;
 			musicBox = new Item();
 			musicBox.SetDefaults(0, false);
 			Width.Set(TextureAssets.InventoryBack.Value.Width * scale, 0f);
 			Height.Set(TextureAssets.InventoryBack.Value.Height * scale, 0f);
+		}
+
+		public override void Click(UIMouseEvent evt) {
+			if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
+				List<ItemDefinition> favorites = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().MusicBoxFavs;
+				if (favorites.Any(x => x.Type == slotItemID)) {
+					favorites.RemoveAll(x => x.Type == slotItemID);
+				}
+				else {
+					favorites.Add(new ItemDefinition(slotItemID));
+				}
+			}
 		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
@@ -268,34 +281,33 @@ namespace tMusicPlayer
 			bool isEntrySlot = Id == "EntrySlot";
 			float oldScale = Main.inventoryScale;
 			Main.inventoryScale = scale;
-			CalculatedStyle dimensions = GetDimensions();
-			Rectangle rectangle = dimensions.ToRectangle();
+			Rectangle rectangle = GetDimensions().ToRectangle();
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			if (isDisplaySlot) {
 				if (UI.listening) {
 					int index = tMusicPlayer.AllMusic.FindIndex((MusicData musicRef) => musicRef.music == Main.curMusic);
 					UI.ListenDisplay = index;
 					if (index != -1) {
-						itemID = tMusicPlayer.AllMusic[index].musicbox;
+						displayID = tMusicPlayer.AllMusic[index].musicbox;
 					}
 				}
 				if (!UI.listening || UI.ListenDisplay == -1) {
 					UI.ListenDisplay = -1;
-					itemID = tMusicPlayer.AllMusic[UI.DisplayBox].musicbox;
+					displayID = tMusicPlayer.AllMusic[UI.DisplayBox].musicbox;
 				}
 			}
 			if (!isEntrySlot) {
 				// TODO: Implement 'IncludeResearch' better?
-				bool isResearched = tMusicPlayer.tMPServerConfig.IncludeResearched && modplayer.Player.difficulty == PlayerDifficultyID.Creative && modplayer.Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(itemID);
-				bool HasMusicBox = modplayer.MusicBoxList.Any(item => item.Type == itemID);
-				musicBox.SetDefaults(HasMusicBox || isResearched ? itemID : 0);
+				bool isResearched = tMusicPlayer.tMPServerConfig.IncludeResearched && modplayer.Player.difficulty == PlayerDifficultyID.Creative && modplayer.Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(displayID);
+				bool HasMusicBox = modplayer.MusicBoxList.Any(item => item.Type == slotItemID);
+				musicBox.SetDefaults(HasMusicBox || isResearched ? slotItemID : 0);
 			}
 			else {
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
 						MusicUISystem.MusicUI.canPlay.Add(musicBox.type);
-						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
+						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < 5) {
 						modplayer.musicBoxesStored++;
@@ -303,44 +315,65 @@ namespace tMusicPlayer
 					musicBox.TurnToAir();
 				}
 			}
+
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
-				if (isSelectionSlot && (Main.mouseItem.type == refItem || Main.mouseItem.IsAir) && !Main.mouseRight) {
-					if (Main.mouseLeft) {
-						Main.playerInventory = true;
-					}
-					ItemSlot.Handle(ref musicBox, context);
+				if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
+					Main.cursorOverride = 3; 
 				}
-				else if (isEntrySlot) {
-					int mouseType = Main.mouseItem.type;
-					if (mouseType != 0) {
-						bool ValidEntryBox = modplayer.MusicBoxList.All(x => x.Type != mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
-						bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < 5;
-						if (ValidEntryBox | isUnrecordedAndNotMax) {
-							ItemSlot.Handle(ref musicBox, context);
+				else {
+					if (isSelectionSlot && (Main.mouseItem.type == slotItemID || Main.mouseItem.IsAir) && !Main.mouseRight) {
+						if (Main.mouseLeft) {
+							Main.playerInventory = true;
 						}
-					}
-					else {
 						ItemSlot.Handle(ref musicBox, context);
 					}
-					if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
-						Main.hoverItemName = "Insert a music box you do not already own!";
+					else if (isEntrySlot) {
+						int mouseType = Main.mouseItem.type;
+						if (mouseType != 0) {
+							bool ValidEntryBox = modplayer.MusicBoxList.All(x => x.Type != mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
+							bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < 5;
+							if (ValidEntryBox | isUnrecordedAndNotMax) {
+								ItemSlot.Handle(ref musicBox, context);
+							}
+						}
+						else {
+							ItemSlot.Handle(ref musicBox, context);
+						}
+						if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
+							Main.hoverItemName = "Insert a music box you do not already own!";
+						}
 					}
 				}
 			}
+
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
 			TextureAssets.InventoryBack2 = (isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3);
+
+			bool isFavorited = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().MusicBoxFavs.Any(x => x.Type == slotItemID);
+			if (isFavorited) {
+				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack6;
+			}
+
 			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle));
+
+			if (isFavorited) {
+				Texture2D texture = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Rank_Light", AssetRequestMode.ImmediateLoad).Value;
+				Rectangle pos = new Rectangle(rectangle.X + rectangle.Width - texture.Width, rectangle.Y, texture.Width, texture.Height);
+				spriteBatch.Draw(texture, pos, Color.White);
+			}
+
 			TextureAssets.InventoryBack2 = backup;
 			Main.inventoryScale = oldScale;
+
 			if (isSelectionSlot) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.musicbox == refItem);
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.musicbox == slotItemID);
 				int musicID = tMusicPlayer.AllMusic[index].music;
-				if (musicBox.type == refItem) {
-					if (modplayer.MusicBoxList.All(x => x.Type != refItem)) {
-						modplayer.MusicBoxList.Add(new ItemDefinition(refItem));
+				if (musicBox.type == slotItemID) {
+					if (modplayer.MusicBoxList.All(x => x.Type != slotItemID)) {
+						modplayer.MusicBoxList.Add(new ItemDefinition(slotItemID));
 						UI.canPlay.Add(musicID);
-						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{refItem}]", Colors.RarityGreen);
+						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					if (IsMouseHovering && Main.mouseRight && Id.Contains("Grid")) {
 						UI.ListenDisplay = -1;
@@ -349,10 +382,10 @@ namespace tMusicPlayer
 						UI.playingMusic = musicID;
 					}
 				}
-				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.MusicBoxList.Any(x => x.Type == refItem)) {
-					modplayer.MusicBoxList.RemoveAll(x => x.Type == refItem);
+				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.MusicBoxList.Any(x => x.Type == slotItemID)) {
+					modplayer.MusicBoxList.RemoveAll(x => x.Type == slotItemID);
 					UI.canPlay.Remove(musicID); // = tMusicPlayer.tMPConfig.EnableAllMusicBoxes;
-					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{refItem}]", Color.IndianRed);
+					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{slotItemID}]", Color.IndianRed);
 					if (!UI.canPlay.Contains(musicID)) {
 						int next = UI.FindNextIndex();
 						int prev = UI.FindPrevIndex();
@@ -369,6 +402,7 @@ namespace tMusicPlayer
 					}
 				}
 			}
+
 			if (musicBox.IsAir) {
 				int type;
 				if (isDisplaySlot) {
@@ -383,10 +417,10 @@ namespace tMusicPlayer
 					}
 				}
 				else {
-					type = refItem;
+					type = slotItemID;
 				}
-				if (type > 0)
-				{
+
+				if (type > 0) {
 					Texture2D texture;
 					if (type < ItemID.Count) {
 						texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{type}", AssetRequestMode.ImmediateLoad).Value;

@@ -17,14 +17,6 @@ namespace tMusicPlayer
 		[Tooltip("While smart cursor is toggled, most buttons show extra information about them")]
 		public bool EnableMoreTooltips { get; set; }
 
-		/*
-		[DefaultValue(false)]
-		[Label("Unlock all music in the selection list")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("All music can be played from the MusicPlayer, regaurdless of whether it was obtained or not.")]
-		public bool EnableAllMusicBoxes { get; set; }
-		*/
-
 		[DefaultValue(false)]
 		[Label("Hide MusicPlayer until hotkey pressed")]
 		[BackgroundColor(76, 168, 84, 255)]

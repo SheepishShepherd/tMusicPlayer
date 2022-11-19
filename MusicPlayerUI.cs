@@ -30,8 +30,9 @@ namespace tMusicPlayer
 		public HoverButton detectButton;
 		public HoverButton recordButton;
 		public HoverButton expandButton;
-		
+
 		// Selection Panel Buttons
+		public HoverButton favoritesButton;
 		public HoverButton sortIDButton;
 		public HoverButton sortNameButton;
 		public HoverButton filterModButton;
@@ -61,6 +62,7 @@ namespace tMusicPlayer
 		public MusicBoxSlot[] SelectionSlots;
 		internal List<int> canPlay;
 		internal bool viewMode = false;
+		internal bool viewFavs = false;
 
 		public bool selectionVisible = false;
 		
@@ -180,6 +182,16 @@ namespace tMusicPlayer
 			// Positioning base for filter buttons
 			float center = (selectionPanel.Width.Pixels / 2) - 11;
 
+			favoritesButton = new HoverButton(buttonTextures.Value, new Rectangle(7 * 24, 48, 22, 22)) {
+				Id = "showFavorites"
+			};
+			favoritesButton.Width.Pixels = 22f;
+			favoritesButton.Height.Pixels = 22f;
+			favoritesButton.Left.Pixels = center - (20 * 5) - 8;
+			favoritesButton.Top.Pixels = 42;
+			favoritesButton.OnClick += (a, b) => OrganizeSelection(sortType, availabililty, FilterMod, false, true);
+			selectionPanel.Append(favoritesButton);
+
 			sortIDButton = new HoverButton(buttonTextures.Value, new Rectangle(0 * 24, 48, 22, 22)) {
 				Id = "sortbyid"
 			};
@@ -261,7 +273,7 @@ namespace tMusicPlayer
 			closeButton.OnClick += (a, b) => selectionVisible = !selectionVisible;
 			selectionPanel.Append(closeButton);
 
-			viewModeButton = new HoverButton(buttonTextures.Value, new Rectangle(7 * 24, 48, 22, 22)) {
+			viewModeButton = new HoverButton(buttonTextures.Value, new Rectangle(0 * 24, 96, 22, 22)) {
 				Id = "viewmode"
 			};
 			viewModeButton.Width.Pixels = 22f;
@@ -450,10 +462,14 @@ namespace tMusicPlayer
 			OrganizeSelection(sortType, availabililty, FilterMod);
 		}
 
-		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false) {
+		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false, bool clickedFavorites = false) {
 			sortType = sortBy;
 			availabililty = progressBy;
 			FilterMod = filterMod;
+
+			if (clickedFavorites) {
+				viewFavs = !viewFavs;
+			}
 
 			int displayMusicID = tMusicPlayer.AllMusic[DisplayBox].music;
 			if (sortBy == SortBy.ID) {
@@ -482,8 +498,9 @@ namespace tMusicPlayer
 						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
 						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != musicData[i].musicbox);
 						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == musicData[i].musicbox);
+						bool CheckFavorited = viewFavs && modplayer.MusicBoxFavs.All(x => x.Type != musicData[i].musicbox);
 
-						if (CheckFilterMod || CheckObtained || CheckUnobtained) {
+						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;
 						}
 					}
@@ -518,8 +535,9 @@ namespace tMusicPlayer
 						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
 						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != musicData[i].musicbox);
 						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == musicData[i].musicbox);
+						bool CheckFavorited = viewFavs && modplayer.MusicBoxFavs.All(x => x.Type != musicData[i].musicbox);
 
-						if (CheckFilterMod || CheckObtained || CheckUnobtained) {
+						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;
 						}
 					}

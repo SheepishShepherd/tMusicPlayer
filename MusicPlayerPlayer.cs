@@ -10,41 +10,40 @@ namespace tMusicPlayer
 	public class MusicPlayerPlayer : ModPlayer
 	{
 		public List<ItemDefinition> MusicBoxList;
+		public List<ItemDefinition> MusicBoxFavs;
 		public int musicBoxesStored;
 
 		public override void Initialize() {
 			MusicBoxList = new List<ItemDefinition>();
+			MusicBoxFavs = new List<ItemDefinition>();
 			musicBoxesStored = 0;
 		}
 
         public override void SaveData(TagCompound tag) {
 			tag["Music Boxes"] = MusicBoxList;
+			tag["Favorites"] = MusicBoxFavs;
 			tag["Stored Boxes"] = musicBoxesStored;
 		}
 
         public override void LoadData(TagCompound tag) {
 			MusicBoxList = tag.Get<List<ItemDefinition>>("Music Boxes");
+			MusicBoxFavs = tag.Get<List<ItemDefinition>>("Favorites");
 			musicBoxesStored = tag.Get<int>("Stored Boxes");
 		}
 
 		public override void OnEnterWorld(Player player) {
-			// When entering a world, we must setup the players music boxes and determine whether they can be played or not.
-			// This is important wince we can change "Unlock all music boxes" in the configs while outside of a world.
-			MusicPlayerUI musicPlayerUI = MusicUISystem.MusicUI;
+			// Determine if the player wants to start with the small panel or large panel
 			if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
 				MusicUISystem.MusicUI.SwapPanelSize();
 			}
-			if (musicPlayerUI != null) {
+
+			// Add all the player's obtained musicboxes to the canPlay array for the UI
+			if (MusicUISystem.MusicUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox)) {
-						musicPlayerUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
+						MusicUISystem.MusicUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
 					}
 				}
-				/*
-				if (tMusicPlayer.tMPConfig.EnableAllMusicBoxes) musicPlayerUI.canPlay[i] = true;
-				else musicPlayerUI.canPlay[i] = MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox);
-				*/
-				// Remove above line if bringing back EnableAllMusicBoxes
 			}
 		}
 

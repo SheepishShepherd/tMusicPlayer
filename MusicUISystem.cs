@@ -14,6 +14,7 @@ namespace tMusicPlayer
 
 		internal static UserInterface MP_UserInterface;
 		internal static MusicPlayerUI MusicUI;
+		internal const int MaxUnrecordedBoxes = 20;
 
 		public override void Load()
 		{

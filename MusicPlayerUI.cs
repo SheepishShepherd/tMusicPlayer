@@ -337,7 +337,7 @@ namespace tMusicPlayer
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (modplayer.musicBoxesStored > 0 && MusicUISystem.MusicUI.recording && Main.curMusic > 0 && Main.rand.Next(540) == 0) {
+			if (modplayer.musicBoxesStored > 0 && MusicUISystem.MusicUI.recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
@@ -621,7 +621,7 @@ namespace tMusicPlayer
 					case MusicMode.Record:
 						recording = !recording;
 						if (recording) {
-							recording = (Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0);
+							recording = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0;
 						}
 						if (recording) {
 							listening = true;

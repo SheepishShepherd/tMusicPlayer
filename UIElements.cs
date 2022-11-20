@@ -310,7 +310,7 @@ namespace tMusicPlayer
 						MusicUISystem.MusicUI.canPlay.Add(musicBox.type);
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
-					else if (modplayer.musicBoxesStored < 20) {
+					else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
 						modplayer.musicBoxesStored++;
 					}
 					musicBox.TurnToAir();
@@ -333,7 +333,7 @@ namespace tMusicPlayer
 						int mouseType = Main.mouseItem.type;
 						if (mouseType != 0) {
 							bool ValidEntryBox = modplayer.MusicBoxList.All(x => x.Type != mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
-							bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < 5;
+							bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
 							if (ValidEntryBox | isUnrecordedAndNotMax) {
 								ItemSlot.Handle(ref musicBox, context);
 							}

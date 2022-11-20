@@ -52,60 +52,7 @@ namespace tMusicPlayer
 					UI.musicEntryPanel.Top.Pixels = UI.selectionPanel.Top.Pixels - UI.musicEntryPanel.Height.Pixels;
 					ResettingPanels = false;
 				}
-				/*
-				if (EnableAllMusicBoxes) {
-					for (int j = 0; j < musicPlayerUI.canPlay.Count; j++) {
-						musicPlayerUI.canPlay[j] = true;
-					}
-					tMusicPlayer.SendDebugText("EnableAllMusicBoxes enabled. All music in canPlay set to true.");
-				}
-				else {
-					MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-					for (int i = 0; i < musicPlayerUI.canPlay.Count; i++) {
-						musicPlayerUI.canPlay[i] = (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.AllMusic[i].musicbox) != -1);
-					}
-					Main.NewText("EnableAllMusicBoxes disabled. Music in canPlay restored appropriately", Color.White);
-					int next = tMusicPlayer.MusicPlayerUI.FindNextIndex();
-					int prev = tMusicPlayer.MusicPlayerUI.FindPrevIndex();
-					if (modPlayer.MusicBoxList.FindIndex((ItemDefinition x) => x.Type == tMusicPlayer.MusicPlayerUI.DisplayBox) == -1) {
-						if (next != -1) {
-							tMusicPlayer.MusicPlayerUI.DisplayBox = next;
-						}
-						else if (prev != -1) {
-							tMusicPlayer.MusicPlayerUI.DisplayBox = prev;
-						}
-						else {
-							musicPlayerUI.listening = true;
-						}
-					}
-				}
-				*/
 			}
-		}
-	}
-
-	[BackgroundColor(55, 59, 80, 255)]
-	[Label("Global Configs (Reloading Required)")]
-	public class TMPServerConfig : ModConfig
-	{
-		public override ConfigScope Mode => ConfigScope.ServerSide;
-
-		[ReloadRequired]
-		[Range(3, 20)]
-		[DefaultValue(5)]
-		[Label("MusicPlayer maximum music boxes for recording")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("Set the maximum amount of music boxes able to be stored")]
-		public int MaxStorage { get; set; }
-
-		[DefaultValue(false)]
-		[Label("MusicPlayer includes researched music boxes")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("If you have researched a music box, it will automatically fill in!")]
-		public bool IncludeResearched { get; set; }
-
-		public override void OnChanged() {
-
 		}
 	}
 }

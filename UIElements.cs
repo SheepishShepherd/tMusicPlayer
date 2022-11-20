@@ -282,7 +282,8 @@ namespace tMusicPlayer
 			float oldScale = Main.inventoryScale;
 			Main.inventoryScale = scale;
 			Rectangle rectangle = GetDimensions().ToRectangle();
-			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+			Player player = Main.LocalPlayer;
+			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 			if (isDisplaySlot) {
 				if (UI.listening) {
 					int index = tMusicPlayer.AllMusic.FindIndex((MusicData musicRef) => musicRef.music == Main.curMusic);
@@ -298,7 +299,7 @@ namespace tMusicPlayer
 			}
 			if (!isEntrySlot) {
 				// TODO: Implement 'IncludeResearch' better?
-				bool isResearched = tMusicPlayer.tMPServerConfig.IncludeResearched && modplayer.Player.difficulty == PlayerDifficultyID.Creative && modplayer.Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(displayID);
+				bool isResearched = modplayer.Player.difficulty == PlayerDifficultyID.Creative && player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(slotItemID);
 				bool HasMusicBox = modplayer.MusicBoxList.Any(item => item.Type == slotItemID);
 				musicBox.SetDefaults(HasMusicBox || isResearched ? slotItemID : 0);
 			}
@@ -309,7 +310,7 @@ namespace tMusicPlayer
 						MusicUISystem.MusicUI.canPlay.Add(musicBox.type);
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
-					else if (modplayer.musicBoxesStored < 5) {
+					else if (modplayer.musicBoxesStored < 20) {
 						modplayer.musicBoxesStored++;
 					}
 					musicBox.TurnToAir();
@@ -317,7 +318,7 @@ namespace tMusicPlayer
 			}
 
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-				Main.LocalPlayer.mouseInterface = true;
+				player.mouseInterface = true;
 				if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
 					Main.cursorOverride = 3; 
 				}
@@ -350,7 +351,7 @@ namespace tMusicPlayer
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
 			TextureAssets.InventoryBack2 = (isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3);
 
-			bool isFavorited = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().MusicBoxFavs.Any(x => x.Type == slotItemID);
+			bool isFavorited = modplayer.MusicBoxFavs.Any(x => x.Type == slotItemID);
 			if (isFavorited) {
 				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack6;
 			}
@@ -630,7 +631,7 @@ namespace tMusicPlayer
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
 					Main.hoverItemName = 
 						"Stored music boxes record songs while recording is enabled\n" + 
-						$"Up to {tMusicPlayer.tMPServerConfig.MaxStorage} music boxes can be held at once\n" + 
+						$"Up to 20 music boxes can be held at once\n" + 
 						"Right click to take out one music box\nLeft click to take all of them out";
 				}
 			}

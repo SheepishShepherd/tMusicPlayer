@@ -13,7 +13,6 @@ namespace tMusicPlayer
 		public static Dictionary<int, int> itemToMusicReference;
 
 		public static TMPConfig tMPConfig;
-		public static TMPServerConfig tMPServerConfig;
 
 		internal static ModKeybind HidePlayerHotkey;
 		internal static ModKeybind PlayStopHotkey;
@@ -23,7 +22,6 @@ namespace tMusicPlayer
 		public override void Load() {
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
-			tMPServerConfig = ModContent.GetInstance<TMPServerConfig>();
 			HidePlayerHotkey = KeybindLoader.RegisterKeybind(this, "Hide Music Player", "Up");
 			PlayStopHotkey = KeybindLoader.RegisterKeybind(this, "Play/Stop Music", "Down");
 			PrevSongHotkey = KeybindLoader.RegisterKeybind(this, "Previous Song", "Left");
@@ -136,7 +134,6 @@ namespace tMusicPlayer
 			itemToMusicReference = null;
 
 			tMPConfig = null;
-			tMPServerConfig = null;
 
 			HidePlayerHotkey = null;
 			PlayStopHotkey = null;

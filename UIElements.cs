@@ -103,6 +103,8 @@ namespace tMusicPlayer
 				Top.Set(Main.mouseY - offset.Y, 0f);
 				Recalculate();
 			}
+
+			// Look into this. What is it doing exactly? Can I make this more efficient?
 			CalculatedStyle dimensions = Parent.GetDimensions();
 			Rectangle parentSpace = dimensions.ToRectangle();
 			Rectangle mouseRect = new Rectangle(Main.mouseX, Main.mouseY, 0, 0);
@@ -186,8 +188,7 @@ namespace tMusicPlayer
 			bool cannotPlayListMusic = Id.Contains("altplay") && !UI.canPlay.Contains(Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1)));
 			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic | clearAvailDisabled;
 			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
-			CalculatedStyle innerDimensions = GetInnerDimensions();
-			spriteBatch.Draw(texture, innerDimensions.ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
+			spriteBatch.Draw(texture, GetInnerDimensions().ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !disabled) {
@@ -507,8 +508,6 @@ namespace tMusicPlayer
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
-			CalculatedStyle innerDimensions = GetInnerDimensions();
-			Rectangle hitbox = innerDimensions.ToRectangle();
 			//base.DrawSelf(spriteBatch);
 			Texture2D searchbar = ModContent.Request<Texture2D>("tMusicPlayer/UI/search").Value;
 			spriteBatch.Draw(searchbar, GetDimensions().Position(), Color.White);
@@ -623,8 +622,6 @@ namespace tMusicPlayer
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
-			CalculatedStyle dimensions = GetDimensions();
-			Rectangle rectangle = dimensions.ToRectangle();
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
@@ -637,6 +634,7 @@ namespace tMusicPlayer
 			}
 			base.DrawSelf(spriteBatch);
 			Rectangle inner = GetInnerDimensions().ToRectangle();
+			Rectangle rectangle = GetDimensions().ToRectangle();
 			Asset<Texture2D> texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad);
 			spriteBatch.Draw(texture.Value, inner, Color.White);
 

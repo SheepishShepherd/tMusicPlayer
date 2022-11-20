@@ -359,19 +359,20 @@ namespace tMusicPlayer
 			}
 
 			base.Update(gameTime);
+
 			if (Main.gameMenu) {
 				playingMusic = -1;
 				ListenDisplay = -1;
 				listening = false;
 			}
+
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
 				mpToggleVisibility = !mpToggleVisibility;
-				if (mpToggleVisibility) {
-					if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
-						MusicUISystem.MusicUI.SwapPanelSize();
-					}
+				if (mpToggleVisibility && tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
+					MusicUISystem.MusicUI.SwapPanelSize();
 				}
 			}
+
 			if (tMusicPlayer.PlayStopHotkey.JustPressed) {
 				ToggleButton(MusicMode.Play);
 			}
@@ -406,9 +407,8 @@ namespace tMusicPlayer
 		public int FindNextIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i < musicData.Count; i++) {
-				if (i != index && canPlay.Contains(musicData[i].music)) {
+				if (i != index && canPlay.Contains(musicData[i].music))
 					return i;
-				}
 			}
 			return -1;
 		}
@@ -416,9 +416,8 @@ namespace tMusicPlayer
 		public int FindPrevIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i >= 0; i--) {
-				if (i != index && canPlay.Contains(musicData[i].music)) {
+				if (i != index && canPlay.Contains(musicData[i].music))
 					return i;
-				}
 			}
 			return -1;
 		}

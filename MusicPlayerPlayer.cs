@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
@@ -61,6 +63,42 @@ namespace tMusicPlayer
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == MusicUISystem.MusicUI.playingMusic);
 				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
 			}
+		}
+
+		public override bool ShiftClickSlot(Item[] inventory, int context, int slot) {
+			// This contains the logic for shift-clicking music boxes into the UI
+			// The Selection panel must be open and no chests can be open for the shift click to work
+			if (MusicUISystem.MusicUI.selectionVisible && Player.chest == -1) {
+				int type = inventory[slot].type;
+				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
+					musicBoxesStored++;
+					inventory[slot].TurnToAir();
+					SoundEngine.PlaySound(SoundID.Grab);
+					return true;
+				}
+				else if (tMusicPlayer.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+					MusicBoxList.Add(new ItemDefinition(type));
+					inventory[slot].TurnToAir();
+					SoundEngine.PlaySound(SoundID.Grab);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public override bool HoverSlot(Item[] inventory, int context, int slot) {
+			if (MusicUISystem.MusicUI.selectionVisible && Player.chest == -1 && Main.keyState.IsKeyDown(Keys.LeftShift)) {
+				int type = inventory[slot].type;
+				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
+					Main.cursorOverride = 9;
+					return true;
+				}
+				else if (tMusicPlayer.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+					Main.cursorOverride = 9;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

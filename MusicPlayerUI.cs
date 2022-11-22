@@ -32,6 +32,7 @@ namespace tMusicPlayer
 		public HoverButton expandButton;
 
 		// Selection Panel Buttons
+		public HoverButton ejectButton;
 		public HoverButton favoritesButton;
 		public HoverButton sortIDButton;
 		public HoverButton sortNameButton;
@@ -55,7 +56,6 @@ namespace tMusicPlayer
 		
 		public SearchBar searchBar;
 		public MusicBoxSlot AddMusicBoxSlot;
-		public ListenStorageSlot MusicStorageSlot;
 		public HoverButton closeButton;
 		public UIList SelectionList;
 		public FixedUIScrollbar selectionScrollBar;
@@ -283,14 +283,6 @@ namespace tMusicPlayer
 			viewModeButton.OnClick += (a, b) => UpdateViewMode();
 			selectionPanel.Append(viewModeButton);
 
-			musicEntryPanel = new BackDrop() {
-				Id = "MusicEntry"
-			};
-			musicEntryPanel.Width.Pixels = panelTextures[1].Value.Height;
-			musicEntryPanel.Height.Pixels = panelTextures[1].Value.Width;
-			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
-			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
-
 			searchBar = new SearchBar("Search...", "");
 			searchBar.Width.Pixels = 216f;
 			searchBar.Height.Pixels = 28f;
@@ -298,20 +290,31 @@ namespace tMusicPlayer
 			searchBar.Left.Pixels = 12f;
 			selectionPanel.Append(searchBar);
 
+			musicEntryPanel = new BackDrop() {
+				Id = "MusicEntry"
+			};
+			musicEntryPanel.Width.Pixels = panelTextures[1].Value.Height;
+			musicEntryPanel.Height.Pixels = panelTextures[1].Value.Width;
+			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 4f;
+			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
+
+			ejectButton = new HoverButton(buttonTextures.Value, new Rectangle(8 * 24, 48, 22, 22)) {
+				Id = "ejectMusicBoxes"
+			};
+			ejectButton.Width.Pixels = 22f;
+			ejectButton.Height.Pixels = 22f;
+			ejectButton.Left.Pixels = 10;
+			ejectButton.Top.Pixels = 63;
+			ejectButton.OnClick += (a, b) => EjectBox(false);
+			ejectButton.OnRightClick += (a, b) => EjectBox(true);
+			musicEntryPanel.Append(ejectButton);
+
 			AddMusicBoxSlot = new MusicBoxSlot(ItemID.MusicBox, 0.85f) {
 				Id = "EntrySlot"
 			};
-			AddMusicBoxSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (AddMusicBoxSlot.Width.Pixels / 2);
+			AddMusicBoxSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (AddMusicBoxSlot.Width.Pixels / 2) + 1;
 			AddMusicBoxSlot.Top.Pixels = 8f;
 			musicEntryPanel.Append(AddMusicBoxSlot);
-
-			Asset<Texture2D> texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad);
-			MusicStorageSlot = new ListenStorageSlot(ItemID.MusicBox);
-			MusicStorageSlot.Width.Pixels = texture.Value.Width;
-			MusicStorageSlot.Height.Pixels = texture.Value.Height;
-			MusicStorageSlot.Left.Pixels = (musicEntryPanel.Width.Pixels / 2) - (MusicStorageSlot.Width.Pixels / 2);
-			MusicStorageSlot.Top.Pixels = AddMusicBoxSlot.Height.Pixels + 16f;
-			musicEntryPanel.Append(MusicStorageSlot);
 
 			selectionScrollBar = new FixedUIScrollbar();
 			selectionScrollBar.SetView(100f, 1000f);
@@ -388,7 +391,8 @@ namespace tMusicPlayer
 			this.AddOrRemoveChild(selectionPanel, selectionVisible);
 
 			// Update positions of UIElements that are not parented by the main SelectionPanel
-			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 10f;
+			// TODO: dont do this each tick
+			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 4f;
 			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 			musicEntryPanel.Recalculate();
 			
@@ -459,6 +463,24 @@ namespace tMusicPlayer
 		internal void UpdateViewMode() {
 			viewMode = !viewMode;
 			OrganizeSelection(sortType, availabililty, FilterMod);
+		}
+
+		internal void EjectBox(bool ejectAll) {
+			Player player = Main.LocalPlayer;
+			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
+			if (modplayer.musicBoxesStored <= 0)
+				return;
+
+			if (ejectAll) {
+				while (modplayer.musicBoxesStored > 0) {
+					player.QuickSpawnItem(player.GetSource_OpenItem(ItemID.MusicBox), ItemID.MusicBox);
+					modplayer.musicBoxesStored--;
+				}
+			}
+			else {
+				player.QuickSpawnItem(player.GetSource_OpenItem(ItemID.MusicBox), ItemID.MusicBox);
+				modplayer.musicBoxesStored--;
+			}
 		}
 
 		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false, bool clickedFavorites = false) {

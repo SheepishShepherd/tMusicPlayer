@@ -31,17 +31,29 @@ namespace tMusicPlayer
 			MusicPlayerUI UI = MusicUISystem.MusicUI;
 			Rectangle rect = GetInnerDimensions().ToRectangle();
 			if (Id == "SelectionPanel") {
+				// Draw the panel backdrop
 				Texture2D texture = MusicPlayerUI.panelTextures[3].Value;
 				spriteBatch.Draw(texture, rect, Color.White);
 			}
 			else if (Id == "MusicPlayerPanel") {
+				// Draw the panel backdrop, depending on what size the player has selected
 				Texture2D texture = UI.smallPanel ? MusicPlayerUI.panelTextures[1].Value : MusicPlayerUI.panelTextures[2].Value;
 				spriteBatch.Draw(texture, rect, Color.White);
 			}
 			else if (Id == "MusicEntry") {
+				// Draw the panel backdrop
 				Texture2D obj = MusicPlayerUI.panelTextures[1].Value;
-				// TODO[?]: Simplify/make better later
-				spriteBatch.Draw(obj, new Rectangle(rect.X + obj.Bounds.Height + 2, rect.Y, obj.Width, obj.Height), obj.Bounds, Color.White, MathHelper.ToRadians(90), Vector2.Zero, SpriteEffects.None, 0f);
+				Rectangle pos = new Rectangle(rect.X + obj.Bounds.Height + 2, rect.Y, obj.Width, obj.Height);
+				spriteBatch.Draw(obj, pos, obj.Bounds, Color.White, MathHelper.ToRadians(90), Vector2.Zero, SpriteEffects.None, 0f);
+
+				// Draw an empty music box to display how many the player has stored
+				Texture2D texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad).Value;
+				pos = new Rectangle((int)(Left.Pixels + Width.Pixels / 2), (int)(Top.Pixels + Height.Pixels - texture.Height * 1.5f), texture.Width, texture.Height);
+				spriteBatch.Draw(texture, pos, Color.White);
+
+				// Draw the numerical value of boxes stored
+				Vector2 pos2 = new Vector2(pos.X + texture.Width - 15, pos.Y + texture.Height - 10);
+				Utils.DrawBorderString(spriteBatch, Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored.ToString(), pos2, Color.White, 0.85f);
 			}
 			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !UI.smallPanel) {
@@ -219,6 +231,11 @@ namespace tMusicPlayer
                 "unavailability" => "Show all unobtained music boxes",
                 "clearavailability" => "Clear availability filter",
                 "viewmode" => UI.viewMode ? "Change to Grid mode" : "Change to List mode",
+				"ejectMusicBoxes" =>
+						"Stored music boxes can record songs if recording is enabled\n" +
+						"Up to 20 music boxes can be held at once\n" +
+						"Left-click to eject one music box into your inventory\n" +
+						"Right click to place all of your stored music boxes in your inventory",
                 _ => "",
             };
         }
@@ -577,69 +594,6 @@ namespace tMusicPlayer
 				color2 *= 0.8f;
 				DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, FontAssets.MouseText.Value, displayString, drawPos, color2);
 			}
-		}
-	}
-
-	internal class ListenStorageSlot : UIElement
-	{
-		public string Id { get; init; } = "";
-
-		private readonly int itemID;
-
-		public ListenStorageSlot(int itemID) {
-			this.itemID = itemID;
-		}
-
-		public override void Click(UIMouseEvent evt) {
-			Player player = Main.LocalPlayer;
-			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (IsMouseHovering && modplayer.musicBoxesStored > 0) {
-				if (Main.mouseItem.IsAir) {
-					Main.mouseItem.SetDefaults(itemID);
-					modplayer.musicBoxesStored--;
-				}
-				while (modplayer.musicBoxesStored > 0) {
-					player.QuickSpawnItem(player.GetSource_OpenItem(itemID), itemID, 1);
-					modplayer.musicBoxesStored--;
-				}
-			}
-		}
-
-		public override void RightClick(UIMouseEvent evt) {
-			Player player = Main.LocalPlayer;
-			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (IsMouseHovering && modplayer.musicBoxesStored > 0) {
-				if (Main.mouseItem.IsAir) {
-					Main.mouseItem.SetDefaults(itemID);
-					modplayer.musicBoxesStored--;
-					SoundEngine.PlaySound(SoundID.Grab);
-				}
-				else {
-					player.QuickSpawnItem(player.GetSource_OpenItem(itemID), itemID, 1);
-					modplayer.musicBoxesStored--;
-				}
-			}
-		}
-
-		protected override void DrawSelf(SpriteBatch spriteBatch) {
-			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-				Main.LocalPlayer.mouseInterface = true;
-				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
-					Main.hoverItemName = 
-						"Stored music boxes record songs while recording is enabled\n" + 
-						$"Up to 20 music boxes can be held at once\n" + 
-						"Right click to take out one music box\nLeft click to take all of them out";
-				}
-			}
-			base.DrawSelf(spriteBatch);
-			Rectangle inner = GetInnerDimensions().ToRectangle();
-			Rectangle rectangle = GetDimensions().ToRectangle();
-			Asset<Texture2D> texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad);
-			spriteBatch.Draw(texture.Value, inner, Color.White);
-
-			Vector2 pos2 = new Vector2(rectangle.X + inner.Width * 0.75f, rectangle.Y + inner.Height * 0.75f);
-			Utils.DrawBorderString(spriteBatch, modplayer.musicBoxesStored.ToString(), pos2, Color.White, 0.85f);
 		}
 	}
 }

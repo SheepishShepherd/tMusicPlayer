@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.IO;
@@ -12,6 +13,10 @@ namespace tMusicPlayer
 		public List<ItemDefinition> MusicBoxList;
 		public List<ItemDefinition> MusicBoxFavs;
 		public int musicBoxesStored;
+
+		public bool BoxIsCollected(int type) => MusicBoxList.Any(item => item.Type == type);
+		public bool BoxResearched(int type) => Player.difficulty == PlayerDifficultyID.Creative && Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(type);
+		public bool BoxIsFavorited(int type) => MusicBoxFavs.Any(item => item.Type == type);
 
 		public override void Initialize() {
 			MusicBoxList = new List<ItemDefinition>();
@@ -40,7 +45,7 @@ namespace tMusicPlayer
 			// Add all the player's obtained musicboxes to the canPlay array for the UI
 			if (MusicUISystem.MusicUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
-					if (MusicBoxList.Any(x => x.Type == tMusicPlayer.AllMusic[i].musicbox)) {
+					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
 						MusicUISystem.MusicUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
 					}
 				}

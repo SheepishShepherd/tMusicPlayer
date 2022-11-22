@@ -345,7 +345,7 @@ namespace tMusicPlayer
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
                     SoundEngine.PlaySound(SoundID.Item166);
-					if (modplayer.MusicBoxList.All(x => x.Type != musicBoxType)) {
+					if (!modplayer.BoxIsCollected(musicBoxType)) {
 						// If we don't have it in our music player, automatically add it in.
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));
 					}
@@ -517,9 +517,9 @@ namespace tMusicPlayer
 					if (!initializing) {
 						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
-						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != musicData[i].musicbox);
-						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == musicData[i].musicbox);
-						bool CheckFavorited = viewFavs && modplayer.MusicBoxFavs.All(x => x.Type != musicData[i].musicbox);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].musicbox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].musicbox);
+						bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(musicData[i].musicbox);
 
 						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;
@@ -554,9 +554,9 @@ namespace tMusicPlayer
 					if (!initializing) {
 						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
-						bool CheckObtained = progressBy == ProgressBy.Obtained && modplayer.MusicBoxList.All(x => x.Type != musicData[i].musicbox);
-						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.MusicBoxList.Any(x => x.Type == musicData[i].musicbox);
-						bool CheckFavorited = viewFavs && modplayer.MusicBoxFavs.All(x => x.Type != musicData[i].musicbox);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].musicbox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].musicbox);
+						bool CheckFavorited = viewFavs && !modplayer.BoxIsCollected(musicData[i].musicbox);
 
 						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
@@ -282,12 +281,13 @@ namespace tMusicPlayer
 
 		public override void Click(UIMouseEvent evt) {
 			if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
-				List<ItemDefinition> favorites = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().MusicBoxFavs;
-				if (favorites.Any(x => x.Type == slotItemID)) {
-					favorites.RemoveAll(x => x.Type == slotItemID);
+
+				MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+				if (modplayer.BoxIsFavorited(slotItemID)) {
+					modplayer.MusicBoxFavs.RemoveAll(x => x.Type == slotItemID);
 				}
 				else {
-					favorites.Add(new ItemDefinition(slotItemID));
+					modplayer.MusicBoxFavs.Add(new ItemDefinition(slotItemID));
 				}
 			}
 		}
@@ -316,10 +316,7 @@ namespace tMusicPlayer
 				}
 			}
 			if (!isEntrySlot) {
-				// TODO: Implement 'IncludeResearch' better?
-				bool isResearched = modplayer.Player.difficulty == PlayerDifficultyID.Creative && player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(slotItemID);
-				bool HasMusicBox = modplayer.MusicBoxList.Any(item => item.Type == slotItemID);
-				musicBox.SetDefaults(HasMusicBox || isResearched ? slotItemID : 0);
+				musicBox.SetDefaults(modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? slotItemID : 0);
 			}
 			else {
 				if (!musicBox.IsAir) {
@@ -350,7 +347,7 @@ namespace tMusicPlayer
 					else if (isEntrySlot) {
 						int mouseType = Main.mouseItem.type;
 						if (mouseType != 0) {
-							bool ValidEntryBox = modplayer.MusicBoxList.All(x => x.Type != mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
+							bool ValidEntryBox = !modplayer.BoxIsCollected(mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
 							bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
 							if (ValidEntryBox | isUnrecordedAndNotMax) {
 								ItemSlot.Handle(ref musicBox, context);
@@ -369,7 +366,7 @@ namespace tMusicPlayer
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
 			TextureAssets.InventoryBack2 = (isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3);
 
-			bool isFavorited = modplayer.MusicBoxFavs.Any(x => x.Type == slotItemID);
+			bool isFavorited = modplayer.BoxIsFavorited(slotItemID);
 			if (isFavorited) {
 				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack6;
 			}
@@ -389,7 +386,7 @@ namespace tMusicPlayer
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.musicbox == slotItemID);
 				int musicID = tMusicPlayer.AllMusic[index].music;
 				if (musicBox.type == slotItemID) {
-					if (modplayer.MusicBoxList.All(x => x.Type != slotItemID)) {
+					if (!modplayer.BoxIsCollected(slotItemID)) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(slotItemID));
 						UI.canPlay.Add(musicID);
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
@@ -401,7 +398,7 @@ namespace tMusicPlayer
 						UI.playingMusic = musicID;
 					}
 				}
-				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.MusicBoxList.Any(x => x.Type == slotItemID)) {
+				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.BoxIsCollected(slotItemID)) {
 					modplayer.MusicBoxList.RemoveAll(x => x.Type == slotItemID);
 					UI.canPlay.Remove(musicID); // = tMusicPlayer.tMPConfig.EnableAllMusicBoxes;
 					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{slotItemID}]", Color.IndianRed);

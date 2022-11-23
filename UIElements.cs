@@ -322,7 +322,7 @@ namespace tMusicPlayer
 			else if (isSelectionSlot) {
 				musicBox.SetDefaults(modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? slotItemID : 0);
 			}
-			else {
+			else if (isEntrySlot) {
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));

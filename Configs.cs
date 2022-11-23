@@ -42,7 +42,7 @@ namespace tMusicPlayer
 
 		public override void OnChanged() {
 			if (!Main.gameMenu && !Main.dedServ) {
-				MusicPlayerUI UI = MusicUISystem.MusicUI;
+				MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 				if (ResettingPanels) {
 					UI.MusicPlayerPanel.Left.Pixels = 1115f;
 					UI.MusicPlayerPanel.Top.Pixels = 16f;

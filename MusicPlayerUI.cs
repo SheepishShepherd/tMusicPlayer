@@ -646,6 +646,7 @@ namespace tMusicPlayer
 							recording = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0;
 						}
 						if (recording) {
+							playingMusic = -1;
 							listening = true;
 						}
 						break;

@@ -10,8 +10,7 @@ using Terraria.ModLoader.IO;
 
 namespace tMusicPlayer
 {
-	public class MusicPlayerPlayer : ModPlayer
-	{
+	public class MusicPlayerPlayer : ModPlayer {
 		public List<ItemDefinition> MusicBoxList;
 		public List<ItemDefinition> MusicBoxFavs;
 		public int musicBoxesStored;

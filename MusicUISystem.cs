@@ -11,8 +11,7 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
-	internal class MusicUISystem : ModSystem
-	{
+	internal class MusicUISystem : ModSystem {
 		public static MusicUISystem Instance { get; private set; }
 
 		internal UserInterface MP_UserInterface;
@@ -22,8 +21,7 @@ namespace tMusicPlayer
 		internal string UIHoverText = "";
 		internal Color UIHoverTextColor = default;
 
-		public override void Load()
-		{
+		public override void Load() {
 			Instance = this;
 
 			// Setup the Music Player UI.
@@ -35,14 +33,12 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void Unload()
-		{
+		public override void Unload() {
 			MP_UserInterface = null;
 			MusicUI = null;
 		}
 
-		public override void PostAddRecipes()
-		{
+		public override void PostAddRecipes() {
 			// After all PostSetupContent has occured, setup all the MusicData.
 			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
 			foreach (int itemID in tMusicPlayer.itemToMusicReference.Keys) {
@@ -86,17 +82,11 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void UpdateUI(GameTime gameTime)
-		{
-			// Update Music Player UI as long as it exists.
-			UserInterface mP_UserInterface = MP_UserInterface;
-			if (mP_UserInterface != null) {
-				mP_UserInterface.Update(gameTime);
-			}
+		public override void UpdateUI(GameTime gameTime) {
+			MP_UserInterface?.Update(gameTime);
 		}
 
-		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-		{
+		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
 			// Draws the Music Player UI.
 			int index = layers.FindIndex((GameInterfaceLayer layer) => layer.Name.Equals("Vanilla: Inventory"));
 			if (index != -1) {
@@ -128,8 +118,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		private void DrawTooltipBG(SpriteBatch sb, string text, Color textColor = default)
-		{
+		private void DrawTooltipBG(SpriteBatch sb, string text, Color textColor = default) {
 			if (text == "")
 				return;
 

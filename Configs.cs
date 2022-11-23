@@ -6,8 +6,7 @@ namespace tMusicPlayer
 {
 	[BackgroundColor(55, 59, 80, 255)]
 	[Label("Personal Configs")]
-	public class TMPConfig : ModConfig
-	{
+	public class TMPConfig : ModConfig {
 		public override ConfigScope Mode => ConfigScope.ClientSide;
 
 		[Header("[i:576] [c/ffeb6e:Configs]")]

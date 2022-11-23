@@ -7,8 +7,7 @@ using Terraria.ModLoader;
 
 namespace tMusicPlayer
 {
-	public class tMusicPlayer : Mod
-	{
+	public class tMusicPlayer : Mod {
 		internal static List<MusicData> AllMusic;
 		public static Dictionary<int, int> itemToMusicReference;
 

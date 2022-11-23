@@ -2,8 +2,7 @@
 
 namespace tMusicPlayer
 {
-	internal class MusicData
-	{
+	internal class MusicData {
 		internal int music;
 		internal int musicbox;
 		internal string mod;

@@ -17,8 +17,7 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
-	internal class BackDrop : UIElement
-	{
+	internal class BackDrop : UIElement {
 		public string Id { get; init; } = "";
 
 		public bool dragging;
@@ -129,14 +128,7 @@ namespace tMusicPlayer
 		}
 	}
 
-	internal class FixedUIScrollbar : UIScrollbar
-	{
-		public string Id { get; init; } = "";
-
-		public FixedUIScrollbar() {
-
-		}
-
+	internal class FixedUIScrollbar : UIScrollbar {
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			UserInterface temp = UserInterface.ActiveInstance;
 			UserInterface.ActiveInstance = MusicUISystem.Instance.MP_UserInterface;
@@ -152,8 +144,7 @@ namespace tMusicPlayer
 		}
 	}
 	
-	internal class HoverButton : UIImage
-	{
+	internal class HoverButton : UIImage {
 		public string Id { get; init; } = "";
 
 		internal Texture2D texture;
@@ -249,8 +240,7 @@ namespace tMusicPlayer
         }
 	}
 
-	internal class ItemSlotRow : UIElement
-	{
+	internal class ItemSlotRow : UIElement {
 		public string Id { get; init; } = "";
 
 		private int order;
@@ -267,8 +257,7 @@ namespace tMusicPlayer
 		}
 	}
 
-	internal class MusicBoxSlot : UIElement
-	{
+	internal class MusicBoxSlot : UIElement {
 		public string Id { get; set; } = "";
 
 		internal Item musicBox; // The item in this slot
@@ -461,8 +450,7 @@ namespace tMusicPlayer
 		}
 	}
 
-	internal class SearchBar : UITextBox
-	{
+	internal class SearchBar : UITextBox {
 		public string Id { get; init; } = "";
 
 		internal bool focused = false;
@@ -525,9 +513,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		private static bool JustPressed(Keys key) {
-			return Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
-		}
+		private static bool JustPressed(Keys key) => Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			//base.DrawSelf(spriteBatch);

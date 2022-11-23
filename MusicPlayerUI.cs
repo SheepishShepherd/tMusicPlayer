@@ -16,8 +16,7 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
-	internal class MusicPlayerUI : UIState
-	{
+	internal class MusicPlayerUI : UIState {
 		public BackDrop MusicPlayerPanel;
 		public bool mpToggleVisibility = true;
 		public MusicBoxSlot DisplayMusicSlot;
@@ -671,21 +670,18 @@ namespace tMusicPlayer
 		}
 	}
 
-	public enum MusicMode
-	{
+	public enum MusicMode {
 		Play,
 		Listen,
 		Record
 	}
 
-	public enum SortBy
-	{
+	public enum SortBy {
 		ID,
 		Name
 	}
 
-	public enum ProgressBy
-	{
+	public enum ProgressBy {
 		None,
 		Obtained,
 		Unobtained

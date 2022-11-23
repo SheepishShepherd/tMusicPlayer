@@ -39,16 +39,16 @@ namespace tMusicPlayer
 		}
 
 		public override void OnEnterWorld(Player player) {
-			// Determine if the player wants to start with the small panel or large panel
-			if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.Instance.MusicUI.smallPanel) {
-				MusicUISystem.Instance.MusicUI.SwapPanelSize();
-			}
-
-			// Add all the player's obtained musicboxes to the canPlay array for the UI
-			if (MusicUISystem.Instance.MusicUI != null) {
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			if (UI != null) {
+				// Determine if the player wants to start with the small panel or large panel
+				if (tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
+					UI.SwapPanelSize();
+				}
+				// Add all the player's obtained musicboxes to the canPlay array for the UI
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
-						MusicUISystem.Instance.MusicUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
+						UI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
 					}
 				}
 			}
@@ -59,8 +59,9 @@ namespace tMusicPlayer
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
 			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
-			if (!Main.gameMenu && !Main.dedServ && MusicUISystem.Instance.MusicUI != null && MusicUISystem.Instance.MusicUI.playingMusic > -1) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == MusicUISystem.Instance.MusicUI.playingMusic);
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			if (!Main.gameMenu && !Main.dedServ && UI != null && UI.playingMusic > -1) {
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == UI.playingMusic);
 				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
 			}
 		}

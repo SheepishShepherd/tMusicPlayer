@@ -340,7 +340,8 @@ namespace tMusicPlayer
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (modplayer.musicBoxesStored > 0 && MusicUISystem.Instance.MusicUI.recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			if (modplayer.musicBoxesStored > 0 && UI.recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
@@ -356,7 +357,7 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
 
 					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					MusicUISystem.Instance.MusicUI.recording = false;
+					UI.recording = false;
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -371,8 +372,8 @@ namespace tMusicPlayer
 
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
 				mpToggleVisibility = !mpToggleVisibility;
-				if (mpToggleVisibility && tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.Instance.MusicUI.smallPanel) {
-					MusicUISystem.Instance.MusicUI.SwapPanelSize();
+				if (mpToggleVisibility && tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
+					UI.SwapPanelSize();
 				}
 			}
 
@@ -607,14 +608,16 @@ namespace tMusicPlayer
 			if (!canPlay.Contains(musicID)) {
 				return;
 			}
-			if (MusicUISystem.Instance.MusicUI.playingMusic != musicID) {
-				MusicUISystem.Instance.MusicUI.ListenDisplay = -1;
-				MusicUISystem.Instance.MusicUI.listening = false;
-				MusicUISystem.Instance.MusicUI.DisplayBox = index;
-				MusicUISystem.Instance.MusicUI.playingMusic = musicID;
+
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			if (UI.playingMusic != musicID) {
+				UI.ListenDisplay = -1;
+				UI.listening = false;
+				UI.DisplayBox = index;
+				UI.playingMusic = musicID;
 			}
 			else {
-				MusicUISystem.Instance.MusicUI.playingMusic = -1;
+				UI.playingMusic = -1;
 			}
 		}
 

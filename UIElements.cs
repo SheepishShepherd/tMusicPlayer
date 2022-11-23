@@ -326,7 +326,7 @@ namespace tMusicPlayer
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
-						MusicUISystem.Instance.MusicUI.canPlay.Add(musicBox.type);
+						UI.canPlay.Add(musicBox.type);
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {

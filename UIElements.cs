@@ -27,7 +27,7 @@ namespace tMusicPlayer
 		public BackDrop() { }
 
 		public override void Draw(SpriteBatch spriteBatch) {
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			Rectangle rect = GetInnerDimensions().ToRectangle();
 			if (Id == "SelectionPanel") {
 				// Draw the panel backdrop
@@ -139,14 +139,14 @@ namespace tMusicPlayer
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			UserInterface temp = UserInterface.ActiveInstance;
-			UserInterface.ActiveInstance = MusicUISystem.MP_UserInterface;
+			UserInterface.ActiveInstance = MusicUISystem.Instance.MP_UserInterface;
 			base.DrawSelf(spriteBatch);
 			UserInterface.ActiveInstance = temp;
 		}
 
 		public override void MouseDown(UIMouseEvent evt) {
 			UserInterface temp = UserInterface.ActiveInstance;
-			UserInterface.ActiveInstance = MusicUISystem.MP_UserInterface;
+			UserInterface.ActiveInstance = MusicUISystem.Instance.MP_UserInterface;
 			base.MouseDown(evt);
 			UserInterface.ActiveInstance = temp;
 		}
@@ -165,7 +165,7 @@ namespace tMusicPlayer
 		}
 
 		public bool UseAlternateTexture() {
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (Id.Contains("altplay")) {
 				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 				return UI.playingMusic == num;
@@ -181,7 +181,7 @@ namespace tMusicPlayer
         }
 
 		public override void Draw(SpriteBatch spriteBatch) {
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			bool useAlt = UseAlternateTexture();
 			int selectedMusic = tMusicPlayer.AllMusic[UI.DisplayBox].music;
 			int firstBox = UI.musicData[0].music;
@@ -212,7 +212,7 @@ namespace tMusicPlayer
 		}
 
 		public string SetHoverItemName(string ID) {
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
             return ID switch {
                 "expand" => (UI.smallPanel ? "Maximize" : "Minimize") ?? "",
                 "play" => ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "",
@@ -293,7 +293,7 @@ namespace tMusicPlayer
 		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
-			MusicPlayerUI UI = MusicUISystem.MusicUI;
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			bool isSelectionSlot = Id.Contains("SelectionSlot");
 			bool isDisplaySlot = Id == "DisplaySlot";
 			bool isEntrySlot = Id == "EntrySlot";
@@ -326,7 +326,7 @@ namespace tMusicPlayer
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
-						MusicUISystem.MusicUI.canPlay.Add(musicBox.type);
+						MusicUISystem.Instance.MusicUI.canPlay.Add(musicBox.type);
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
@@ -548,7 +548,7 @@ namespace tMusicPlayer
 							newString = currentString;
                         }
 					}
-					MusicPlayerUI UI = MusicUISystem.MusicUI;
+					MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 					if (currentString.Length >= 0) {
 						List<MusicData> musicData = new List<MusicData>();
 						foreach (MusicData item in tMusicPlayer.AllMusic.ToArray()) {

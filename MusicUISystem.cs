@@ -12,12 +12,14 @@ namespace tMusicPlayer
 	{
 		public static MusicUISystem Instance { get; private set; }
 
-		internal static UserInterface MP_UserInterface;
-		internal static MusicPlayerUI MusicUI;
+		internal UserInterface MP_UserInterface;
+		internal MusicPlayerUI MusicUI;
 		internal const int MaxUnrecordedBoxes = 20;
 
 		public override void Load()
 		{
+			Instance = this;
+
 			// Setup the Music Player UI.
 			if (!Main.dedServ) {
 				MusicUI = new MusicPlayerUI();
@@ -49,7 +51,7 @@ namespace tMusicPlayer
 
 			// Setup UI's item slot count.
 			if (!Main.dedServ) {
-				MusicPlayerUI UI = MusicUISystem.MusicUI;
+				MusicPlayerUI UI = Instance.MusicUI;
 
 				if (UI.sortType == SortBy.ID) {
 					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();

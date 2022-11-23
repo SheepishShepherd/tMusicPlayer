@@ -40,15 +40,15 @@ namespace tMusicPlayer
 
 		public override void OnEnterWorld(Player player) {
 			// Determine if the player wants to start with the small panel or large panel
-			if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.MusicUI.smallPanel) {
-				MusicUISystem.MusicUI.SwapPanelSize();
+			if (tMusicPlayer.tMPConfig.StartWithSmall != MusicUISystem.Instance.MusicUI.smallPanel) {
+				MusicUISystem.Instance.MusicUI.SwapPanelSize();
 			}
 
 			// Add all the player's obtained musicboxes to the canPlay array for the UI
-			if (MusicUISystem.MusicUI != null) {
+			if (MusicUISystem.Instance.MusicUI != null) {
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
-						MusicUISystem.MusicUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
+						MusicUISystem.Instance.MusicUI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
 					}
 				}
 			}
@@ -59,8 +59,8 @@ namespace tMusicPlayer
 			// Terraria source code uses UpdateEquips and sets Main.musicBox2 to determine music.
 			// By updating Main.musicBox2 again in PostUpdateEquips, the music player effectively becomes top priority.
 			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
-			if (!Main.gameMenu && !Main.dedServ && MusicUISystem.MusicUI != null && MusicUISystem.MusicUI.playingMusic > -1) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == MusicUISystem.MusicUI.playingMusic);
+			if (!Main.gameMenu && !Main.dedServ && MusicUISystem.Instance.MusicUI != null && MusicUISystem.Instance.MusicUI.playingMusic > -1) {
+				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == MusicUISystem.Instance.MusicUI.playingMusic);
 				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
 			}
 		}
@@ -68,7 +68,7 @@ namespace tMusicPlayer
 		public override bool ShiftClickSlot(Item[] inventory, int context, int slot) {
 			// This contains the logic for shift-clicking music boxes into the UI
 			// The Selection panel must be open and no chests can be open for the shift click to work
-			if (MusicUISystem.MusicUI.selectionVisible && Player.chest == -1) {
+			if (MusicUISystem.Instance.MusicUI.selectionVisible && Player.chest == -1) {
 				int type = inventory[slot].type;
 				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
 					musicBoxesStored++;
@@ -87,7 +87,7 @@ namespace tMusicPlayer
 		}
 
 		public override bool HoverSlot(Item[] inventory, int context, int slot) {
-			if (MusicUISystem.MusicUI.selectionVisible && Player.chest == -1 && Main.keyState.IsKeyDown(Keys.LeftShift)) {
+			if (MusicUISystem.Instance.MusicUI.selectionVisible && Player.chest == -1 && Main.keyState.IsKeyDown(Keys.LeftShift)) {
 				int type = inventory[slot].type;
 				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
 					Main.cursorOverride = 9;

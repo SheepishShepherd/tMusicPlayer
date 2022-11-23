@@ -175,7 +175,7 @@ namespace tMusicPlayer
 			}
 
 			return Id switch {
-                "expand" => !UI.smallPanel ? 24 : 0,
+                "expand" => !UI.smallPanel ? 20 : 0,
                 "play" => UI.playingMusic > -1 ? 24 : 0,
                 "listen" => UI.listening ? 24 : 0,
                 "record" => !UI.recording ? 24 : 0,

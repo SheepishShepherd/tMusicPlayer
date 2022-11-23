@@ -38,9 +38,7 @@ namespace tMusicPlayer
 		public HoverButton sortNameButton;
 		public HoverButton filterModButton;
 		public HoverButton clearFilterModButton;
-		public HoverButton clearAvailabilityButton;
-		public HoverButton obtainedButton;
-		public HoverButton unobtainedButton;
+		public HoverButton availabilityButton;
 		public HoverButton viewModeButton;
 
 		public bool smallPanel = true;
@@ -187,7 +185,7 @@ namespace tMusicPlayer
 			};
 			favoritesButton.Width.Pixels = 22f;
 			favoritesButton.Height.Pixels = 22f;
-			favoritesButton.Left.Pixels = center - (20 * 5) - 8;
+			favoritesButton.Left.Pixels = center - (20 * 3) - (8 * 2) + 4;
 			favoritesButton.Top.Pixels = 42;
 			favoritesButton.OnClick += (a, b) => OrganizeSelection(sortType, availabililty, FilterMod, false, true);
 			selectionPanel.Append(favoritesButton);
@@ -197,7 +195,7 @@ namespace tMusicPlayer
 			};
 			sortIDButton.Width.Pixels = 22f;
 			sortIDButton.Height.Pixels = 22f;
-			sortIDButton.Left.Pixels = center - (20 * 3) - 8;
+			sortIDButton.Left.Pixels = center - (20 * 2) - 8 + 4;
 			sortIDButton.Top.Pixels = 42;
 			sortIDButton.OnClick += (a, b) => OrganizeSelection(SortBy.ID, availabililty, FilterMod);
 			selectionPanel.Append(sortIDButton);
@@ -207,7 +205,7 @@ namespace tMusicPlayer
 			};
 			sortNameButton.Width.Pixels = 22f;
 			sortNameButton.Height.Pixels = 22f;
-			sortNameButton.Left.Pixels = center - (20 * 2) - 8;
+			sortNameButton.Left.Pixels = center - 20 - 8 + 4;
 			sortNameButton.Top.Pixels = 42;
 			sortNameButton.OnClick += (a, b) => OrganizeSelection(SortBy.Name, availabililty, FilterMod);
 			selectionPanel.Append(sortNameButton);
@@ -217,7 +215,7 @@ namespace tMusicPlayer
 			};
 			filterModButton.Width.Pixels = 22f;
 			filterModButton.Height.Pixels = 22f;
-			filterModButton.Left.Pixels = center - (20 * 1);
+			filterModButton.Left.Pixels = center + 8 - 4;
 			filterModButton.Top.Pixels = 42;
 			filterModButton.OnClick += (a, b) => OrganizeSelection(sortType, availabililty, UpdateModFilter(true));
 			filterModButton.OnRightClick += (a, b) => OrganizeSelection(sortType, availabililty, UpdateModFilter(false));
@@ -228,40 +226,21 @@ namespace tMusicPlayer
 			};
 			clearFilterModButton.Width.Pixels = 22f;
 			clearFilterModButton.Height.Pixels = 22f;
-			clearFilterModButton.Left.Pixels = center;
+			clearFilterModButton.Left.Pixels = center + 20 + 8 - 4;
 			clearFilterModButton.Top.Pixels = 42;
 			clearFilterModButton.OnClick += (a, b) => OrganizeSelection(sortType, availabililty, ResetModFilter());
 			selectionPanel.Append(clearFilterModButton);
 
-			clearAvailabilityButton = new HoverButton(buttonTextures.Value, new Rectangle(4 * 24, 48, 22, 22)) {
-				Id = "clearavailability"
-			};
-			clearAvailabilityButton.Width.Pixels = 22f;
-			clearAvailabilityButton.Height.Pixels = 22f;
-			clearAvailabilityButton.Left.Pixels = center + (20 * 1) + 8;
-			clearAvailabilityButton.Top.Pixels = 42;
-			clearAvailabilityButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.None, FilterMod);
-			selectionPanel.Append(clearAvailabilityButton);
-
-			obtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(5 * 24, 48, 22, 22)) {
+			availabilityButton = new HoverButton(buttonTextures.Value, new Rectangle(4 * 24, 48, 22, 22)) {
 				Id = "availability"
 			};
-			obtainedButton.Width.Pixels = 22f;
-			obtainedButton.Height.Pixels = 22f;
-			obtainedButton.Left.Pixels = center + (20 * 2) + 8;
-			obtainedButton.Top.Pixels = 42;
-			obtainedButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.Obtained, FilterMod);
-			selectionPanel.Append(obtainedButton);
-
-			unobtainedButton = new HoverButton(buttonTextures.Value, new Rectangle(6 * 24, 48, 22, 22)) {
-				Id = "unavailability"
-			};
-			unobtainedButton.Width.Pixels = 22f;
-			unobtainedButton.Height.Pixels = 22f;
-			unobtainedButton.Left.Pixels = center + (20 * 3) + 8;
-			unobtainedButton.Top.Pixels = 42;
-			unobtainedButton.OnClick += (a, b) => OrganizeSelection(sortType, ProgressBy.Unobtained, FilterMod);
-			selectionPanel.Append(unobtainedButton);
+			availabilityButton.Width.Pixels = 22f;
+			availabilityButton.Height.Pixels = 22f;
+			availabilityButton.Left.Pixels = center + (20 * 2) + (8 * 2) - 4;
+			availabilityButton.Top.Pixels = 42;
+			availabilityButton.OnClick += (a, b) => OrganizeSelection(sortType, UpdateAvailabilityFilter(true), FilterMod);
+			availabilityButton.OnRightClick += (a, b) => OrganizeSelection(sortType, UpdateAvailabilityFilter(false), FilterMod);
+			selectionPanel.Append(availabilityButton);
 
 			closeButton = new HoverButton(closeTextures.Value, new Rectangle(0, 0, 18, 18)) {
 				Id = "select_close"
@@ -441,6 +420,15 @@ namespace tMusicPlayer
 			FilterMod = "";
 			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
 			return FilterMod;
+		}
+
+		internal ProgressBy UpdateAvailabilityFilter(bool next) {
+			return availabililty switch {
+				ProgressBy.None => next ? ProgressBy.Obtained : ProgressBy.Unobtained,
+				ProgressBy.Obtained => next ? ProgressBy.Unobtained : ProgressBy.None,
+				ProgressBy.Unobtained => next ? ProgressBy.None : ProgressBy.Obtained,
+				_ => ProgressBy.None
+			};
 		}
 
 		internal string UpdateModFilter(bool next) {

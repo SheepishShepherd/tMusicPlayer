@@ -195,11 +195,21 @@ namespace tMusicPlayer
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
 			bool musicAtZero = Id != "expand" && Id != "view" && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
-			bool clearAvailDisabled = Id == "clearavailability" && UI.availabililty == ProgressBy.None;
 			bool cannotPlayListMusic = Id.Contains("altplay") && !UI.canPlay[Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1))];
-			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic | clearAvailDisabled;
+			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
+
+			//Cycle availability texture
+			if (Id == "availability") {
+				src.X += 24 * (int)UI.availabililty;
+			}
+
 			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			spriteBatch.Draw(texture, GetInnerDimensions().ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
+
+			if (Id == "availability") {
+				src.X -= 24 * (int)UI.availabililty;
+			}
+
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !disabled) {
@@ -213,6 +223,14 @@ namespace tMusicPlayer
 
 		public string SetHoverItemName(string ID) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			if (Id == "availability") {
+				return UI.availabililty switch {
+					ProgressBy.Obtained => "Showing obtained music boxes",
+					ProgressBy.Unobtained => "Showing unobtained music boxes",
+					_ => "No availability filter"
+				};
+			}
+
             return ID switch {
                 "expand" => (UI.smallPanel ? "Maximize" : "Minimize") ?? "",
                 "play" => ((UI.playingMusic >= 0) ? "Stop" : "Play") ?? "",
@@ -226,16 +244,13 @@ namespace tMusicPlayer
                 "sortbyname" => "Sort by name",
                 "filtermod" => $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}",
                 "clearfiltermod" => "Clear mod filter",
-                "availability" => "Show all obtained music boxes",
-                "unavailability" => "Show all unobtained music boxes",
-                "clearavailability" => "Clear availability filter",
                 "viewmode" => UI.viewMode ? "Change to Grid mode" : "Change to List mode",
 				"ejectMusicBoxes" =>
 						"Stored music boxes can record songs if recording is enabled\n" +
 						"Up to 20 music boxes can be held at once\n" +
 						"Left-click to eject one music box into your inventory\n" +
 						"Right click to place all of your stored music boxes in your inventory",
-                _ => "",
+                _ => ""
             };
         }
 	}

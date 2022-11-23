@@ -53,6 +53,8 @@ namespace tMusicPlayer
 			if (!Main.dedServ) {
 				MusicPlayerUI UI = Instance.MusicUI;
 
+				UI.canPlay = new bool[tMusicPlayer.AllMusic.Count];
+
 				if (UI.sortType == SortBy.ID) {
 					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
 				}

@@ -48,7 +48,7 @@ namespace tMusicPlayer
 				// Add all the player's obtained musicboxes to the canPlay array for the UI
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
-						UI.canPlay.Add(tMusicPlayer.AllMusic[i].music);
+						UI.canPlay[i] = true;
 					}
 				}
 			}

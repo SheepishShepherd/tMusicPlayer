@@ -60,7 +60,7 @@ namespace tMusicPlayer
 		public UIList SelectionList;
 		public FixedUIScrollbar selectionScrollBar;
 		public MusicBoxSlot[] SelectionSlots;
-		internal List<int> canPlay;
+		internal bool[] canPlay;
 		internal bool viewMode = false;
 		internal bool viewFavs = false;
 
@@ -330,8 +330,6 @@ namespace tMusicPlayer
 			SelectionList.Left.Pixels = 0f;
 			SelectionList.Top.Pixels = 72f;
 			selectionPanel.Append(SelectionList);
-
-			canPlay = new List<int>();
 		}
 
 		public override void Update(GameTime gameTime) {
@@ -397,7 +395,7 @@ namespace tMusicPlayer
 			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
 			musicEntryPanel.Recalculate();
 			
-			if (!listening && canPlay.Count == 0) {
+			if (!listening && !canPlay.Contains(true)) {
 				ToggleButton(MusicMode.Listen);
 			}
 			if (modplayer.musicBoxesStored <= 0) {
@@ -412,7 +410,7 @@ namespace tMusicPlayer
 		public int FindNextIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i < musicData.Count; i++) {
-				if (i != index && canPlay.Contains(musicData[i].music))
+				if (i != index && canPlay[DisplayBox])
 					return i;
 			}
 			return -1;
@@ -421,7 +419,7 @@ namespace tMusicPlayer
 		public int FindPrevIndex() {
 			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
 			for (int i = index; i >= 0; i--) {
-				if (i != index && canPlay.Contains(musicData[i].music))
+				if (i != index && canPlay[DisplayBox])
 					return i;
 			}
 			return -1;
@@ -605,7 +603,7 @@ namespace tMusicPlayer
 		private void ListViewPlaySong(string Id) {
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
-			if (!canPlay.Contains(musicID)) {
+			if (!canPlay[index]) {
 				return;
 			}
 

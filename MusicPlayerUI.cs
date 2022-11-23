@@ -591,7 +591,7 @@ namespace tMusicPlayer
 		private void ListViewPlaySong(string Id) {
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
 			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
-			if (!canPlay[index]) {
+			if (!canPlay[index] || Main.musicVolume <= 0f) {
 				return;
 			}
 

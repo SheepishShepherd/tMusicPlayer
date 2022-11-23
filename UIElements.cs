@@ -164,25 +164,28 @@ namespace tMusicPlayer
 			this.src = src;
 		}
 
-		public bool UseAlternateTexture() {
+		public int UseAlternateTexture() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (Id.Contains("altplay")) {
 				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-				return UI.playingMusic == num;
+				return UI.playingMusic == num ? 24 : 0;
 			}
-            return Id switch {
-                "expand" => !UI.smallPanel,
-                "play" => UI.playingMusic > -1,
-                "listen" => UI.listening,
-                "record" => !UI.recording,
-                "viewmode" => !UI.viewMode,
-                _ => false,
+			else if (Id == "availability") {
+				return 24 * (int)UI.availabililty;
+			}
+
+			return Id switch {
+                "expand" => !UI.smallPanel ? 24 : 0,
+                "play" => UI.playingMusic > -1 ? 24 : 0,
+                "listen" => UI.listening ? 24 : 0,
+                "record" => !UI.recording ? 24 : 0,
+                "viewmode" => !UI.viewMode ? 24 : 0,
+                _ => 0,
             };
         }
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			bool useAlt = UseAlternateTexture();
 			int selectedMusic = tMusicPlayer.AllMusic[UI.DisplayBox].music;
 			int firstBox = UI.musicData[0].music;
 			int lastBox = UI.musicData[UI.musicData.Count - 1].music;
@@ -193,22 +196,13 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			bool recordUnavail = Id == "record" && modplayer.musicBoxesStored <= 0;
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
-			bool musicAtZero = Id != "expand" && Id != "view" && Main.musicVolume <= 0f;
+			bool musicAtZero = (Id == "next" || Id == "prev" || Id == "play" || Id == "listen" || Id == "record" || Id.Contains("altplay")) && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
 			bool cannotPlayListMusic = Id.Contains("altplay") && !UI.canPlay[Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1))];
 			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
 
-			//Cycle availability texture
-			if (Id == "availability") {
-				src.X += 24 * (int)UI.availabililty;
-			}
-
-			Rectangle push = new Rectangle(useAlt ? (src.X + src.Width + 2) : src.X, (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
+			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			spriteBatch.Draw(texture, GetInnerDimensions().ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
-
-			if (Id == "availability") {
-				src.X -= 24 * (int)UI.availabililty;
-			}
 
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;

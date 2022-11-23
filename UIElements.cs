@@ -315,7 +315,11 @@ namespace tMusicPlayer
 					displayID = tMusicPlayer.AllMusic[UI.DisplayBox].musicbox;
 				}
 			}
-			if (!isEntrySlot) {
+
+			if (isDisplaySlot && (modplayer.BoxIsCollected(displayID) || modplayer.BoxResearched(displayID))) {
+				musicBox.SetDefaults(displayID);
+			}
+			else if (isSelectionSlot) {
 				musicBox.SetDefaults(modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? slotItemID : 0);
 			}
 			else {
@@ -437,13 +441,8 @@ namespace tMusicPlayer
 				}
 
 				if (type > 0) {
-					Texture2D texture;
-					if (type < ItemID.Count) {
-						texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{type}", AssetRequestMode.ImmediateLoad).Value;
-					}
-                    else {
-						texture = ModContent.Request<Texture2D>(ItemLoader.GetItem(type).Texture, AssetRequestMode.ImmediateLoad).Value;
-					}
+					string texturePath = type < ItemID.Count ? $"Terraria/Images/Item_{type}" : ItemLoader.GetItem(type).Texture;
+					Texture2D texture = ModContent.Request<Texture2D>(texturePath, AssetRequestMode.ImmediateLoad).Value;
 					float x2 = (rectangle.X + rectangle.Width / 2) - texture.Width * scale / 2f;
 					float y2 = (rectangle.Y + rectangle.Height / 2) - texture.Height * scale / 2f;
 					spriteBatch.Draw(texture, new Vector2(x2, y2), texture.Bounds, new Color(75, 75, 75, 75), 0f, Vector2.Zero, scale, 0, 0f);

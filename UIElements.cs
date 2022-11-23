@@ -207,10 +207,10 @@ namespace tMusicPlayer
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				Main.LocalPlayer.mouseInterface = true;
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !disabled) {
-					Main.hoverItemName = SetHoverItemName(Id);
+					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);
 				}
 				else if (Id == "filtermod") {
-					Main.hoverItemName = $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}";
+					MusicUISystem.Instance.UIHoverText = $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}";
 				}
 			}
 		}
@@ -370,7 +370,7 @@ namespace tMusicPlayer
 							ItemSlot.Handle(ref musicBox, context);
 						}
 						if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
-							Main.hoverItemName = "Insert a music box you do not already own!";
+							MusicUISystem.Instance.UIHoverText = "Insert a music box you do not already own!";
 						}
 					}
 				}

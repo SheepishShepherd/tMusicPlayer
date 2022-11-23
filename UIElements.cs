@@ -366,16 +366,15 @@ namespace tMusicPlayer
 			}
 
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
-			TextureAssets.InventoryBack2 = (isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3);
+			TextureAssets.InventoryBack2 = isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3;
 
-			bool isFavorited = modplayer.BoxIsFavorited(slotItemID);
-			if (isFavorited) {
-				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack6;
+			if (isSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
+				TextureAssets.InventoryBack2 = modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? TextureAssets.InventoryBack6 : backup;
 			}
 
 			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle));
 
-			if (isFavorited) {
+			if (isSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
 				Texture2D texture = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Rank_Light", AssetRequestMode.ImmediateLoad).Value;
 				Rectangle pos = new Rectangle(rectangle.X + rectangle.Width - texture.Width, rectangle.Y, texture.Width, texture.Height);
 				spriteBatch.Draw(texture, pos, Color.White);

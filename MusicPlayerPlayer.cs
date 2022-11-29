@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -7,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.IO;
+using Terraria.UI;
 
 namespace tMusicPlayer
 {
@@ -87,7 +87,7 @@ namespace tMusicPlayer
 		}
 
 		public override bool HoverSlot(Item[] inventory, int context, int slot) {
-			if (MusicUISystem.Instance.MusicUI.selectionVisible && Player.chest == -1 && Main.keyState.IsKeyDown(Keys.LeftShift)) {
+			if (MusicUISystem.Instance.MusicUI.selectionVisible && Player.chest == -1 && ItemSlot.ShiftInUse) {
 				int type = inventory[slot].type;
 				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
 					Main.cursorOverride = 9;

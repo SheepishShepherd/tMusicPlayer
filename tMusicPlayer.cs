@@ -130,7 +130,6 @@ namespace tMusicPlayer
 
 		public override void Unload() {
 			AllMusic = null;
-			itemToMusicReference = null;
 
 			tMPConfig = null;
 

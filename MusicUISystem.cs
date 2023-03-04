@@ -41,14 +41,16 @@ namespace tMusicPlayer
 		public override void PostAddRecipes() {
 			// After all PostSetupContent has occured, setup all the MusicData.
 			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
-			foreach (int itemID in tMusicPlayer.itemToMusicReference.Keys) {
-				Item item = ContentSamples.ItemsByType[itemID];
+			foreach (KeyValuePair<int, int> music in tMusicPlayer.itemToMusicReference) {
+				int itemID = music.Key;
+				int musicID = music.Value;
+
+				if (!ContentSamples.ItemsByType.TryGetValue(itemID, out Item item))
+					continue; // If the item does not exist, move onto the next pair
+
 				string displayName = item.ModItem.Mod.DisplayName;
 				string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
-				int musicID = tMusicPlayer.itemToMusicReference.TryGetValue(itemID, out int num) ? num : (-1);
-				if (musicID != -1) {
-					tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
-				}
+				tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
 			}
 
 			// Setup UI's item slot count.

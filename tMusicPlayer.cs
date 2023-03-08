@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -8,8 +7,9 @@ using Terraria.ModLoader;
 namespace tMusicPlayer
 {
 	public class tMusicPlayer : Mod {
+		internal static tMusicPlayer instance;
+
 		internal static List<MusicData> AllMusic;
-		public static Dictionary<int, int> itemToMusicReference;
 
 		public static TMPConfig tMPConfig;
 
@@ -19,6 +19,8 @@ namespace tMusicPlayer
 		internal static ModKeybind NextSongHotkey;
 		
 		public override void Load() {
+			instance = this;
+
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
 			HidePlayerHotkey = KeybindLoader.RegisterKeybind(this, "Hide Music Player", "Up");
@@ -121,16 +123,11 @@ namespace tMusicPlayer
 				new MusicData(MusicID.OtherworldlyWoF, ItemID.MusicBoxOWWallOfFlesh, 83),
 				new MusicData(MusicID.OtherworldlyHallow, ItemID.MusicBoxOWHallow, 84)
 			};
-
-			// Code provided by Jopojelly. Thank you, Jopo!
-			// This grabs the entire dictionary of MODDED music-to-musicbox correlations.
-			FieldInfo field = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
-			itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
 		}
 
 		public override void Unload() {
+			instance = null;
 			AllMusic = null;
-
 			tMPConfig = null;
 
 			HidePlayerHotkey = null;

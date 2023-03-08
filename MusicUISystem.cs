@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -39,18 +40,32 @@ namespace tMusicPlayer
 		}
 
 		public override void PostAddRecipes() {
-			// After all PostSetupContent has occured, setup all the MusicData.
-			// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
-			foreach (KeyValuePair<int, int> music in tMusicPlayer.itemToMusicReference) {
-				int itemID = music.Key;
-				int musicID = music.Value;
+			// This grabs the entire dictionary of MODDED music-to-musicbox correlations. Code provided by Jopojelly. Thank you, Jopo!
+			FieldInfo field = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
+			Dictionary<int, int> itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
 
-				if (!ContentSamples.ItemsByType.TryGetValue(itemID, out Item item))
-					continue; // If the item does not exist, move onto the next pair
+			if (itemToMusicReference == null) {
+				// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
+				foreach (KeyValuePair<int, int> music in itemToMusicReference) {
+					int itemID = music.Key;
+					int musicID = music.Value;
 
-				string displayName = item.ModItem.Mod.DisplayName;
-				string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
-				tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
+					if (!ContentSamples.ItemsByType.TryGetValue(itemID, out Item item))
+						continue; // If the item does not exist, move onto the next pair
+
+					string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
+					string displayName = item.ModItem == null ? "Terraria" : item.ModItem.Mod.DisplayName;
+
+					if (!tMusicPlayer.AllMusic.Exists(x => x.musicbox == itemID)) {
+						tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
+					}
+					else {
+						tMusicPlayer.instance.Logger.Info($"Prevented a vanilla overwrite for {name} [#{itemID}]. Selection may play undesired music.");
+					}
+				}
+			}
+			else {
+				tMusicPlayer.instance.Logger.Error($"itemToMusicReference failed and has a null value. Modded music will not be added to the music player.");
 			}
 
 			// Setup UI's item slot count.

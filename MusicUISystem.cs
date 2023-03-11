@@ -44,7 +44,7 @@ namespace tMusicPlayer
 			FieldInfo field = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
 			Dictionary<int, int> itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
 
-			if (itemToMusicReference == null) {
+			if (itemToMusicReference != null) {
 				// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
 				foreach (KeyValuePair<int, int> music in itemToMusicReference) {
 					int itemID = music.Key;

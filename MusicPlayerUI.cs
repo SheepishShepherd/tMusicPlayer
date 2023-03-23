@@ -320,17 +320,18 @@ namespace tMusicPlayer
 			if (modplayer.musicBoxesStored > 0 && UI.recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
-					int musicBoxType = tMusicPlayer.AllMusic[index].musicbox;
+					MusicData musicData = tMusicPlayer.AllMusic[index];
                     SoundEngine.PlaySound(SoundID.Item166);
-					if (!modplayer.BoxIsCollected(musicBoxType)) {
+					if (!modplayer.BoxIsCollected(musicData.musicbox)) {
 						// If we don't have it in our music player, automatically add it in.
-						modplayer.MusicBoxList.Add(new ItemDefinition(musicBoxType));
+						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.musicbox));
+						canPlay[index] = true; // as soon as it is recorded, the player should be able to play the music
 					}
 					else {
 						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(player.GetSource_OpenItem(musicBoxType), musicBoxType);
+						player.QuickSpawnItem(player.GetSource_OpenItem(musicData.musicbox), musicData.musicbox);
 					}
-					tMusicPlayer.SendDebugText($"Music Box ({tMusicPlayer.AllMusic[index].name}) obtained!", Color.BlanchedAlmond);
+					tMusicPlayer.SendDebugText($"Music Box ({musicData.name}) obtained!", Color.BlanchedAlmond);
 
 					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
 					UI.recording = false;

@@ -95,7 +95,9 @@ namespace tMusicPlayer
 				}
 				UI.ModList.Sort();
 				UI.ModList.Remove("Terraria");
+				UI.ModList.Remove("Terraria Otherworld");
 				UI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
+				UI.ModList.Insert(1, "Terraria Otherworld"); // Put Terraria Otherworld immediately after
 			}
 		}
 

@@ -146,6 +146,7 @@ namespace tMusicPlayer
 	
 	internal class HoverButton : UIImage {
 		public string Id { get; init; } = "";
+		public int refNum = -1; // used for the altplay feature
 
 		internal Texture2D texture;
 		internal Rectangle src;
@@ -157,9 +158,8 @@ namespace tMusicPlayer
 
 		public int UseAlternateTexture() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			if (Id.Contains("altplay")) {
-				int num = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-				return UI.playingMusic == num ? 24 : 0;
+			if (Id == "altplay") {
+				return UI.playingMusic == refNum ? 24 : 0;
 			}
 			else if (Id == "availability") {
 				return 24 * (int)UI.availabililty;
@@ -177,19 +177,18 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			int selectedMusic = tMusicPlayer.AllMusic[UI.DisplayBox].music;
+
 			int firstBox = UI.musicData[0].music;
 			int lastBox = UI.musicData[UI.musicData.Count - 1].music;
 			bool firstOrLast = (Id == "prev" && selectedMusic == firstBox) || (Id == "next" && selectedMusic == lastBox);
-			int indexPrev = UI.FindPrevIndex();
-			int indexNext = UI.FindNextIndex();
-			bool firstOrLastUnavail = (Id == "prev" && (indexPrev == -1 || UI.listening)) || (Id == "next" && (indexNext == -1 || UI.listening));
-			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+			bool firstOrLastUnavail = (Id == "prev" && (UI.FindPrevIndex() == -1 || UI.listening)) || (Id == "next" && (UI.FindNextIndex() == -1 || UI.listening));
 			bool recordUnavail = Id == "record" && modplayer.musicBoxesStored <= 0;
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
-			bool musicAtZero = (Id == "next" || Id == "prev" || Id == "play" || Id == "listen" || Id == "record" || Id.Contains("altplay")) && Main.musicVolume <= 0f;
+			bool musicAtZero = (Id == "next" || Id == "prev" || Id == "play" || Id == "listen" || Id == "record" || Id == "altplay") && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
-			bool cannotPlayListMusic = Id.Contains("altplay") && !UI.canPlay[Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1))];
+			bool cannotPlayListMusic = Id == "altplay" && !UI.canPlay[refNum];
 			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
 
 			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
@@ -241,8 +240,6 @@ namespace tMusicPlayer
 	}
 
 	internal class ItemSlotRow : UIElement {
-		public string Id { get; init; } = "";
-
 		private int order;
 
 		public ItemSlotRow(int order, float width, float height) {
@@ -450,8 +447,6 @@ namespace tMusicPlayer
 	}
 
 	internal class SearchBar : UITextBox {
-		public string Id { get; init; } = "";
-
 		internal bool focused = false;
 
 		private readonly int _maxLength = 40;

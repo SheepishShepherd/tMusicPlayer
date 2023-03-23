@@ -560,7 +560,8 @@ namespace tMusicPlayer
 					
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures.Value, new Rectangle(24, 0, 22, 22)) {
-						Id = $"altplay_{musicData[i].music}",
+						Id = "altplay",
+						refNum = musicData[i].music
 					};
 					playSong.Width.Pixels = 22f;
 					playSong.Height.Pixels = 22f;

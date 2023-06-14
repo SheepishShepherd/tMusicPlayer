@@ -74,15 +74,15 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void MouseDown(UIMouseEvent evt) {
-			base.MouseDown(evt);
+		public override void LeftMouseDown(UIMouseEvent evt) {
+			base.LeftMouseDown(evt);
 			if (Elements.All((UIElement x) => !x.IsMouseHovering)) {
 				DragStart(evt);
 			}
 		}
 
-		public override void MouseUp(UIMouseEvent evt) {
-			base.MouseUp(evt);
+		public override void LeftMouseUp(UIMouseEvent evt) {
+			base.LeftMouseUp(evt);
 			if (dragging) {
 				DragEnd(evt);
 			}
@@ -136,10 +136,10 @@ namespace tMusicPlayer
 			UserInterface.ActiveInstance = temp;
 		}
 
-		public override void MouseDown(UIMouseEvent evt) {
+		public override void LeftMouseDown(UIMouseEvent evt) {
 			UserInterface temp = UserInterface.ActiveInstance;
 			UserInterface.ActiveInstance = MusicUISystem.Instance.MP_UserInterface;
-			base.MouseDown(evt);
+			base.LeftMouseDown(evt);
 			UserInterface.ActiveInstance = temp;
 		}
 	}
@@ -274,7 +274,7 @@ namespace tMusicPlayer
 			Height.Set(TextureAssets.InventoryBack.Value.Height * scale, 0f);
 		}
 
-		public override void Click(UIMouseEvent evt) {
+		public override void LeftClick(UIMouseEvent evt) {
 			if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
 
 				MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
@@ -464,7 +464,7 @@ namespace tMusicPlayer
 			BorderColor = Color.White;
 		}
 
-		public override void Click(UIMouseEvent evt) {
+		public override void LeftClick(UIMouseEvent evt) {
 			Focus();
 		}
 

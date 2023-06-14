@@ -16,7 +16,7 @@ namespace tMusicPlayer
 		public int musicBoxesStored;
 
 		public bool BoxIsCollected(int type) => MusicBoxList.Any(item => item.Type == type);
-		public bool BoxResearched(int type) => Player.difficulty == PlayerDifficultyID.Creative && Player.creativeTracker.ItemSacrifices.SacrificesCountByItemIdCache.ContainsKey(type);
+		public bool BoxResearched(int type) => Player.difficulty == PlayerDifficultyID.Creative && Player.creativeTracker.ItemSacrifices.TryGetSacrificeNumbers(type, out int count, out int max) && count >= max;
 		public bool BoxIsFavorited(int type) => MusicBoxFavs.Any(item => item.Type == type);
 
 		public override void Initialize() {
@@ -37,7 +37,7 @@ namespace tMusicPlayer
 			musicBoxesStored = tag.Get<int>("Stored Boxes");
 		}
 
-		public override void OnEnterWorld(Player player) {
+		public override void OnEnterWorld() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (UI != null) {
 				// Determine if the player wants to start with the small panel or large panel

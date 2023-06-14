@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -23,10 +24,10 @@ namespace tMusicPlayer
 
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
-			HidePlayerHotkey = KeybindLoader.RegisterKeybind(this, "Hide Music Player", "Up");
-			PlayStopHotkey = KeybindLoader.RegisterKeybind(this, "Play/Stop Music", "Down");
-			PrevSongHotkey = KeybindLoader.RegisterKeybind(this, "Previous Song", "Left");
-			NextSongHotkey = KeybindLoader.RegisterKeybind(this, "Next Song", "Right");
+			HidePlayerHotkey = KeybindLoader.RegisterKeybind(this, "HidePlayer", Keys.Up.ToString());
+			PlayStopHotkey = KeybindLoader.RegisterKeybind(this, "PlayOrStop", Keys.Down.ToString());
+			PrevSongHotkey = KeybindLoader.RegisterKeybind(this, "PreviousSong", Keys.Left.ToString());
+			NextSongHotkey = KeybindLoader.RegisterKeybind(this, "NextSong", Keys.Right.ToString());
 
 			// A list that contains all the MusicData we need, including mod and name.
 			AllMusic = new List<MusicData> {

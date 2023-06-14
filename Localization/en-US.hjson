@@ -1,0 +1,48 @@
+Mods: {
+	tMusicPlayer: {
+		Keybinds: {
+			HidePlayer.DisplayName: Hide Music Player
+			PlayOrStop.DisplayName: Play/Stop Music
+			PreviousSong.DisplayName: Previous Song
+			NextSong.DisplayName: Next Song
+		}
+
+		Configs: {
+			TMPConfig: {
+				DisplayName: Personalize your music player!
+
+				EnableMoreTooltips: {
+					Label: Smart Cursor: Enable button tooltips
+					Tooltip: While smart cursor is toggled on, most buttons display information about them.
+				}
+
+				ForceUseHotkey: {
+					Label: Hide MusicPlayer until hotkey pressed
+					Tooltip: The MusicPlayer will not show or hide unless the hotkey is pressed to toggle between the states.
+				}
+
+				Headers.Defaults: Defaults Header
+
+				StartWithSmall: {
+					Label: Music Player defaults to mini-mode
+					Tooltip: ""
+				}
+
+				StartWithListView: {
+					Label: Selection panel defaults to list view
+					Tooltip: ""
+				}
+
+				ResetPanels: {
+					Label: Reset Panels
+					Tooltip: ""
+				}
+
+				EnableDebugMode: {
+					Label: Enable Debug Mode
+					Tooltip: ""
+				}
+			}
+		}
+	}
+}

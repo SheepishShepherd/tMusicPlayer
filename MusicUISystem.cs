@@ -112,7 +112,7 @@ namespace tMusicPlayer
 				layers.Insert(index, new LegacyGameInterfaceLayer(
 					"tMusicPlayer: Music Player",
 					delegate {
-						if (MusicUI.mpToggleVisibility) {
+						if (MusicUI.MusicPlayerVisible) {
 							MP_UserInterface.Draw(Main.spriteBatch, new GameTime());
 						}
 						return true;

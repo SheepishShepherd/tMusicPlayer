@@ -222,7 +222,7 @@ namespace tMusicPlayer
                 "record" => (UI.listening ? "Disable" : "Enable") + " Listening",
                 "prev" => "Previous Song",
                 "next" => "Next Song",
-                "view" => (UI.selectionVisible ? "Close" : "Open") + " Selection List",
+                "view" => (UI.SelectionPanelVisible ? "Close" : "Open") + " Selection List",
 				"showFavorites" => "Show favorited music",
 				"sortbyid" => "Sort by ID",
                 "sortbyname" => "Sort by name",

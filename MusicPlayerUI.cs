@@ -16,9 +16,26 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
-	internal class MusicPlayerUI : UIState {
+	internal class MusicPlayerUI : UIState
+	{
+		private bool playerVisible;
+		public bool MusicPlayerVisible {
+			get => playerVisible;
+			set {
+				playerVisible = value;
+			}
+		}
+
+		private bool selectionVisible;
+		public bool SelectionPanelVisible {
+			get => selectionVisible;
+			set {
+				selectionVisible = value;
+			}
+		}
+
+
 		public BackDrop MusicPlayerPanel;
-		public bool mpToggleVisibility = true;
 		public MusicBoxSlot DisplayMusicSlot;
 
 		// Musicplayer buttons
@@ -60,8 +77,6 @@ namespace tMusicPlayer
 		internal bool[] canPlay;
 		internal bool viewMode = false;
 		internal bool viewFavs = false;
-
-		public bool selectionVisible = false;
 		
 		public static Asset<Texture2D>[] panelTextures;
 		public static Asset<Texture2D> buttonTextures;
@@ -130,7 +145,7 @@ namespace tMusicPlayer
 			viewButton.Height.Pixels = 22f;
 			viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - viewButton.Width.Pixels - 6f;
 			viewButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - viewButton.Height.Pixels - 4f;
-			viewButton.OnLeftClick += (a, b) => selectionVisible = !selectionVisible;
+			viewButton.OnLeftClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
 			MusicPlayerPanel.Append(viewButton);
 
 			detectButton = new HoverButton(buttonTextures.Value, new Rectangle(96, 0, 22, 22)) {
@@ -248,7 +263,7 @@ namespace tMusicPlayer
 			closeButton.Height.Pixels = 18f;
 			closeButton.Left.Pixels = selectionPanel.Width.Pixels - closeButton.Width.Pixels - 11f;
 			closeButton.Top.Pixels = 12f;
-			closeButton.OnLeftClick += (a, b) => selectionVisible = !selectionVisible;
+			closeButton.OnLeftClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
 			selectionPanel.Append(closeButton);
 
 			viewModeButton = new HoverButton(buttonTextures.Value, new Rectangle(0 * 24, 96, 22, 22)) {
@@ -348,8 +363,8 @@ namespace tMusicPlayer
 			}
 
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
-				mpToggleVisibility = !mpToggleVisibility;
-				if (mpToggleVisibility && tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
+				MusicPlayerVisible = !MusicPlayerVisible;
+				if (MusicPlayerVisible && tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
 					UI.SwapPanelSize();
 				}
 			}
@@ -364,9 +379,9 @@ namespace tMusicPlayer
 				ChangeDisplay(true, false);
 			}
 
-			this.AddOrRemoveChild(MusicPlayerPanel, mpToggleVisibility);
-			this.AddOrRemoveChild(musicEntryPanel, selectionVisible);
-			this.AddOrRemoveChild(selectionPanel, selectionVisible);
+			this.AddOrRemoveChild(MusicPlayerPanel, MusicPlayerVisible);
+			this.AddOrRemoveChild(musicEntryPanel, SelectionPanelVisible);
+			this.AddOrRemoveChild(selectionPanel, SelectionPanelVisible);
 
 			// Update positions of UIElements that are not parented by the main SelectionPanel
 			// TODO: dont do this each tick
@@ -380,7 +395,7 @@ namespace tMusicPlayer
 			if (modplayer.musicBoxesStored <= 0) {
 				recording = false;
 			}
-			if (!selectionVisible && searchBar.currentString != "") {
+			if (!SelectionPanelVisible && searchBar.currentString != "") {
 				searchBar.currentString = "";
 				OrganizeSelection(sortType, availabililty, FilterMod);
 			}

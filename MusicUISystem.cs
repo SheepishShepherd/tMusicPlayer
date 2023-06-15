@@ -12,11 +12,15 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
+	[Autoload(Side = ModSide.Client)]
 	internal class MusicUISystem : ModSystem {
 		public static MusicUISystem Instance { get; private set; }
 
 		internal UserInterface MP_UserInterface;
 		internal MusicPlayerUI MusicUI;
+
+		public Dictionary<int, int> itemToMusicReference;
+		internal Dictionary<string, List<int>> RegisteredMusic;
 		internal const int MaxUnrecordedBoxes = 20;
 
 		internal string UIHoverText = "";
@@ -26,12 +30,14 @@ namespace tMusicPlayer
 			Instance = this;
 
 			// Setup the Music Player UI.
-			if (!Main.dedServ) {
-				MusicUI = new MusicPlayerUI();
-				MusicUI.Activate();
-				MP_UserInterface = new UserInterface();
-				MP_UserInterface.SetState(MusicUI);
-			}
+			MP_UserInterface = new UserInterface();
+			MusicUI = new MusicPlayerUI();
+			MusicUI.Activate();
+			MP_UserInterface.SetState(MusicUI);
+
+			// This grabs the entire dictionary of MODDED music-to-musicbox correlations. Code provided by Jopojelly. Thank you, Jopo!
+			FieldInfo itemToMusicField = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
+			itemToMusicReference = (Dictionary<int, int>)itemToMusicField.GetValue(null);
 		}
 
 		public override void Unload() {
@@ -39,28 +45,26 @@ namespace tMusicPlayer
 			MusicUI = null;
 		}
 
-		public override void PostAddRecipes() {
-			// This grabs the entire dictionary of MODDED music-to-musicbox correlations. Code provided by Jopojelly. Thank you, Jopo!
-			FieldInfo field = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
-			Dictionary<int, int> itemToMusicReference = (Dictionary<int, int>)field.GetValue(null);
+		public override void UpdateUI(GameTime gameTime) {
+			if (MP_UserInterface?.CurrentState != null)
+				MP_UserInterface?.Update(gameTime);
+		}
 
+		public override void PostAddRecipes() {
 			if (itemToMusicReference != null) {
 				// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
 				foreach (KeyValuePair<int, int> music in itemToMusicReference) {
-					int itemID = music.Key;
-					int musicID = music.Value;
-
-					if (!ContentSamples.ItemsByType.TryGetValue(itemID, out Item item))
+					if (!ContentSamples.ItemsByType.TryGetValue(music.Key, out Item item))
 						continue; // If the item does not exist, move onto the next pair
 
 					string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
-					string displayName = item.ModItem == null ? "Terraria" : item.ModItem.Mod.DisplayName;
+					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.DisplayName;
 
-					if (!tMusicPlayer.AllMusic.Exists(x => x.musicbox == itemID)) {
-						tMusicPlayer.AllMusic.Add(new MusicData(musicID, itemID, displayName, name));
+					if (!tMusicPlayer.AllMusic.Exists(x => x.musicbox == music.Key)) {
+						tMusicPlayer.AllMusic.Add(new MusicData(music.Value, music.Key, modSource, name));
 					}
 					else {
-						tMusicPlayer.instance.Logger.Info($"Prevented a vanilla overwrite for {name} [#{itemID}]. Selection may play undesired music.");
+						tMusicPlayer.instance.Logger.Info($"Prevented a vanilla overwrite for {name} [#{music.Key}]. Selection may play undesired music.");
 					}
 				}
 			}
@@ -69,40 +73,33 @@ namespace tMusicPlayer
 			}
 
 			// Setup UI's item slot count.
-			if (!Main.dedServ) {
-				MusicPlayerUI UI = Instance.MusicUI;
+			MusicPlayerUI UI = Instance.MusicUI;
 
-				UI.canPlay = new bool[tMusicPlayer.AllMusic.Count];
+			UI.canPlay = new bool[tMusicPlayer.AllMusic.Count];
 
-				if (UI.sortType == SortBy.ID) {
-					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
-				}
-				if (UI.sortType == SortBy.Name) {
-					tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
-				}
-				
-				UI.SelectionSlots = new MusicBoxSlot[tMusicPlayer.AllMusic.Count];
-				UI.musicData = new List<MusicData>(tMusicPlayer.AllMusic);
-				UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
-
-				// Setup the mod list for the Mod Filter
-				// Must occur after all other modded music is established
-				UI.ModList = new List<string>();
-				foreach (MusicData box in UI.musicData) {
-					if (!UI.ModList.Contains(box.mod)) {
-						UI.ModList.Add(box.mod);
-					}
-				}
-				UI.ModList.Sort();
-				UI.ModList.Remove("Terraria");
-				UI.ModList.Remove("Terraria Otherworld");
-				UI.ModList.Insert(0, "Terraria"); // Put Terraria infront of all mods
-				UI.ModList.Insert(1, "Terraria Otherworld"); // Put Terraria Otherworld immediately after
+			if (UI.sortType == SortBy.ID) {
+				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.music).ToList();
 			}
-		}
+			if (UI.sortType == SortBy.Name) {
+				tMusicPlayer.AllMusic = tMusicPlayer.AllMusic.OrderBy(x => x.name).ToList();
+			}
+				
+			UI.SelectionSlots = new MusicBoxSlot[tMusicPlayer.AllMusic.Count];
+			UI.musicData = new List<MusicData>(tMusicPlayer.AllMusic);
+			UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
 
-		public override void UpdateUI(GameTime gameTime) {
-			MP_UserInterface?.Update(gameTime);
+			// Setup the mod list for the Mod Filter
+			// Must occur after all other modded music is established
+			RegisteredMusic = new Dictionary<string, List<int>> {
+				{ "Terraria", new List<int>() },
+				{ "Terraria Otherworld", new List<int>() }
+			};
+			foreach (MusicData box in UI.musicData) {
+				RegisteredMusic.TryAdd(box.mod, new List<int>());
+				RegisteredMusic[box.mod].Add(box.music);
+			}
+
+			UI.ModList = RegisteredMusic.Keys.ToList();
 		}
 
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {

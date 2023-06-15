@@ -174,8 +174,6 @@ namespace tMusicPlayer
 			// Setup UI's item slot count.
 			MusicPlayerUI UI = Instance.MusicUI;
 
-			UI.canPlay = new bool[AllMusic.Count];
-
 			if (UI.sortType == SortBy.ID) {
 				AllMusic = AllMusic.OrderBy(x => x.MusicID).ToList();
 			}

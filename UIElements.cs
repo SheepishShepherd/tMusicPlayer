@@ -166,7 +166,7 @@ namespace tMusicPlayer
 		public int UseAlternateTexture() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (Id == "altplay") {
-				return UI.playingMusic == refNum ? 24 : 0;
+				return UI.playingMusic == MusicUISystem.Instance.AllMusic[refNum].MusicID ? 24 : 0;
 			}
 			else if (Id == "availability") {
 				return 24 * (int)UI.availabililty;
@@ -195,7 +195,7 @@ namespace tMusicPlayer
 			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
 			bool musicAtZero = (Id == "next" || Id == "prev" || Id == "play" || Id == "listen" || Id == "record" || Id == "altplay") && Main.musicVolume <= 0f;
 			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
-			bool cannotPlayListMusic = Id == "altplay" && !UI.canPlay[refNum];
+			bool cannotPlayListMusic = Id == "altplay" && !MusicUISystem.Instance.AllMusic[refNum].canPlay;
 			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
 
 			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
@@ -328,7 +328,9 @@ namespace tMusicPlayer
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
-						UI.canPlay[MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == musicBox.type)] = true;
+						int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == musicBox.type);
+						if (index != -1)
+							MusicUISystem.Instance.AllMusic[index].canPlay = true;
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
@@ -394,25 +396,25 @@ namespace tMusicPlayer
 
 			if (isSelectionSlot) {
 				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == slotItemID);
-				int musicID = MusicUISystem.Instance.AllMusic[index].MusicID;
+				MusicData musicData = MusicUISystem.Instance.AllMusic[index];
 				if (musicBox.type == slotItemID) {
 					if (!modplayer.BoxIsCollected(slotItemID)) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(slotItemID));
-						UI.canPlay[index] = true;
+						musicData.canPlay = true;
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					if (IsMouseHovering && Main.mouseRight && Id.Contains("Grid")) {
 						UI.ListenDisplay = -1;
 						UI.listening = false;
 						UI.DisplayBox = index;
-						UI.playingMusic = musicID;
+						UI.playingMusic = musicData.MusicID;
 					}
 				}
 				else if (musicBox.IsAir && ContainsPoint(Main.MouseScreen) && modplayer.BoxIsCollected(slotItemID)) {
 					modplayer.MusicBoxList.RemoveAll(x => x.Type == slotItemID);
 					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{slotItemID}]", Color.IndianRed);
 					if (!modplayer.BoxResearched(slotItemID)) {
-						UI.canPlay[index] = false;
+						musicData.canPlay = false;
 						int next = UI.FindNextIndex();
 						int prev = UI.FindPrevIndex();
 						if (next != -1) {

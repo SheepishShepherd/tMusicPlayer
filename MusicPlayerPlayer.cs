@@ -44,9 +44,9 @@ namespace tMusicPlayer
 					UI.SwapPanelSize(); // Determine if the player wants to start with the small panel or large panel
 				}
 				
-				for (int i = 0; i < MusicUISystem.Instance.AllMusic.Count; i++) {
-					if (BoxIsCollected(MusicUISystem.Instance.AllMusic[i].MusicBox)) {
-						UI.canPlay[i] = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
+				foreach (MusicData data in MusicUISystem.Instance.AllMusic) {
+					if (BoxIsCollected(data.MusicBox)) {
+						data.canPlay = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
 					}
 				}
 			}

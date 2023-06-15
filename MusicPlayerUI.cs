@@ -49,7 +49,6 @@ namespace tMusicPlayer
 			}
 		}
 
-
 		public BackDrop MusicPlayerPanel;
 		public MusicBoxSlot DisplayMusicSlot;
 
@@ -77,6 +76,8 @@ namespace tMusicPlayer
 		public bool recording = false;
 
 		public int DisplayBox = 0;
+		public MusicData DisplayBoxData() => MusicUISystem.Instance.AllMusic[DisplayBox];
+
 		public int ListenDisplay = -1;
 		public int playingMusic = -1;
 
@@ -89,7 +90,6 @@ namespace tMusicPlayer
 		public UIList SelectionList;
 		public FixedUIScrollbar selectionScrollBar;
 		public MusicBoxSlot[] SelectionSlots;
-		internal bool[] canPlay;
 		internal bool viewMode = false;
 		internal bool viewFavs = false;
 		
@@ -355,7 +355,7 @@ namespace tMusicPlayer
 					if (!modplayer.BoxIsCollected(musicData.MusicBox)) {
 						// If we don't have it in our music player, automatically add it in.
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.MusicBox));
-						canPlay[index] = true; // as soon as it is recorded, the player should be able to play the music
+						musicData.canPlay = true; // as soon as it is recorded, the player should be able to play the music
 					}
 					else {
 						// If we do have it already, spawn the item.
@@ -390,15 +390,14 @@ namespace tMusicPlayer
 				ChangeDisplay(true, false);
 			}
 			
-			if (!listening && !canPlay.Contains(true)) {
+			if (!listening && MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false)) {
 				ToggleButton(MusicMode.Listen); // If nothing can be played, turn on 'listening mode'
 			}
 		}
 
 		public int FindNextIndex() {
-			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
-			for (int i = index; i < musicData.Count; i++) {
-				if (i != index && canPlay[DisplayBox])
+			for (int i = DisplayBoxData().GetIndex; i < musicData.Count; i++) {
+				if (i != DisplayBoxData().GetIndex && DisplayBoxData().canPlay)
 					return i;
 			}
 			return -1;
@@ -406,8 +405,8 @@ namespace tMusicPlayer
 
 		public int FindPrevIndex() {
 			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
-			for (int i = index; i >= 0; i--) {
-				if (i != index && canPlay[DisplayBox])
+			for (int i = DisplayBoxData().GetIndex; i >= 0; i--) {
+				if (i != DisplayBoxData().GetIndex && DisplayBoxData().canPlay)
 					return i;
 			}
 			return -1;
@@ -574,13 +573,13 @@ namespace tMusicPlayer
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures.Value, new Rectangle(24, 0, 22, 22)) {
 						Id = "altplay",
-						refNum = musicData[i].MusicID
+						refNum = musicData[i].GetIndex
 					};
 					playSong.Width.Pixels = 22f;
 					playSong.Height.Pixels = 22f;
 					playSong.Left.Pixels = SelectionSlots[i].Left.Pixels + SelectionSlots[i].Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
-					playSong.OnLeftClick += (a, b) => ListViewPlaySong(playSong.Id);
+					playSong.OnLeftClick += (a, b) => ListViewPlaySong(musicData[i].GetIndex);
 					newRow.Append(playSong);
 
 					// Song name and mod
@@ -601,22 +600,19 @@ namespace tMusicPlayer
 			SelectionList.SetScrollbar(selectionScrollBar);
 		}
 
-		private void ListViewPlaySong(string Id) {
-			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-			int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicID);
-			if (!canPlay[index] || Main.musicVolume <= 0f) {
+		private void ListViewPlaySong(int index) {
+			if (index == -1 || Main.musicVolume <= 0f || !MusicUISystem.Instance.AllMusic[index].canPlay)
 				return;
-			}
 
-			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			if (UI.playingMusic != musicID) {
-				UI.ListenDisplay = -1;
-				UI.listening = false;
-				UI.DisplayBox = index;
-				UI.playingMusic = musicID;
+			int musicID = MusicUISystem.Instance.AllMusic[index].MusicID;
+			if (playingMusic != musicID) {
+				ListenDisplay = -1;
+				listening = false;
+				DisplayBox = index;
+				playingMusic = musicID;
 			}
 			else {
-				UI.playingMusic = -1;
+				playingMusic = -1;
 			}
 		}
 

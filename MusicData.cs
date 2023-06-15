@@ -22,6 +22,9 @@ namespace tMusicPlayer
 		/// <summary> If applicable, the name of the composer that made this music. </summary>
 		internal string composer;
 
+		/// <summary> Determines if the Music Player is able to play this music. </summary>
+		internal bool canPlay = false;
+
 		internal int GetIndex => MusicUISystem.Instance.AllMusic.IndexOf(this);
 
 		internal Mod GetMod => ModLoader.TryGetMod(Mod, out Mod mod) ? mod : null;

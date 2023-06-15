@@ -32,22 +32,21 @@ namespace tMusicPlayer
 		}
 
         public override void LoadData(TagCompound tag) {
-			MusicBoxList = tag.Get<List<ItemDefinition>>("Music Boxes");
-			MusicBoxFavs = tag.Get<List<ItemDefinition>>("Favorites");
+			MusicBoxList = tag.GetList<ItemDefinition>("Music Boxes").ToList();
+			MusicBoxFavs = tag.GetList<ItemDefinition>("Favorites").ToList();
 			musicBoxesStored = tag.Get<int>("Stored Boxes");
 		}
 
 		public override void OnEnterWorld() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (UI != null) {
-				// Determine if the player wants to start with the small panel or large panel
 				if (tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
-					UI.SwapPanelSize();
+					UI.SwapPanelSize(); // Determine if the player wants to start with the small panel or large panel
 				}
-				// Add all the player's obtained musicboxes to the canPlay array for the UI
+				
 				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
 					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
-						UI.canPlay[i] = true;
+						UI.canPlay[i] = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
 					}
 				}
 			}

@@ -1,40 +1,57 @@
 ﻿using Terraria;
+using Terraria.ModLoader;
 
 namespace tMusicPlayer
 {
 	internal class MusicData {
-		internal int music;
-		internal int musicbox;
-		internal string mod;
-		internal string name;
-		internal int mainMusicBox2;
+		/// <summary> The music ID assigned. This is used as a unique identifier. </summary>
+		internal int MusicID { get; init; }
 
-		public override string ToString() => $"{name} from {mod} [Item#{musicbox}] -- [MusicID#{music}]";
-		
+		/// <summary> The numerical value used for 'Main.musicBox2', the value used for equipping music boxes as an accessory. </summary>
+		internal int OutputValue { get; init; }
+
+		/// <summary> The item ID of the music box that plays this music. </summary>
+		internal int MusicBox { get; init; }
+
+		/// <summary> The internal name of the mod that the music originates from. </summary>
+		internal string Mod { get; init; }
+
+		/// <summary> The name provided to the music box. </summary>
+		internal string name;
+
+		/// <summary> If applicable, the name of the composer that made this music. </summary>
+		internal string composer;
+
+		internal int GetIndex => MusicUISystem.Instance.AllMusic.IndexOf(this);
+
+		internal Mod GetMod => ModLoader.TryGetMod(Mod, out Mod mod) ? mod : null;
+
+		public override string ToString() => $"[i:{MusicBox}] [{Mod}] {name}{(string.IsNullOrEmpty(composer) ? " " : $" by {composer} ")}(MusicID: #{MusicID})";
+
 		// Vanilla method
 		internal MusicData(int music, int musicbox, int mainMusicBox2) {
-			this.music = music;
-			this.musicbox = musicbox;
-			this.mainMusicBox2 = mainMusicBox2;
+			this.MusicID = music;
+			this.OutputValue = mainMusicBox2;
+			this.MusicBox = musicbox;
 
 			string itemNameValue = Lang.GetItemNameValue(musicbox);
 			if (itemNameValue.Contains("Otherworldly")) {
-				this.mod = "Terraria Otherworld";
+				this.Mod = "Terraria Otherworld";
 			}
 			else {
-				this.mod = "Terraria";
+				this.Mod = "Terraria";
 			}
 			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
 		}
 
 		// Mod method
 		public MusicData(int music, int musicbox, string mod, string name) {
-			this.music = music;
-			this.musicbox = musicbox;
-			this.mod = mod;
-			this.name = name;
+			this.MusicID = music;
+			this.OutputValue = music;
+			this.MusicBox = musicbox;
 
-			mainMusicBox2 = music;
+			this.Mod = mod;
+			this.name = name;
 		}
 	}
 }

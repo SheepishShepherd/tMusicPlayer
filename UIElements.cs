@@ -60,7 +60,7 @@ namespace tMusicPlayer
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 30);
-				Utils.DrawBorderString(spriteBatch, musicRef.mod, pos, Color.White, 0.75f);
+				Utils.DrawBorderString(spriteBatch, musicRef.Mod, pos, Color.White, 0.75f);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
@@ -184,10 +184,10 @@ namespace tMusicPlayer
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-			int selectedMusic = MusicUISystem.Instance.AllMusic[UI.DisplayBox].music;
+			int selectedMusic = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicID;
 
-			int firstBox = UI.musicData[0].music;
-			int lastBox = UI.musicData[UI.musicData.Count - 1].music;
+			int firstBox = UI.musicData[0].MusicID;
+			int lastBox = UI.musicData[UI.musicData.Count - 1].MusicID;
 			bool firstOrLast = (Id == "prev" && selectedMusic == firstBox) || (Id == "next" && selectedMusic == lastBox);
 			bool firstOrLastUnavail = (Id == "prev" && (UI.FindPrevIndex() == -1 || UI.listening)) || (Id == "next" && (UI.FindNextIndex() == -1 || UI.listening));
 			bool recordUnavail = Id == "record" && modplayer.musicBoxesStored <= 0;
@@ -305,15 +305,15 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 			if (isDisplaySlot) {
 				if (UI.listening) {
-					int index = MusicUISystem.Instance.AllMusic.FindIndex((MusicData musicRef) => musicRef.music == Main.curMusic);
+					int index = MusicUISystem.Instance.AllMusic.FindIndex((MusicData musicRef) => musicRef.MusicID == Main.curMusic);
 					UI.ListenDisplay = index;
 					if (index != -1) {
-						displayID = MusicUISystem.Instance.AllMusic[index].musicbox;
+						displayID = MusicUISystem.Instance.AllMusic[index].MusicBox;
 					}
 				}
 				if (!UI.listening || UI.ListenDisplay == -1) {
 					UI.ListenDisplay = -1;
-					displayID = MusicUISystem.Instance.AllMusic[UI.DisplayBox].musicbox;
+					displayID = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicBox;
 				}
 			}
 
@@ -327,7 +327,7 @@ namespace tMusicPlayer
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
-						UI.canPlay[MusicUISystem.Instance.AllMusic.FindIndex(x => x.musicbox == musicBox.type)] = true;
+						UI.canPlay[MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == musicBox.type)] = true;
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
 					else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
@@ -352,7 +352,7 @@ namespace tMusicPlayer
 					else if (isEntrySlot) {
 						int mouseType = Main.mouseItem.type;
 						if (mouseType != 0) {
-							bool ValidEntryBox = !modplayer.BoxIsCollected(mouseType) && MusicUISystem.Instance.AllMusic.Any(y => y.musicbox == mouseType);
+							bool ValidEntryBox = !modplayer.BoxIsCollected(mouseType) && MusicUISystem.Instance.AllMusic.Any(y => y.MusicBox == mouseType);
 							bool isUnrecordedAndNotMax = mouseType == ItemID.MusicBox && modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
 							if (ValidEntryBox | isUnrecordedAndNotMax) {
 								ItemSlot.Handle(ref musicBox, context);
@@ -387,8 +387,8 @@ namespace tMusicPlayer
 			Main.inventoryScale = oldScale;
 
 			if (isSelectionSlot) {
-				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.musicbox == slotItemID);
-				int musicID = MusicUISystem.Instance.AllMusic[index].music;
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == slotItemID);
+				int musicID = MusicUISystem.Instance.AllMusic[index].MusicID;
 				if (musicBox.type == slotItemID) {
 					if (!modplayer.BoxIsCollected(slotItemID)) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(slotItemID));
@@ -427,13 +427,13 @@ namespace tMusicPlayer
 				int type;
 				if (isDisplaySlot) {
 					if (UI.listening && Main.musicVolume > 0f && UI.ListenDisplay != -1) {
-						type = MusicUISystem.Instance.AllMusic[UI.ListenDisplay].musicbox;
+						type = MusicUISystem.Instance.AllMusic[UI.ListenDisplay].MusicBox;
 					}
 					else {
 						if (UI.DisplayBox == -1) {
 							return;
 						}
-						type = MusicUISystem.Instance.AllMusic[UI.DisplayBox].musicbox;
+						type = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicBox;
 					}
 				}
 				else {

@@ -45,11 +45,14 @@ namespace tMusicPlayer
 				}
 				
 				for (int i = 0; i < MusicUISystem.Instance.AllMusic.Count; i++) {
-					if (BoxIsCollected(MusicUISystem.Instance.AllMusic[i].musicbox)) {
+					if (BoxIsCollected(MusicUISystem.Instance.AllMusic[i].MusicBox)) {
 						UI.canPlay[i] = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
 					}
 				}
 			}
+
+			Main.NewText(MusicUISystem.Instance.AllMusic[0].ToString());
+			Main.NewText(MusicUISystem.Instance.AllMusic[^1].ToString());
 		}
 
 		public override void PostUpdateEquips() {
@@ -59,8 +62,8 @@ namespace tMusicPlayer
 			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (!Main.gameMenu && !Main.dedServ && UI != null && UI.playingMusic > -1) {
-				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == UI.playingMusic);
-				Main.musicBox2 = MusicUISystem.Instance.AllMusic[index].mainMusicBox2;
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == UI.playingMusic);
+				Main.musicBox2 = MusicUISystem.Instance.AllMusic[index].OutputValue;
 			}
 		}
 
@@ -75,7 +78,7 @@ namespace tMusicPlayer
 					SoundEngine.PlaySound(SoundID.Grab);
 					return true;
 				}
-				else if (MusicUISystem.Instance.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+				else if (MusicUISystem.Instance.AllMusic.Any(x => x.MusicBox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
 					MusicBoxList.Add(new ItemDefinition(type));
 					inventory[slot].TurnToAir();
 					SoundEngine.PlaySound(SoundID.Grab);
@@ -92,7 +95,7 @@ namespace tMusicPlayer
 					Main.cursorOverride = 9;
 					return true;
 				}
-				else if (MusicUISystem.Instance.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+				else if (MusicUISystem.Instance.AllMusic.Any(x => x.MusicBox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
 					Main.cursorOverride = 9;
 					return true;
 				}

@@ -348,18 +348,18 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
 			if (modplayer.musicBoxesStored > 0 && recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
-				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					MusicData musicData = MusicUISystem.Instance.AllMusic[index];
                     SoundEngine.PlaySound(SoundID.Item166);
-					if (!modplayer.BoxIsCollected(musicData.musicbox)) {
+					if (!modplayer.BoxIsCollected(musicData.MusicBox)) {
 						// If we don't have it in our music player, automatically add it in.
-						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.musicbox));
+						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.MusicBox));
 						canPlay[index] = true; // as soon as it is recorded, the player should be able to play the music
 					}
 					else {
 						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(player.GetSource_OpenItem(musicData.musicbox), musicData.musicbox);
+						player.QuickSpawnItem(player.GetSource_OpenItem(musicData.MusicBox), musicData.MusicBox);
 					}
 					tMusicPlayer.SendDebugText($"Music Box ({musicData.name}) obtained!", Color.BlanchedAlmond);
 
@@ -396,7 +396,7 @@ namespace tMusicPlayer
 		}
 
 		public int FindNextIndex() {
-			int index = musicData.FindIndex(x => x.music == MusicUISystem.Instance.AllMusic[DisplayBox].music);
+			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
 			for (int i = index; i < musicData.Count; i++) {
 				if (i != index && canPlay[DisplayBox])
 					return i;
@@ -405,7 +405,7 @@ namespace tMusicPlayer
 		}
 
 		public int FindPrevIndex() {
-			int index = musicData.FindIndex(x => x.music == MusicUISystem.Instance.AllMusic[DisplayBox].music);
+			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
 			for (int i = index; i >= 0; i--) {
 				if (i != index && canPlay[DisplayBox])
 					return i;
@@ -417,9 +417,9 @@ namespace tMusicPlayer
 			if (!listening) {
 				int newIndex = next ? FindNextIndex() : FindPrevIndex();
 				if (newIndex != -1) { 
-					DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == musicData[newIndex].music);
+					DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicData[newIndex].MusicID);
 					if (playingMusic > -1) {
-						playingMusic = MusicUISystem.Instance.AllMusic[DisplayBox].music;
+						playingMusic = MusicUISystem.Instance.AllMusic[DisplayBox].MusicID;
 					}
 				}
 			}
@@ -491,15 +491,15 @@ namespace tMusicPlayer
 				viewFavs = !viewFavs;
 			}
 
-			int displayMusicID = MusicUISystem.Instance.AllMusic[DisplayBox].music;
+			int displayMusicID = MusicUISystem.Instance.AllMusic[DisplayBox].MusicID;
 			if (sortBy == SortBy.ID) {
-				musicData = musicData.OrderBy(x => x.music).ToList();
+				musicData = musicData.OrderBy(x => x.MusicID).ToList();
 			}
 			if (sortBy == SortBy.Name) {
 				musicData = musicData.OrderBy(x => x.name).ToList();
 			}
 
-			DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == displayMusicID);
+			DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == displayMusicID);
 			
 			SelectionList.Clear();
 			
@@ -515,17 +515,17 @@ namespace tMusicPlayer
 					// If Availability isn't 'None' check if the box is obtained or not
 					if (!initializing) {
 						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
-						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].musicbox);
-						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].musicbox);
-						bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(musicData[i].musicbox);
+						bool CheckFilterMod = filterMod != "" && (musicData[i].Mod != filterMod);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].MusicBox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].MusicBox);
+						bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(musicData[i].MusicBox);
 
 						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;
 						}
 					}
 
-					SelectionSlots[i] = new MusicBoxSlot(musicData[i].musicbox, 0.85f);
+					SelectionSlots[i] = new MusicBoxSlot(musicData[i].MusicBox, 0.85f);
 					SelectionSlots[i].Left.Pixels = 20f + (SelectionSlots[i].Width.Pixels + 10f) * col;
 					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
 					SelectionSlots[i].Id = $"SelectionSlotGrid_{i}";
@@ -552,10 +552,10 @@ namespace tMusicPlayer
 					// If Availability isn't 'None' check if the box is obtained or not
 					if (!initializing) {
 						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-						bool CheckFilterMod = filterMod != "" && (musicData[i].mod != filterMod);
-						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].musicbox);
-						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].musicbox);
-						bool CheckFavorited = viewFavs && !modplayer.BoxIsCollected(musicData[i].musicbox);
+						bool CheckFilterMod = filterMod != "" && (musicData[i].Mod != filterMod);
+						bool CheckObtained = progressBy == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].MusicBox);
+						bool CheckUnobtained = progressBy == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].MusicBox);
+						bool CheckFavorited = viewFavs && !modplayer.BoxIsCollected(musicData[i].MusicBox);
 
 						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
 							continue;
@@ -565,7 +565,7 @@ namespace tMusicPlayer
 					newRow = new ItemSlotRow(i, panelTextures[2].Value.Bounds.Width, panelTextures[2].Value.Bounds.Height);
 
 					// Item Slot
-					SelectionSlots[i] = new MusicBoxSlot(musicData[i].musicbox, 0.85f);
+					SelectionSlots[i] = new MusicBoxSlot(musicData[i].MusicBox, 0.85f);
 					SelectionSlots[i].Left.Pixels = 20f;
 					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
 					SelectionSlots[i].Id = $"SelectionSlotList_{i}";
@@ -574,7 +574,7 @@ namespace tMusicPlayer
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures.Value, new Rectangle(24, 0, 22, 22)) {
 						Id = "altplay",
-						refNum = musicData[i].music
+						refNum = musicData[i].MusicID
 					};
 					playSong.Width.Pixels = 22f;
 					playSong.Height.Pixels = 22f;
@@ -589,7 +589,7 @@ namespace tMusicPlayer
 					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
 					newRow.Append(songName);
 
-					UIText songMod = new UIText(musicData[i].mod, 0.85f);
+					UIText songMod = new UIText(musicData[i].Mod, 0.85f);
 					songMod.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
 					songMod.Top.Pixels = (newRow.Height.Pixels / 2f) + 4f;
 					newRow.Append(songMod);
@@ -603,7 +603,7 @@ namespace tMusicPlayer
 
 		private void ListViewPlaySong(string Id) {
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-			int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == musicID);
+			int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicID);
 			if (!canPlay[index] || Main.musicVolume <= 0f) {
 				return;
 			}
@@ -625,7 +625,7 @@ namespace tMusicPlayer
 				switch (type) {
 					case MusicMode.Play:
 						if (!listening) {
-							playingMusic = (playingMusic == -1) ? MusicUISystem.Instance.AllMusic[DisplayBox].music : -1;
+							playingMusic = (playingMusic == -1) ? MusicUISystem.Instance.AllMusic[DisplayBox].MusicID : -1;
 							if (playingMusic != -1) {
 								listening = false;
 							}

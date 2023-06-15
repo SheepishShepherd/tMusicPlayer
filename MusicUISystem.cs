@@ -42,7 +42,7 @@ namespace tMusicPlayer
 
 			// A list that contains all the MusicData we need, including mod and name.
 			AllMusic = new List<MusicData> {
-				// 1.3
+				#region 1.3 Music Boxes
 				new MusicData(MusicID.OverworldDay, ItemID.MusicBoxOverworldDay, 0),
 				new MusicData(MusicID.Eerie, ItemID.MusicBoxEerie, 1),
 				new MusicData(MusicID.Night, ItemID.MusicBoxNight, 2),
@@ -83,8 +83,8 @@ namespace tMusicPlayer
 				new MusicData(MusicID.GoblinInvasion, ItemID.MusicBoxGoblins, 37),
 				new MusicData(MusicID.Sandstorm, ItemID.MusicBoxSandstorm, 38),
 				new MusicData(MusicID.OldOnesArmy, ItemID.MusicBoxDD2, 39),
-
-				// 1.4
+				#endregion
+				#region 1.4 Music Boxes
 				new MusicData(MusicID.WindyDay, ItemID.MusicBoxWindyDay, 40),
 				new MusicData(MusicID.SlimeRain, ItemID.MusicBoxSlimeRain, 41),
 				new MusicData(MusicID.SpaceDay, ItemID.MusicBoxSpaceAlt, 42),
@@ -105,8 +105,8 @@ namespace tMusicPlayer
 				new MusicData(MusicID.UndergroundDesert, ItemID.MusicBoxUndergroundDesert, 57),
 				new MusicData(MusicID.Credits, ItemID.MusicBoxCredits, 85),
 				new MusicData(MusicID.Deerclops, ItemID.MusicBoxDeerclops, 86), // Deerclops doesn't have an ID?
-
-				// Otherworld
+				#endregion
+				#region Otherworld Music
 				new MusicData(MusicID.OtherworldlyRain, ItemID.MusicBoxOWRain, 58),
 				new MusicData(MusicID.OtherworldlyDay, ItemID.MusicBoxOWDay, 59),
 				new MusicData(MusicID.OtherworldlyNight, ItemID.MusicBoxOWNight, 60),
@@ -134,6 +134,7 @@ namespace tMusicPlayer
 				new MusicData(MusicID.OtherworldlyJungle, ItemID.MusicBoxOWJungle, 82),
 				new MusicData(MusicID.OtherworldlyWoF, ItemID.MusicBoxOWWallOfFlesh, 83),
 				new MusicData(MusicID.OtherworldlyHallow, ItemID.MusicBoxOWHallow, 84)
+				#endregion
 			};
 		}
 
@@ -157,7 +158,7 @@ namespace tMusicPlayer
 					string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
 					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.DisplayName;
 
-					if (!AllMusic.Exists(x => x.musicbox == music.Key)) {
+					if (!AllMusic.Exists(x => x.MusicBox == music.Key)) {
 						AllMusic.Add(new MusicData(music.Value, music.Key, modSource, name));
 					}
 					else {
@@ -175,7 +176,7 @@ namespace tMusicPlayer
 			UI.canPlay = new bool[AllMusic.Count];
 
 			if (UI.sortType == SortBy.ID) {
-				AllMusic = AllMusic.OrderBy(x => x.music).ToList();
+				AllMusic = AllMusic.OrderBy(x => x.MusicID).ToList();
 			}
 			if (UI.sortType == SortBy.Name) {
 				AllMusic = AllMusic.OrderBy(x => x.name).ToList();
@@ -192,8 +193,8 @@ namespace tMusicPlayer
 				{ "Terraria Otherworld", new List<int>() }
 			};
 			foreach (MusicData box in UI.musicData) {
-				RegisteredMusic.TryAdd(box.mod, new List<int>());
-				RegisteredMusic[box.mod].Add(box.music);
+				RegisteredMusic.TryAdd(box.Mod, new List<int>());
+				RegisteredMusic[box.Mod].Add(box.MusicID);
 			}
 
 			UI.ModList = RegisteredMusic.Keys.ToList();

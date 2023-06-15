@@ -353,7 +353,7 @@ namespace tMusicPlayer
 						int mouseType = Main.mouseItem.type;
 						if (mouseType != 0) {
 							bool ValidEntryBox = !modplayer.BoxIsCollected(mouseType) && tMusicPlayer.AllMusic.Any(y => y.musicbox == mouseType);
-							bool isUnrecordedAndNotMax = mouseType == 576 && modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
+							bool isUnrecordedAndNotMax = mouseType == ItemID.MusicBox && modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
 							if (ValidEntryBox | isUnrecordedAndNotMax) {
 								ItemSlot.Handle(ref musicBox, context);
 							}

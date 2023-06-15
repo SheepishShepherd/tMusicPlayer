@@ -104,7 +104,8 @@ namespace tMusicPlayer
 				new MusicData(MusicID.ConsoleMenu, ItemID.MusicBoxConsoleTitle, 56),
 				new MusicData(MusicID.UndergroundDesert, ItemID.MusicBoxUndergroundDesert, 57),
 				new MusicData(MusicID.Credits, ItemID.MusicBoxCredits, 85),
-				new MusicData(MusicID.Deerclops, ItemID.MusicBoxDeerclops, 86), // Deerclops doesn't have an ID?
+				new MusicData(MusicID.Deerclops, ItemID.MusicBoxDeerclops, 86),
+				new MusicData(MusicID.Shimmer, ItemID.MusicBoxShimmer, 87),
 				#endregion
 				#region Otherworld Music
 				new MusicData(MusicID.OtherworldlyRain, ItemID.MusicBoxOWRain, 58),

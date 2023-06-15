@@ -23,6 +23,7 @@ namespace tMusicPlayer
 			get => playerVisible;
 			set {
 				playerVisible = value;
+				this.AddOrRemoveChild(MusicPlayerPanel, value);
 			}
 		}
 
@@ -31,6 +32,20 @@ namespace tMusicPlayer
 			get => selectionVisible;
 			set {
 				selectionVisible = value;
+				this.AddOrRemoveChild(musicEntryPanel, value);
+				this.AddOrRemoveChild(selectionPanel, value);
+
+				if (value) {
+					musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 4f;
+					musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
+
+					OrganizeSelection(sortType, availabililty, FilterMod); // refresh on open
+				}
+				else {
+					// If not visible, clear search bar text
+					if (searchBar.currentString != "")
+						searchBar.currentString = "";
+				}
 			}
 		}
 
@@ -331,8 +346,8 @@ namespace tMusicPlayer
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			if (modplayer.musicBoxesStored > 0 && UI.recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
+
+			if (modplayer.musicBoxesStored > 0 && recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
 				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
 					MusicData musicData = tMusicPlayer.AllMusic[index];
@@ -349,7 +364,7 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Music Box ({musicData.name}) obtained!", Color.BlanchedAlmond);
 
 					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					UI.recording = false;
+					recording = false;
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -364,40 +379,19 @@ namespace tMusicPlayer
 
 			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
 				MusicPlayerVisible = !MusicPlayerVisible;
-				if (MusicPlayerVisible && tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel) {
-					UI.SwapPanelSize();
-				}
 			}
-
-			if (tMusicPlayer.PlayStopHotkey.JustPressed) {
+			else if (tMusicPlayer.PlayStopHotkey.JustPressed) {
 				ToggleButton(MusicMode.Play);
 			}
-			if (tMusicPlayer.PrevSongHotkey.JustPressed) {
+			else if (tMusicPlayer.PrevSongHotkey.JustPressed) {
 				ChangeDisplay(false, false);
 			}
-			if (tMusicPlayer.NextSongHotkey.JustPressed) {
+			else if (tMusicPlayer.NextSongHotkey.JustPressed) {
 				ChangeDisplay(true, false);
 			}
-
-			this.AddOrRemoveChild(MusicPlayerPanel, MusicPlayerVisible);
-			this.AddOrRemoveChild(musicEntryPanel, SelectionPanelVisible);
-			this.AddOrRemoveChild(selectionPanel, SelectionPanelVisible);
-
-			// Update positions of UIElements that are not parented by the main SelectionPanel
-			// TODO: dont do this each tick
-			musicEntryPanel.Left.Pixels = selectionPanel.Left.Pixels - musicEntryPanel.Width.Pixels + 4f;
-			musicEntryPanel.Top.Pixels = selectionPanel.Top.Pixels + 10f;
-			musicEntryPanel.Recalculate();
 			
 			if (!listening && !canPlay.Contains(true)) {
-				ToggleButton(MusicMode.Listen);
-			}
-			if (modplayer.musicBoxesStored <= 0) {
-				recording = false;
-			}
-			if (!SelectionPanelVisible && searchBar.currentString != "") {
-				searchBar.currentString = "";
-				OrganizeSelection(sortType, availabililty, FilterMod);
+				ToggleButton(MusicMode.Listen); // If nothing can be played, turn on 'listening mode'
 			}
 		}
 
@@ -483,6 +477,9 @@ namespace tMusicPlayer
 				player.QuickSpawnItem(player.GetSource_OpenItem(ItemID.MusicBox), ItemID.MusicBox);
 				modplayer.musicBoxesStored--;
 			}
+
+			if (modplayer.musicBoxesStored == 0)
+				recording = false;
 		}
 
 		internal void OrganizeSelection(SortBy sortBy, ProgressBy progressBy, string filterMod, bool initializing = false, bool clickedFavorites = false) {

@@ -142,6 +142,12 @@ namespace tMusicPlayer
 			base.LeftMouseDown(evt);
 			UserInterface.ActiveInstance = temp;
 		}
+
+		public override void ScrollWheel(UIScrollWheelEvent evt) {
+			base.ScrollWheel(evt);
+			if (this.Parent != null && this.Parent.IsMouseHovering)
+				this.ViewPosition -= (float)evt.ScrollWheelValue / 5; // hovering over the scroll bar will make the scoll slower
+		}
 	}
 	
 	internal class HoverButton : UIImage {

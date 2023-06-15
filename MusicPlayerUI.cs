@@ -310,7 +310,7 @@ namespace tMusicPlayer
 			musicEntryPanel.Append(AddMusicBoxSlot);
 
 			selectionScrollBar = new FixedUIScrollbar();
-			selectionScrollBar.SetView(100f, 1000f);
+			selectionScrollBar.SetView(10f, 1000f);
 			selectionScrollBar.Top.Pixels = 76f;
 			selectionScrollBar.Left.Pixels = -10f;
 			selectionScrollBar.Height.Set(0f, 0.75f);

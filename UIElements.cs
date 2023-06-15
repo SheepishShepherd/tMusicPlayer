@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.ID;
@@ -341,6 +342,11 @@ namespace tMusicPlayer
 				player.mouseInterface = true;
 				if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
 					Main.cursorOverride = 3; 
+				}
+				else if (isDisplaySlot && UI.smallPanel) {
+					MusicData data = MusicUISystem.Instance.AllMusic[UI.DisplayBox];
+					MusicUISystem.Instance.UIHoverText = $"{data.name}\n{data.Mod}";
+					MusicUISystem.Instance.UIHoverTextColor = ItemRarity.GetColor(musicBox.rare);
 				}
 				else {
 					if (isSelectionSlot && (Main.mouseItem.type == slotItemID || Main.mouseItem.IsAir) && !Main.mouseRight) {

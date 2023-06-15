@@ -44,8 +44,8 @@ namespace tMusicPlayer
 					UI.SwapPanelSize(); // Determine if the player wants to start with the small panel or large panel
 				}
 				
-				for (int i = 0; i < tMusicPlayer.AllMusic.Count; i++) {
-					if (BoxIsCollected(tMusicPlayer.AllMusic[i].musicbox)) {
+				for (int i = 0; i < MusicUISystem.Instance.AllMusic.Count; i++) {
+					if (BoxIsCollected(MusicUISystem.Instance.AllMusic[i].musicbox)) {
 						UI.canPlay[i] = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
 					}
 				}
@@ -59,8 +59,8 @@ namespace tMusicPlayer
 			// MusicBox2 has its own special numbers, automatically detected within our MusicData entries
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			if (!Main.gameMenu && !Main.dedServ && UI != null && UI.playingMusic > -1) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == UI.playingMusic);
-				Main.musicBox2 = tMusicPlayer.AllMusic[index].mainMusicBox2;
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == UI.playingMusic);
+				Main.musicBox2 = MusicUISystem.Instance.AllMusic[index].mainMusicBox2;
 			}
 		}
 
@@ -75,7 +75,7 @@ namespace tMusicPlayer
 					SoundEngine.PlaySound(SoundID.Grab);
 					return true;
 				}
-				else if (tMusicPlayer.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+				else if (MusicUISystem.Instance.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
 					MusicBoxList.Add(new ItemDefinition(type));
 					inventory[slot].TurnToAir();
 					SoundEngine.PlaySound(SoundID.Grab);
@@ -92,7 +92,7 @@ namespace tMusicPlayer
 					Main.cursorOverride = 9;
 					return true;
 				}
-				else if (tMusicPlayer.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+				else if (MusicUISystem.Instance.AllMusic.Any(x => x.musicbox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
 					Main.cursorOverride = 9;
 					return true;
 				}

@@ -348,9 +348,9 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
 			if (modplayer.musicBoxesStored > 0 && recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
-				int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == Main.curMusic); // Make sure curMusic is a music box.
 				if (index != -1) {
-					MusicData musicData = tMusicPlayer.AllMusic[index];
+					MusicData musicData = MusicUISystem.Instance.AllMusic[index];
                     SoundEngine.PlaySound(SoundID.Item166);
 					if (!modplayer.BoxIsCollected(musicData.musicbox)) {
 						// If we don't have it in our music player, automatically add it in.
@@ -396,7 +396,7 @@ namespace tMusicPlayer
 		}
 
 		public int FindNextIndex() {
-			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
+			int index = musicData.FindIndex(x => x.music == MusicUISystem.Instance.AllMusic[DisplayBox].music);
 			for (int i = index; i < musicData.Count; i++) {
 				if (i != index && canPlay[DisplayBox])
 					return i;
@@ -405,7 +405,7 @@ namespace tMusicPlayer
 		}
 
 		public int FindPrevIndex() {
-			int index = musicData.FindIndex(x => x.music == tMusicPlayer.AllMusic[DisplayBox].music);
+			int index = musicData.FindIndex(x => x.music == MusicUISystem.Instance.AllMusic[DisplayBox].music);
 			for (int i = index; i >= 0; i--) {
 				if (i != index && canPlay[DisplayBox])
 					return i;
@@ -417,9 +417,9 @@ namespace tMusicPlayer
 			if (!listening) {
 				int newIndex = next ? FindNextIndex() : FindPrevIndex();
 				if (newIndex != -1) { 
-					DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicData[newIndex].music);
+					DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == musicData[newIndex].music);
 					if (playingMusic > -1) {
-						playingMusic = tMusicPlayer.AllMusic[DisplayBox].music;
+						playingMusic = MusicUISystem.Instance.AllMusic[DisplayBox].music;
 					}
 				}
 			}
@@ -491,7 +491,7 @@ namespace tMusicPlayer
 				viewFavs = !viewFavs;
 			}
 
-			int displayMusicID = tMusicPlayer.AllMusic[DisplayBox].music;
+			int displayMusicID = MusicUISystem.Instance.AllMusic[DisplayBox].music;
 			if (sortBy == SortBy.ID) {
 				musicData = musicData.OrderBy(x => x.music).ToList();
 			}
@@ -499,7 +499,7 @@ namespace tMusicPlayer
 				musicData = musicData.OrderBy(x => x.name).ToList();
 			}
 
-			DisplayBox = tMusicPlayer.AllMusic.FindIndex(x => x.music == displayMusicID);
+			DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == displayMusicID);
 			
 			SelectionList.Clear();
 			
@@ -603,7 +603,7 @@ namespace tMusicPlayer
 
 		private void ListViewPlaySong(string Id) {
 			int musicID = Convert.ToInt32(Id.Substring(Id.IndexOf("_") + 1));
-			int index = tMusicPlayer.AllMusic.FindIndex(x => x.music == musicID);
+			int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.music == musicID);
 			if (!canPlay[index] || Main.musicVolume <= 0f) {
 				return;
 			}
@@ -625,7 +625,7 @@ namespace tMusicPlayer
 				switch (type) {
 					case MusicMode.Play:
 						if (!listening) {
-							playingMusic = (playingMusic == -1) ? tMusicPlayer.AllMusic[DisplayBox].music : -1;
+							playingMusic = (playingMusic == -1) ? MusicUISystem.Instance.AllMusic[DisplayBox].music : -1;
 							if (playingMusic != -1) {
 								listening = false;
 							}

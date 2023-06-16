@@ -66,16 +66,14 @@ namespace tMusicPlayer
 
 		public override void LeftMouseDown(UIMouseEvent evt) {
 			base.LeftMouseDown(evt);
-			if (Elements.All((UIElement x) => !x.IsMouseHovering)) {
+			if (Elements.All((UIElement x) => !x.ContainsPoint(Main.MouseScreen)))
 				DragStart(evt);
-			}
 		}
 
 		public override void LeftMouseUp(UIMouseEvent evt) {
 			base.LeftMouseUp(evt);
-			if (dragging) {
+			if (dragging)
 				DragEnd(evt);
-			}
 		}
 
 		private void DragStart(UIMouseEvent evt) {

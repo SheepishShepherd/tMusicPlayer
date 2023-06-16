@@ -434,7 +434,7 @@ namespace tMusicPlayer
 				recording = false;
 		}
 
-		internal void OrganizeSelection(SortBy? sortBy = null, ProgressBy? progressBy = null, string filterMod = null, bool initializing = false, bool clickedFavorites = false) {
+		internal void OrganizeSelection(bool initializing = false, SortBy? sortBy = null, ProgressBy? progressBy = null, string filterMod = null, bool clickedFavorites = false) {
 			if (initializing) {
 				sortType = SortBy.ID;
 				availabililty = ProgressBy.None;
@@ -454,112 +454,88 @@ namespace tMusicPlayer
 					viewFavs = !viewFavs;
 			}
 
-			int displayMusicID = MusicUISystem.Instance.AllMusic[DisplayBox].MusicID;
 			if (sortType == SortBy.ID) {
 				musicData = musicData.OrderBy(x => x.MusicID).ToList();
 			}
-			if (sortType == SortBy.Name) {
+			else if (sortType == SortBy.Name) {
 				musicData = musicData.OrderBy(x => x.name).ToList();
 			}
-
-			DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == displayMusicID);
 			
 			SelectionList.Clear();
-			
-			if (!viewMode) {
-				// Current view mode is GRID
-				ItemSlotRow newRow = new ItemSlotRow(0, 400, 50);
-				int col = 0;
-				int row = 0;
-				for (int i = 0; i < musicData.Count; i++) {
-					// Filter checks do not happen when initializing
-					// Include all music boxes if FilterMod is left empty
-					// Otherwise find music boxes with the same mod name as the selected filter mod
-					// If Availability isn't 'None' check if the box is obtained or not
-					if (!initializing) {
-						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-						bool CheckFilterMod = FilterMod != "" && (musicData[i].Mod != FilterMod);
-						bool CheckObtained = availabililty == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].MusicBox);
-						bool CheckUnobtained = availabililty == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].MusicBox);
-						bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(musicData[i].MusicBox);
 
-						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
-							continue;
-						}
-					}
+			ItemSlotRow newRow = new ItemSlotRow(0);
+			int slotCount = 0;
+			int col = 0;
+			int row = 0;
+			foreach (MusicData data in musicData) {
+				if (!initializing) {
+					MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+					bool CheckFilterMod = FilterMod != "" && (data.Mod != FilterMod);
+					bool CheckObtained = availabililty == ProgressBy.Obtained && !modplayer.BoxIsCollected(data.MusicBox);
+					bool CheckUnobtained = availabililty == ProgressBy.Unobtained && modplayer.BoxIsCollected(data.MusicBox);
+					bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(data.MusicBox);
 
-					SelectionSlots[i] = new MusicBoxSlot(musicData[i].MusicBox, 0.85f);
-					SelectionSlots[i].Left.Pixels = 20f + (SelectionSlots[i].Width.Pixels + 10f) * col;
-					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
-					SelectionSlots[i].Id = $"SelectionSlotGrid_{i}";
-					newRow.Append(SelectionSlots[i]);
-					col++;
-					if (col == 5) {
-						row++;
-						col = 0;
-						SelectionList.Add(newRow);
-						newRow = new ItemSlotRow(row, 400, 50);
-					}
+					if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited)
+						continue;
 				}
-				if (col != 0) {
-					// Add the last row if we did not complete it
-					SelectionList.Add(newRow);
-				}
-			}
-			else {
-				// Current view mode is LIST
-				ItemSlotRow newRow;
-				for (int i = 0; i < musicData.Count; i++) {
-					// Include all music boxes if FilterMod is left empty
-					// Otherwise find music boxes with the same mod name as the selected filter mod
-					// If Availability isn't 'None' check if the box is obtained or not
-					if (!initializing) {
-						MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-						bool CheckFilterMod = FilterMod != "" && (musicData[i].Mod != FilterMod);
-						bool CheckObtained = availabililty == ProgressBy.Obtained && !modplayer.BoxIsCollected(musicData[i].MusicBox);
-						bool CheckUnobtained = availabililty == ProgressBy.Unobtained && modplayer.BoxIsCollected(musicData[i].MusicBox);
-						bool CheckFavorited = viewFavs && !modplayer.BoxIsCollected(musicData[i].MusicBox);
 
-						if (CheckFilterMod || CheckObtained || CheckUnobtained || CheckFavorited) {
-							continue;
-						}
-					}
+				MusicBoxSlot boxSlot = SelectionSlots[slotCount];
 
-					newRow = new ItemSlotRow(i, panelPlayer.Value.Bounds.Width, panelPlayer.Value.Bounds.Height);
+				if (viewMode) {
+					newRow = new ItemSlotRow(slotCount);
 
 					// Item Slot
-					SelectionSlots[i] = new MusicBoxSlot(musicData[i].MusicBox, 0.85f);
-					SelectionSlots[i].Left.Pixels = 20f;
-					SelectionSlots[i].Top.Pixels = (newRow.Height.Pixels / 2f) - (SelectionSlots[i].Height.Pixels / 2f);
-					SelectionSlots[i].Id = $"SelectionSlotList_{i}";
-					newRow.Append(SelectionSlots[i]);
-					
+					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f);
+					boxSlot.Left.Pixels = 20f;
+					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
+					boxSlot.Id = $"SelectionSlotList_{data.MusicBox}";
+					newRow.Append(boxSlot);
+
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures.Value, new Point(1, 0)) {
 						Id = "altplay",
-						refNum = musicData[i].GetIndex
+						refNum = data.GetIndex
 					};
 					playSong.Width.Pixels = 22f;
 					playSong.Height.Pixels = 22f;
-					playSong.Left.Pixels = SelectionSlots[i].Left.Pixels + SelectionSlots[i].Width.Pixels + 8f;
+					playSong.Left.Pixels = boxSlot.Left.Pixels + boxSlot.Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
-					playSong.OnLeftClick += (a, b) => ListViewPlaySong(musicData[i].GetIndex);
+					playSong.OnLeftClick += (a, b) => ListViewPlaySong(data.GetIndex);
 					newRow.Append(playSong);
 
 					// Song name and mod
-					UIText songName = new UIText(musicData[i].name, 0.85f);
+					UIText songName = new UIText(data.name, 0.85f);
 					songName.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
 					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
 					newRow.Append(songName);
 
-					UIText songMod = new UIText(musicData[i].Mod, 0.85f);
+					UIText songMod = new UIText(data.Mod, 0.85f);
 					songMod.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
 					songMod.Top.Pixels = (newRow.Height.Pixels / 2f) + 4f;
 					newRow.Append(songMod);
 
 					SelectionList.Add(newRow);
 				}
+				else {
+					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f);
+					boxSlot.Left.Pixels = 20f + (boxSlot.Width.Pixels + 10f) * col;
+					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
+					boxSlot.Id = $"SelectionSlotGrid_{data.MusicBox}";
+					newRow.Append(boxSlot);
+					col++;
+					if (col == 5) {
+						row++;
+						col = 0;
+						SelectionList.Add(newRow);
+						newRow = new ItemSlotRow(row);
+					}
+				}
+
+				slotCount++;
 			}
+
+			if (col != 0)
+				SelectionList.Add(newRow); // Add the last row if it is still incomplete
 
 			SelectionList.SetScrollbar(selectionScrollBar);
 		}

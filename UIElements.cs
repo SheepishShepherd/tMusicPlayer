@@ -248,7 +248,7 @@ namespace tMusicPlayer
 	internal class ItemSlotRow : UIElement {
 		private int order;
 
-		public ItemSlotRow(int order, float width, float height) {
+		public ItemSlotRow(int order) {
 			this.order = order;
 			Width.Pixels = 400f;
 			Height.Pixels = 50f;

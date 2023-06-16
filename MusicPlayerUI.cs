@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -14,7 +12,6 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-using static tModPorter.ProgressUpdate;
 
 namespace tMusicPlayer
 {

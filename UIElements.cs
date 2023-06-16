@@ -259,7 +259,9 @@ namespace tMusicPlayer
 	}
 
 	internal class MusicBoxSlot : UIElement {
-		public string Id { get; set; } = "";
+		public bool IsDisplaySlot { get; init; } = false;
+		public bool IsEntrySlot { get; init; } = false;
+		public bool IsSelectionSlot { get; init; } = false;
 
 		internal Item musicBox; // The item in this slot
 		internal int displayID; // What the slot should display (only for the Display Slot in the small musicplayer)
@@ -293,15 +295,12 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			bool isSelectionSlot = Id.Contains("SelectionSlot");
-			bool isDisplaySlot = Id == "DisplaySlot";
-			bool isEntrySlot = Id == "EntrySlot";
 			float oldScale = Main.inventoryScale;
 			Main.inventoryScale = scale;
 			Rectangle rectangle = GetDimensions().ToRectangle();
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
-			if (isDisplaySlot) {
+			if (IsDisplaySlot) {
 				if (UI.listening) {
 					int index = MusicUISystem.Instance.AllMusic.FindIndex((MusicData musicRef) => musicRef.MusicID == Main.curMusic);
 					UI.ListenDisplay = index;
@@ -315,13 +314,13 @@ namespace tMusicPlayer
 				}
 			}
 
-			if (isDisplaySlot && (modplayer.BoxIsCollected(displayID) || modplayer.BoxResearched(displayID))) {
+			if (IsDisplaySlot && (modplayer.BoxIsCollected(displayID) || modplayer.BoxResearched(displayID))) {
 				musicBox.SetDefaults(displayID);
 			}
-			else if (isSelectionSlot) {
+			else if (IsSelectionSlot) {
 				musicBox.SetDefaults(modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? slotItemID : 0);
 			}
-			else if (isEntrySlot) {
+			else if (IsEntrySlot) {
 				if (!musicBox.IsAir) {
 					if (musicBox.type != ItemID.MusicBox) {
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicBox.type));
@@ -342,19 +341,18 @@ namespace tMusicPlayer
 				if (Main.keyState.IsKeyDown(Keys.LeftAlt)) {
 					Main.cursorOverride = 3; 
 				}
-				else if (isDisplaySlot && UI.smallPanel) {
-					MusicData data = MusicUISystem.Instance.AllMusic[UI.DisplayBox];
-					MusicUISystem.Instance.UIHoverText = $"{data.name}\n{data.Mod}";
+				else if (IsDisplaySlot && UI.smallPanel) {
+					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed().name}\n{UI.VisualBoxDisplayed().Mod}";
 					MusicUISystem.Instance.UIHoverTextColor = ItemRarity.GetColor(musicBox.rare);
 				}
 				else {
-					if (isSelectionSlot && (Main.mouseItem.type == slotItemID || Main.mouseItem.IsAir) && !Main.mouseRight) {
+					if (IsSelectionSlot && (Main.mouseItem.type == slotItemID || Main.mouseItem.IsAir) && !Main.mouseRight) {
 						if (Main.mouseLeft) {
 							Main.playerInventory = true;
 						}
 						ItemSlot.Handle(ref musicBox, context);
 					}
-					else if (isEntrySlot) {
+					else if (IsEntrySlot) {
 						int mouseType = Main.mouseItem.type;
 						if (mouseType != 0) {
 							bool ValidEntryBox = !modplayer.BoxIsCollected(mouseType) && MusicUISystem.Instance.AllMusic.Any(y => y.MusicBox == mouseType);
@@ -374,14 +372,14 @@ namespace tMusicPlayer
 			}
 
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
-			TextureAssets.InventoryBack2 = isEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3;
+			TextureAssets.InventoryBack2 = IsEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3;
 
-			if (isSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
+			if (IsSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
 				TextureAssets.InventoryBack2 = modplayer.BoxIsCollected(slotItemID) || modplayer.BoxResearched(slotItemID) ? TextureAssets.InventoryBack6 : backup;
 			}
 
 			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle));
-			if (isEntrySlot && musicBox.IsAir) {
+			if (IsEntrySlot && musicBox.IsAir) {
 				// Draw the numerical value of boxes stored
 				float textScale = 0.85f;
 				string text = modplayer.musicBoxesStored.ToString();
@@ -397,7 +395,7 @@ namespace tMusicPlayer
 				Utils.DrawBorderString(spriteBatch, text, pos, textColor, textScale);
 			}
 
-			if (isSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
+			if (IsSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
 				Texture2D texture = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Rank_Light", AssetRequestMode.ImmediateLoad).Value;
 				Rectangle pos = new Rectangle(rectangle.X + rectangle.Width - texture.Width, rectangle.Y, texture.Width, texture.Height);
 				spriteBatch.Draw(texture, pos, Color.White);
@@ -406,7 +404,7 @@ namespace tMusicPlayer
 			TextureAssets.InventoryBack2 = backup;
 			Main.inventoryScale = oldScale;
 
-			if (isSelectionSlot) {
+			if (IsSelectionSlot) {
 				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicBox == slotItemID);
 				MusicData musicData = MusicUISystem.Instance.AllMusic[index];
 				if (musicBox.type == slotItemID) {
@@ -415,7 +413,7 @@ namespace tMusicPlayer
 						musicData.canPlay = true;
 						tMusicPlayer.SendDebugText($"Added [c/{Utils.Hex3(Color.DarkSeaGreen)}:{musicBox.Name}] [ID#{slotItemID}]", Colors.RarityGreen);
 					}
-					if (IsMouseHovering && Main.mouseRight && Id.Contains("Grid")) {
+					if (IsMouseHovering && Main.mouseRight && !UI.viewMode) {
 						UI.ListenDisplay = -1;
 						UI.listening = false;
 						UI.DisplayBox = index;
@@ -445,7 +443,7 @@ namespace tMusicPlayer
 
 			if (musicBox.IsAir) {
 				int type;
-				if (isDisplaySlot) {
+				if (IsDisplaySlot) {
 					if (UI.listening && Main.musicVolume > 0f && UI.ListenDisplay != -1) {
 						type = MusicUISystem.Instance.AllMusic[UI.ListenDisplay].MusicBox;
 					}

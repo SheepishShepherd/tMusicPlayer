@@ -81,6 +81,13 @@ namespace tMusicPlayer
 		public int DisplayBox = 0;
 		public MusicData DisplayBoxData() => MusicUISystem.Instance.AllMusic[DisplayBox];
 
+		public MusicData VisualBoxDisplayed() {
+			if (listening)
+				return MusicUISystem.Instance.AllMusic[ListenDisplay];
+
+			return DisplayBoxData();
+		}
+
 		public int ListenDisplay = -1;
 		public int playingMusic = -1;
 		public bool listening = false;
@@ -173,7 +180,7 @@ namespace tMusicPlayer
 			MusicPlayerPanel.Append(expandButton);
 			
 			DisplayMusicSlot = new MusicBoxSlot(0, 1f) {
-				Id = "DisplaySlot"
+				IsDisplaySlot = true
 			};
 			DisplayMusicSlot.Left.Pixels = 8f;
 			DisplayMusicSlot.Top.Pixels = MusicPlayerPanel.Height.Pixels / 2f - TextureAssets.InventoryBack.Value.Height / 2;
@@ -262,7 +269,7 @@ namespace tMusicPlayer
 			SelectionPanel.Append(searchBar);
 
 			BoxEntrySlot = new MusicBoxSlot(ItemID.MusicBox, 0.85f) {
-				Id = "EntrySlot"
+				IsEntrySlot = true
 			};
 			BoxEntrySlot.Left.Pixels = closeButton.Left.Pixels - BoxEntrySlot.Width.Pixels - 9f;
 			BoxEntrySlot.Top.Pixels = closeButton.Top.Pixels;
@@ -485,10 +492,11 @@ namespace tMusicPlayer
 					newRow = new ItemSlotRow(slotCount);
 
 					// Item Slot
-					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f);
+					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f) {
+						IsSelectionSlot = true
+					};
 					boxSlot.Left.Pixels = 20f;
 					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
-					boxSlot.Id = $"SelectionSlotList_{data.MusicBox}";
 					newRow.Append(boxSlot);
 
 					// Play button
@@ -517,10 +525,11 @@ namespace tMusicPlayer
 					SelectionList.Add(newRow);
 				}
 				else {
-					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f);
+					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f) {
+						IsSelectionSlot = true
+					};
 					boxSlot.Left.Pixels = 20f + (boxSlot.Width.Pixels + 10f) * col;
 					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
-					boxSlot.Id = $"SelectionSlotGrid_{data.MusicBox}";
 					newRow.Append(boxSlot);
 					col++;
 					if (col == 5) {

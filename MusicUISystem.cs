@@ -183,7 +183,7 @@ namespace tMusicPlayer
 				
 			UI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
 			UI.musicData = new List<MusicData>(AllMusic);
-			UI.OrganizeSelection(SortBy.ID, ProgressBy.None, "", true);
+			UI.OrganizeSelection(initializing: true);
 
 			// Setup the mod list for the Mod Filter
 			// Must occur after all other modded music is established

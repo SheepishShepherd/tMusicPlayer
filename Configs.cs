@@ -39,10 +39,8 @@ namespace tMusicPlayer
 				MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 				UI.MusicPlayerPanel.Left.Pixels = 1115f;
 				UI.MusicPlayerPanel.Top.Pixels = 16f;
-				UI.selectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.selectionPanel.Width.Pixels / 2f;
-				UI.selectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.selectionPanel.Height.Pixels / 2f;
-				UI.musicEntryPanel.Left.Pixels = UI.selectionPanel.Left.Pixels + UI.selectionPanel.Width.Pixels - UI.musicEntryPanel.Width.Pixels - 10f;
-				UI.musicEntryPanel.Top.Pixels = UI.selectionPanel.Top.Pixels - UI.musicEntryPanel.Height.Pixels;
+				UI.SelectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.SelectionPanel.Width.Pixels / 2f;
+				UI.SelectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.SelectionPanel.Height.Pixels / 2f;
 				ResetPanels = false;
 			}
 		}

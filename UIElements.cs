@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Elements;
@@ -18,42 +19,30 @@ using Terraria.UI;
 
 namespace tMusicPlayer
 {
-	internal class BackDrop : UIElement {
+	internal class BackDrop : UIImage {
 		public string Id { get; init; } = "";
 
 		public bool dragging;
 		private Vector2 offset;
 
-		public BackDrop() { }
+		public BackDrop(Asset<Texture2D> texture) : base(texture) {
+			Width.Set(texture.Value.Width, 0f);
+			Height.Set(texture.Value.Height, 0f);
+		}
+
+		public void UpdatePanelDimensions(bool miniMode) {
+			if (Id != "MusicPlayerPanel")
+				return; // Only the player panel changes in size
+
+			SetImage(miniMode ? MusicPlayerUI.panelMini : MusicPlayerUI.panelPlayer);
+			Width.Set(miniMode ? MusicPlayerUI.panelMini.Value.Width : MusicPlayerUI.panelPlayer.Value.Width, 0f);
+			Height.Set(miniMode ? MusicPlayerUI.panelMini.Value.Height : MusicPlayerUI.panelPlayer.Value.Height, 0f);
+		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			Rectangle rect = GetInnerDimensions().ToRectangle();
-			if (Id == "SelectionPanel") {
-				// Draw the panel backdrop
-				Texture2D texture = MusicPlayerUI.panelTextures[3].Value;
-				spriteBatch.Draw(texture, rect, Color.White);
-			}
-			else if (Id == "MusicPlayerPanel") {
-				// Draw the panel backdrop, depending on what size the player has selected
-				Texture2D texture = UI.smallPanel ? MusicPlayerUI.panelTextures[1].Value : MusicPlayerUI.panelTextures[2].Value;
-				spriteBatch.Draw(texture, rect, Color.White);
-			}
-			else if (Id == "MusicEntry") {
-				// Draw the panel backdrop
-				Texture2D obj = MusicPlayerUI.panelTextures[1].Value;
-				Rectangle pos = new Rectangle(rect.X + obj.Bounds.Height + 2, rect.Y, obj.Width, obj.Height);
-				spriteBatch.Draw(obj, pos, obj.Bounds, Color.White, MathHelper.ToRadians(90), Vector2.Zero, SpriteEffects.None, 0f);
-
-				// Draw an empty music box to display how many the player has stored
-				Texture2D texture = ModContent.Request<Texture2D>($"Terraria/Images/Item_{ItemID.MusicBox}", AssetRequestMode.ImmediateLoad).Value;
-				pos = new Rectangle((int)(Left.Pixels + Width.Pixels / 2), (int)(Top.Pixels + Height.Pixels - texture.Height * 1.5f), texture.Width, texture.Height);
-				spriteBatch.Draw(texture, pos, Color.White);
-
-				// Draw the numerical value of boxes stored
-				Vector2 pos2 = new Vector2(pos.X + texture.Width - 15, pos.Y + texture.Height - 10);
-				Utils.DrawBorderString(spriteBatch, Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored.ToString(), pos2, Color.White, 0.85f);
-			}
+			
 			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !UI.smallPanel) {
 				int musicBoxDisplayed = (UI.listening && UI.ListenDisplay != -1) ? UI.ListenDisplay : UI.DisplayBox;
@@ -151,59 +140,40 @@ namespace tMusicPlayer
 		}
 	}
 	
-	internal class HoverButton : UIImage {
+	internal class HoverButton : UIElement {
 		public string Id { get; init; } = "";
 		public int refNum = -1; // used for the altplay feature
 
 		internal Texture2D texture;
 		internal Rectangle src;
 
-		public HoverButton(Texture2D texture, Rectangle src) : base(texture) {
+		public HoverButton(Texture2D texture, Point coord) {
 			this.texture = texture;
-			this.src = src;
+			if (texture == MusicPlayerUI.buttonTextures.Value) {
+				Width.Set(22f, 0f);
+				Height.Set(22f, 0f);
+			}
+			else if (texture == MusicPlayerUI.closeTextures.Value) {
+				Width.Set(18f, 0f);
+				Height.Set(18f, 0f);
+			}
+			this.src = new Rectangle((int)(coord.X * (Width.Pixels + 2)), (int)(coord.Y * (Height.Pixels + 2)), (int)Width.Pixels, (int)Height.Pixels);
 		}
 
-		public int UseAlternateTexture() {
-			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			if (Id == "altplay") {
-				return UI.playingMusic == MusicUISystem.Instance.AllMusic[refNum].MusicID ? 24 : 0;
-			}
-			else if (Id == "availability") {
-				return 24 * (int)UI.availabililty;
-			}
-
-			return Id switch {
-                "expand" => !UI.smallPanel ? 20 : 0,
-                "play" => UI.playingMusic > -1 ? 24 : 0,
-                "listen" => UI.listening ? 24 : 0,
-                "record" => !UI.recording ? 24 : 0,
-                "viewmode" => !UI.viewMode ? 24 : 0,
-                _ => 0,
-            };
-        }
+		public override void MouseOver(UIMouseEvent evt) {
+			SoundEngine.PlaySound(SoundID.MenuTick);
+		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-			int selectedMusic = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicID;
+			bool hovering = ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface;
 
-			int firstBox = UI.musicData[0].MusicID;
-			int lastBox = UI.musicData[UI.musicData.Count - 1].MusicID;
-			bool firstOrLast = (Id == "prev" && selectedMusic == firstBox) || (Id == "next" && selectedMusic == lastBox);
-			bool firstOrLastUnavail = (Id == "prev" && (UI.FindPrevIndex() == -1 || UI.listening)) || (Id == "next" && (UI.FindNextIndex() == -1 || UI.listening));
-			bool recordUnavail = Id == "record" && modplayer.musicBoxesStored <= 0;
-			bool activeListen = (Id == "next" || Id == "prev" || Id == "play") && UI.listening;
-			bool musicAtZero = (Id == "next" || Id == "prev" || Id == "play" || Id == "listen" || Id == "record" || Id == "altplay") && Main.musicVolume <= 0f;
-			bool clearModDisabled = Id == "clearfiltermod" && UI.FilterMod == "";
-			bool cannotPlayListMusic = Id == "altplay" && !MusicUISystem.Instance.AllMusic[refNum].canPlay;
-			bool disabled = firstOrLast | firstOrLastUnavail | recordUnavail | activeListen | musicAtZero | clearModDisabled | cannotPlayListMusic;
+			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (hovering && !Disabled()) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
+			spriteBatch.Draw(texture, GetInnerDimensions().ToRectangle(), push, Disabled() ? new Color(60, 60, 60, 60) : Color.White);
 
-			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (IsMouseHovering && !disabled) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
-			spriteBatch.Draw(texture, GetInnerDimensions().ToRectangle(), push, disabled ? new Color(60, 60, 60, 60) : Color.White);
-
-			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+			if (hovering) {
 				Main.LocalPlayer.mouseInterface = true;
-				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !disabled) {
+				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !Disabled()) {
 					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);
 				}
 				else if (Id == "filtermod") {
@@ -211,6 +181,35 @@ namespace tMusicPlayer
 				}
 			}
 		}
+
+		public bool Disabled() {
+			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			return Id switch {
+				"altplay" => !MusicUISystem.Instance.AllMusic[refNum].canPlay || Main.musicVolume <= 0f,
+				"clearfiltermod" => UI.FilterMod == "",
+				"listen" => Main.musicVolume <= 0f,
+				"next" => UI.FindNextIndex() == -1 || UI.listening || Main.musicVolume <= 0f,
+				"play" => UI.listening || Main.musicVolume <= 0f,
+				"prev" => UI.FindPrevIndex() == -1 || UI.listening || Main.musicVolume <= 0f,
+				"record" => modplayer.musicBoxesStored <= 0 || Main.musicVolume <= 0f,
+				_ => false,
+			};
+		}
+
+		public int UseAlternateTexture() {
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			return Id switch {
+				"altplay" => UI.playingMusic == MusicUISystem.Instance.AllMusic[refNum].MusicID ? 24 : 0,
+				"availability" => 24 * (int)UI.availabililty,
+                "expand" => !UI.smallPanel ? 20 : 0,
+                "listen" => UI.listening ? 24 : 0,
+				"play" => UI.playingMusic > -1 ? 24 : 0,
+				"record" => !UI.recording ? 24 : 0,
+                "viewmode" => !UI.viewMode ? 24 : 0,
+                _ => 0,
+            };
+        }
 
 		public string SetHoverItemName(string ID) {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
@@ -237,10 +236,10 @@ namespace tMusicPlayer
                 "clearfiltermod" => "Clear mod filter",
                 "viewmode" => UI.viewMode ? "Change to Grid mode" : "Change to List mode",
 				"ejectMusicBoxes" =>
-						"Stored music boxes can record songs if recording is enabled\n" +
-						"Up to 20 music boxes can be held at once\n" +
-						"Left-click to eject one music box into your inventory\n" +
-						"Right click to place all of your stored music boxes in your inventory",
+					"Stored music boxes can record songs if recording is enabled\n" +
+					"Up to 20 music boxes can be held at once\n" +
+					"Left-click to eject one music box into your inventory\n" +
+					"Right click to place all of your stored music boxes in your inventory",
                 _ => ""
             };
         }
@@ -277,8 +276,8 @@ namespace tMusicPlayer
 			this.slotItemID = refItem;
 			musicBox = new Item();
 			musicBox.SetDefaults(0, false);
-			Width.Set(TextureAssets.InventoryBack.Value.Width * scale, 0f);
-			Height.Set(TextureAssets.InventoryBack.Value.Height * scale, 0f);
+			Width.Set((int)(TextureAssets.InventoryBack.Value.Width * scale), 0f);
+			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * scale), 0f);
 		}
 
 		public override void LeftClick(UIMouseEvent evt) {
@@ -384,6 +383,21 @@ namespace tMusicPlayer
 			}
 
 			ItemSlot.Draw(spriteBatch, ref musicBox, context, Utils.TopLeft(rectangle));
+			if (isEntrySlot && musicBox.IsAir) {
+				// Draw the numerical value of boxes stored
+				float textScale = 0.85f;
+				string text = modplayer.musicBoxesStored.ToString();
+				Vector2 pos = new Vector2((int)(rectangle.Right - (FontAssets.MouseText.Value.MeasureString(text).X * textScale)) - 4, rectangle.Top + 2);
+				Color textColor = new Color(150, 150, 150, 50);
+				if (modplayer.musicBoxesStored == MusicUISystem.MaxUnrecordedBoxes) {
+					textColor = new Color(150, 150, 50, 50);
+				}
+				else if (modplayer.musicBoxesStored == 0) {
+					textColor = new Color(150, 50, 50, 50);
+				}
+
+				Utils.DrawBorderString(spriteBatch, text, pos, textColor, textScale);
+			}
 
 			if (isSelectionSlot && modplayer.BoxIsFavorited(slotItemID)) {
 				Texture2D texture = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Rank_Light", AssetRequestMode.ImmediateLoad).Value;
@@ -470,6 +484,8 @@ namespace tMusicPlayer
 		private int textBlinkerCount;
 		private int textBlinkerState;
 
+		private readonly Asset<Texture2D> searchBar = ModContent.Request<Texture2D>("tMusicPlayer/UI/search");
+
 		public SearchBar(string hintText, string text = "") : base(text) {
 			this.hintText = hintText;
 			currentString = text;
@@ -503,96 +519,79 @@ namespace tMusicPlayer
 
 		public override void Update(GameTime gameTime) {
 			Vector2 MousePosition = new Vector2(Main.mouseX, Main.mouseY);
-			if (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight)) {
-				Unfocus();
+			if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape) || (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight))) {
+				Unfocus(); // Unfocus search bar when pressing Tab or Esc, or when clicking outside the input box
 			}
+
+			if (JustPressed(Keys.Enter)) {
+				Main.drawingPlayerChat = false;
+				Unfocus(); // Pressing enter will also unfocus the search bar, but will also close player chat
+			}
+
 			base.Update(gameTime);
+		}
+
+		public void ClearSearchText() {
+			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+			SetText("");
+			UI.musicData = new List<MusicData>(MusicUISystem.Instance.AllMusic);
+			UI.OrganizeSelection();
 		}
 
 		public override void SetText(string text, float textScale, bool large) {
 			if (text == null)
 				return;
 
-			if (text.ToString().Length > _maxLength) {
+			if (text.ToString().Length > _maxLength)
 				text = text.ToString().Substring(0, _maxLength);
-			}
-			if (currentString != text) {
+
+			if (currentString != text)
 				currentString = text;
-			}
 		}
 
 		private static bool JustPressed(Keys key) => Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
-			//base.DrawSelf(spriteBatch);
-			Texture2D searchbar = ModContent.Request<Texture2D>("tMusicPlayer/UI/search").Value;
-			spriteBatch.Draw(searchbar, GetDimensions().Position(), Color.White);
-			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface)
 				Main.LocalPlayer.mouseInterface = true;
-			}
+
+			spriteBatch.Draw(searchBar.Value, GetDimensions().Position(), Color.White);
+
 			if (focused) {
 				PlayerInput.WritingText = true;
 				Main.instance.HandleIME();
-				string newString = Main.GetInputText(currentString);
-				if (FontAssets.MouseText.Value.MeasureString(newString.ToLower()).X < Width.Pixels - 10f) {
+				string newString = Main.GetInputText(currentString).ToLower();
+				if (FontAssets.MouseText.Value.MeasureString(newString).X < Width.Pixels - 10f) {
 					if (!newString.Equals(currentString)) {
-						// Stops the user from typing a name that doesn't exist. Prevents a gamebreaking hard-lock.
-						bool nameCheck = false;
-						foreach (MusicData item in MusicUISystem.Instance.AllMusic.ToArray()) {
-							if (item.name.ToLower().Contains(newString)) {
-								nameCheck = true;
-								break;
-							}
+						// Check for a music box that contains the searchbar text within its name.
+						// This will stop the user from typing a name that doesn't exist preventing a hard-lock.
+						// If there is an existing music box name with the new text, update the search filter selection to reflect it
+						List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.name.ToLower().Contains(newString)).ToList();
+						if (searchedData.Count > 0) {
+							currentString = newString;
+							MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+							UI.musicData = searchedData;
+							UI.OrganizeSelection();
 						}
-						if (nameCheck) {
-							currentString = newString.ToLower();
-						}
-						else {
-							newString = currentString;
-                        }
-					}
-					MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-					if (currentString.Length >= 0) {
-						List<MusicData> musicData = new List<MusicData>();
-						foreach (MusicData item in MusicUISystem.Instance.AllMusic.ToArray()) {
-							if (item.name.ToLower().Contains(currentString)) {
-								musicData.Add(item);
-							}
-						}
-						UI.musicData = musicData;
-						UI.OrganizeSelection(UI.sortType, UI.availabililty, UI.FilterMod);
-					}
-					else {
-						UI.OrganizeSelection(UI.sortType, UI.availabililty, UI.FilterMod);
 					}
 				}
-				if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape)) {
-					Unfocus();
-				}
-				if (JustPressed(Keys.Enter)) {
-					Main.drawingPlayerChat = false;
-					Unfocus();
-				}
+
 				if (++textBlinkerCount >= 20) {
 					textBlinkerState = (textBlinkerState + 1) % 2;
 					textBlinkerCount = 0;
 				}
 				Main.instance.DrawWindowsIMEPanel(new Vector2(198f, Main.screenHeight - 36), 0f);
 			}
+
+			// Draws the appropriate text in the search bar
 			string displayString = currentString;
-			if (textBlinkerState == 1 && focused) {
+			if (textBlinkerState == 1 && focused)
 				displayString += "|";
-			}
-			Color color2 = Color.White;
+
+			string searchText = currentString.Length == 0 && !focused ? hintText : displayString;
+			Color faded = Color.White * (currentString.Length == 0 && !focused ? 0.6f :  0.8f);
 			Vector2 drawPos = GetDimensions().Position() + new Vector2(32f, 3f);
-			if (currentString.Length == 0 && !focused) {
-				color2 *= 0.6f;
-				DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, FontAssets.MouseText.Value, hintText, drawPos, color2);
-			}
-			else {
-				color2 *= 0.8f;
-				DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, FontAssets.MouseText.Value, displayString, drawPos, color2);
-			}
+			DynamicSpriteFontExtensionMethods.DrawString(spriteBatch, FontAssets.MouseText.Value, searchText, drawPos, faded);
 		}
 	}
 }

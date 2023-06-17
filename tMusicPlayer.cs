@@ -37,9 +37,8 @@ namespace tMusicPlayer
 		}
 
 		public static void SendDebugText(string message, Color color = default) {
-			if (tMPConfig.EnableDebugMode) {
+			if (tMPConfig.EnableDebugMode)
 				Main.NewText(message, color);
-			}
 		}
 	}
 }

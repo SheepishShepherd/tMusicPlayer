@@ -25,6 +25,7 @@ namespace tMusicPlayer
 		/// <summary> Determines if the Music Player is able to play this music. </summary>
 		internal bool canPlay = false;
 
+		/// <summary> Gets the index of this MusicData within <see cref="MusicUISystem.AllMusic"/></summary>
 		internal int GetIndex => MusicUISystem.Instance.AllMusic.IndexOf(this);
 
 		/// <summary> The display name of the mod. </summary>
@@ -68,12 +69,7 @@ namespace tMusicPlayer
 			this.MusicBox = musicbox;
 
 			string itemNameValue = Lang.GetItemNameValue(musicbox);
-			if (itemNameValue.Contains("Otherworldly")) {
-				this.Mod = "Terraria Otherworld";
-			}
-			else {
-				this.Mod = "Terraria";
-			}
+			this.Mod = itemNameValue.Contains("Otherworldly") ? "Terraria Otherworld" : "Terraria";
 			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
 		}
 

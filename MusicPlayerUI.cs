@@ -124,11 +124,8 @@ namespace tMusicPlayer
 					return; // Cannot change if music is turned off
 				}
 
-				if (MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false))
-					value = false; // force false if the player has no music boxes to play
-
-				if (value)
-					listening = false; // if music is not playing, turn on listening mode
+				if (MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false) || IsListening)
+					value = false; // force false if the player has no music boxes to play OR while listening mode is active (play button is disabled)
 
 				playingMusic = value;
 			}
@@ -162,7 +159,7 @@ namespace tMusicPlayer
 					return; // Cannot change if music is turned off
 				}
 
-				if (Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0)
+				if (Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored == 0)
 					value = false; // force false if the player has no boxes to record with
 
 				if (value)

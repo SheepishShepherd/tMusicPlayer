@@ -46,8 +46,8 @@ namespace tMusicPlayer
 			if (MusicUISystem.Instance.MusicUI is not MusicPlayerUI UI)
 				return;
 
-			if (tMusicPlayer.tMPConfig.StartWithSmall != UI.smallPanel)
-				UI.SwapPanelSize(); // Determine if the player wants to start with the small panel or large panel
+			if (tMusicPlayer.tMPConfig.StartWithSmall != UI.MiniModePlayer)
+				UI.MiniModePlayer = !UI.MiniModePlayer; // Determine if the player wants to start with the small panel or large panel
 		}
 
 		public override void PostUpdateEquips() {
@@ -58,8 +58,8 @@ namespace tMusicPlayer
 			if (MusicUISystem.Instance.MusicUI is not MusicPlayerUI UI)
 				return;
 
-			if (!Main.gameMenu && !Main.dedServ && UI.playingMusic > -1) {
-				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == UI.playingMusic);
+			if (!Main.gameMenu && !Main.dedServ && UI.IsPlayingMusic) {
+				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == UI.CurrentlyPlaying);
 				Main.musicBox2 = MusicUISystem.Instance.AllMusic[index].OutputValue;
 			}
 		}

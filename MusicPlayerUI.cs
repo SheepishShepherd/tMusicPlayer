@@ -74,22 +74,103 @@ namespace tMusicPlayer
 		public static Asset<Texture2D> closeTextures;
 
 		// The Music Player's music box display
+
 		public MusicBoxSlot DisplayMusicSlot;
 		public int DisplayBox = 0;
-		public MusicData DisplayBoxData() => MusicUISystem.Instance.AllMusic[DisplayBox];
 
-		public MusicData VisualBoxDisplayed() {
-			if (listening)
-				return MusicUISystem.Instance.AllMusic[ListenDisplay];
+		/// <summary> The MusicData of the music box being displayed on the music player. </summary>
+		public MusicData DisplayBoxData => MusicUISystem.Instance.AllMusic[DisplayBox];
 
-			return DisplayBoxData();
+		/// <summary> The MusicData from the natural music being played with <see cref="Main.curMusic"/>. </summary>
+		public MusicData ListenModeData => MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == Main.curMusic);
+
+		public MusicData VisualBoxDisplayed => IsListening ? ListenModeData : DisplayBoxData;
+
+		private bool playingMusic = false;
+		private bool listening = true;
+		private bool recording = false;
+		private bool smallPanel = true;
+
+		public bool MiniModePlayer {
+			get => smallPanel;
+			set {
+				MusicPlayerPanel.UpdatePanelDimensions(value);
+				BoxEntrySlot.Top.Pixels = searchBar.Top.Pixels;
+				ejectButton.Top.Pixels = 42;
+
+				MusicPlayerPanel.AddOrRemoveChild(detectButton, !value); // mini-mode does not contain these buttons
+				MusicPlayerPanel.AddOrRemoveChild(recordButton, !value);
+				MusicPlayerPanel.AddOrRemoveChild(prevButton, !value);
+				MusicPlayerPanel.AddOrRemoveChild(nextButton, !value);
+
+				expandButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - expandButton.Width.Pixels - 8f;
+				viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - 20 - 8;
+				playButton.Left.Pixels = value ? MusicPlayerPanel.Width.Pixels - playButton.Width.Pixels - 6f : prevButton.Left.Pixels + playButton.Width.Pixels - 2f;
+				playButton.Top.Pixels = value ? viewButton.Top.Pixels - playButton.Height.Pixels + 2f : MusicPlayerPanel.Height.Pixels - playButton.Height.Pixels - 4f;
+				
+				smallPanel = value;				
+			}
 		}
 
-		public int ListenDisplay = -1;
-		public int playingMusic = -1;
-		public bool listening = false;
-		public bool recording = false;
-		public bool smallPanel = true;
+		/// <summary> What music ID is currentlybeing played by the music player. Return -1 if not playing music. </summary>
+		public int CurrentlyPlaying => IsPlayingMusic ? MusicUISystem.Instance.AllMusic[DisplayBox].MusicID : -1;
+
+		/// <summary> Whether or not the music player is outputing music. </summary>
+		public bool IsPlayingMusic {
+			get => playingMusic;
+			set {
+				if (Main.musicVolume == 0f) {
+					playingMusic = false;
+					return; // Cannot change if music is turned off
+				}
+
+				if (MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false))
+					value = false; // force false if the player has no music boxes to play
+
+				if (value)
+					listening = false; // if music is not playing, turn on listening mode
+
+				playingMusic = value;
+			}
+		}
+
+		/// <summary> Whether or not the music player is actively listening to non-player related music. </summary>
+		public bool IsListening {
+			get => listening;
+			set {
+				if (Main.musicVolume == 0f) {
+					listening = false;
+					return; // Cannot change if music is turned off
+				}
+
+				if (value) {
+					playingMusic = false; // if listening, playing music is turned off
+				}
+				else {
+					recording = false; // if not listening, recording is disabled
+				}
+				listening = value;
+			}
+		}
+
+		/// <summary> Whether or not the music player is currently recording music. This cannot be true if the music player has no stored music boxes. </summary>
+		public bool IsRecording {
+			get => recording;
+			set {
+				if (Main.musicVolume == 0f) {
+					recording = false;
+					return; // Cannot change if music is turned off
+				}
+
+				if (Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0)
+					value = false; // force false if the player has no boxes to record with
+
+				if (value)
+					IsListening = true; // listening needs to occur when recording
+
+				recording = value;
+			}
+		}
 
 		internal bool viewMode = false;
 		internal bool viewFavs = false;
@@ -135,7 +216,7 @@ namespace tMusicPlayer
 			};
 			playButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - playButton.Width.Pixels - 6f;
 			playButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - playButton.Height.Pixels * 2f - 4f;
-			playButton.OnLeftClick += (a, b) => ToggleButton(MusicMode.Play);
+			playButton.OnLeftClick += (a, b) => IsPlayingMusic = !IsPlayingMusic;
 			MusicPlayerPanel.Append(playButton);
 
 			nextButton = new HoverButton(buttonTextures.Value, new Point(3, 0)) {
@@ -159,21 +240,21 @@ namespace tMusicPlayer
 			};
 			detectButton.Left.Pixels = viewButton.Left.Pixels - detectButton.Width.Pixels - 2f;
 			detectButton.Top.Pixels = viewButton.Top.Pixels;
-			detectButton.OnLeftClick += (a, b) => ToggleButton(MusicMode.Listen);
+			detectButton.OnLeftClick += (a, b) => IsListening = !IsListening;
 
 			recordButton = new HoverButton(buttonTextures.Value, new Point(7, 0)) {
 				Id = "record"
 			};
 			recordButton.Left.Pixels = detectButton.Left.Pixels - recordButton.Width.Pixels - 4f;
 			recordButton.Top.Pixels = viewButton.Top.Pixels;
-			recordButton.OnLeftClick += (a, b) => ToggleButton(MusicMode.Record);
+			recordButton.OnLeftClick += (a, b) => IsRecording = !IsRecording;
 
 			expandButton = new HoverButton(closeTextures.Value, new Point(1, 0)) {
 				Id = "expand"
 			};
 			expandButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - expandButton.Width.Pixels - 8f;
 			expandButton.Top.Pixels = 4f;
-			expandButton.OnLeftClick += (a, b) => SwapPanelSize();
+			expandButton.OnLeftClick += (a, b) => MiniModePlayer = !MiniModePlayer;
 			MusicPlayerPanel.Append(expandButton);
 			
 			DisplayMusicSlot = new MusicBoxSlot(0, 1f) {
@@ -321,7 +402,7 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Music Box ({musicData.name}) obtained!", Color.BlanchedAlmond);
 
 					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					recording = false;
+					IsRecording = false;
 					modplayer.musicBoxesStored--;
 				}
 			}
@@ -329,32 +410,27 @@ namespace tMusicPlayer
 			base.Update(gameTime);
 
 			if (Main.gameMenu) {
-				playingMusic = -1;
-				ListenDisplay = -1;
-				listening = false;
+				IsListening = true;
 			}
-
-			if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
-				MusicPlayerVisible = !MusicPlayerVisible;
-			}
-			else if (tMusicPlayer.PlayStopHotkey.JustPressed) {
-				ToggleButton(MusicMode.Play);
-			}
-			else if (tMusicPlayer.PrevSongHotkey.JustPressed) {
-				ChangeDisplay(false, false);
-			}
-			else if (tMusicPlayer.NextSongHotkey.JustPressed) {
-				ChangeDisplay(true, false);
-			}
-			
-			if (!listening && MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false)) {
-				ToggleButton(MusicMode.Listen); // If nothing can be played, turn on 'listening mode'
+			else {
+				if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
+					MusicPlayerVisible = !MusicPlayerVisible;
+				}
+				else if (tMusicPlayer.PlayStopHotkey.JustPressed) {
+					IsPlayingMusic = !IsPlayingMusic;
+				}
+				else if (tMusicPlayer.PrevSongHotkey.JustPressed) {
+					ChangeDisplay(false, false);
+				}
+				else if (tMusicPlayer.NextSongHotkey.JustPressed) {
+					ChangeDisplay(true, false);
+				}
 			}
 		}
 
 		public int FindNextIndex() {
-			for (int i = DisplayBoxData().GetIndex; i < musicData.Count; i++) {
-				if (i != DisplayBoxData().GetIndex && DisplayBoxData().canPlay)
+			for (int i = DisplayBoxData.GetIndex; i < musicData.Count; i++) {
+				if (i != DisplayBoxData.GetIndex && DisplayBoxData.canPlay)
 					return i;
 			}
 			return -1;
@@ -362,22 +438,21 @@ namespace tMusicPlayer
 
 		public int FindPrevIndex() {
 			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
-			for (int i = DisplayBoxData().GetIndex; i >= 0; i--) {
-				if (i != DisplayBoxData().GetIndex && DisplayBoxData().canPlay)
+			for (int i = DisplayBoxData.GetIndex; i >= 0; i--) {
+				if (i != DisplayBoxData.GetIndex && DisplayBoxData.canPlay)
 					return i;
 			}
 			return -1;
 		}
 
 		private void ChangeDisplay(bool next, bool jumpToEnd = false) {
-			if (!listening) {
-				int newIndex = next ? FindNextIndex() : FindPrevIndex();
-				if (newIndex != -1) { 
-					DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicData[newIndex].MusicID);
-					if (playingMusic > -1) {
-						playingMusic = MusicUISystem.Instance.AllMusic[DisplayBox].MusicID;
-					}
-				}
+			if (IsListening)
+				return;
+
+			int newIndex = next ? FindNextIndex() : FindPrevIndex();
+			if (newIndex != -1) { 
+				DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicData[newIndex].MusicID);
+				IsPlayingMusic = true;
 			}
 		}
 
@@ -501,11 +576,9 @@ namespace tMusicPlayer
 						Id = "altplay",
 						refNum = data.GetIndex
 					};
-					playSong.Width.Pixels = 22f;
-					playSong.Height.Pixels = 22f;
 					playSong.Left.Pixels = boxSlot.Left.Pixels + boxSlot.Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
-					playSong.OnLeftClick += (a, b) => ListViewPlaySong(data.GetIndex);
+					playSong.OnLeftClick += (a, b) => UpdateMusicPlayedViaSelectionMenu(data);
 					newRow.Append(playSong);
 
 					// Song name and mod
@@ -546,77 +619,19 @@ namespace tMusicPlayer
 			SelectionList.SetScrollbar(selectionScrollBar);
 		}
 
-		private void ListViewPlaySong(int index) {
-			if (index == -1 || Main.musicVolume <= 0f || !MusicUISystem.Instance.AllMusic[index].canPlay)
+		public void UpdateMusicPlayedViaSelectionMenu(MusicData data) {
+			if (Main.musicVolume <= 0f || !data.canPlay)
 				return;
 
-			int musicID = MusicUISystem.Instance.AllMusic[index].MusicID;
-			if (playingMusic != musicID) {
-				ListenDisplay = -1;
-				listening = false;
-				DisplayBox = index;
-				playingMusic = musicID;
-			}
-			else {
-				playingMusic = -1;
-			}
+			DisplayBox = data.GetIndex;
+			IsPlayingMusic = true;
 		}
 
 		private void ToggleButton(MusicMode type) {
-			if (Main.musicVolume > 0f) {
-				switch (type) {
-					case MusicMode.Play:
-						if (!listening) {
-							playingMusic = (playingMusic == -1) ? MusicUISystem.Instance.AllMusic[DisplayBox].MusicID : -1;
-							if (playingMusic != -1) {
-								listening = false;
-							}
-							break;
-						}
-						return;
-					case MusicMode.Listen:
-						listening = !listening;
-						if (listening) {
-							playingMusic = -1;
-						}
-						else {
-							recording = false;
-						}
-						break;
-					case MusicMode.Record:
-						recording = !recording;
-						if (recording) {
-							recording = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>().musicBoxesStored > 0;
-						}
-						if (recording) {
-							playingMusic = -1;
-							listening = true;
-						}
-						break;
-				}
-				if (tMusicPlayer.tMPConfig.EnableDebugMode) {
-					string green = Utils.Hex3(Color.ForestGreen);
-					string red = Utils.Hex3(Color.IndianRed);
-					tMusicPlayer.SendDebugText($"[c/{(playingMusic > -1 ? green : red)}:Playing] - [c/{(listening ? green : red)}:Listening] - [c/{(recording ? green : red)}:Recording]");
-				}
+			if (tMusicPlayer.tMPConfig.EnableDebugMode) {
+				string GetHex(bool condition) => condition ? Utils.Hex3(Color.ForestGreen) : Utils.Hex3(Color.IndianRed);
+				tMusicPlayer.SendDebugText($"[c/{GetHex(IsPlayingMusic)}:Playing] - [c/{GetHex(IsListening)}:Listening] - [c/{GetHex(IsRecording)}:Recording]");
 			}
-		}
-
-		public void SwapPanelSize() {
-			smallPanel = !smallPanel;
-			MusicPlayerPanel.UpdatePanelDimensions(smallPanel);
-			BoxEntrySlot.Top.Pixels = searchBar.Top.Pixels;
-			ejectButton.Top.Pixels = 42;
-
-			MusicPlayerPanel.AddOrRemoveChild(detectButton, !smallPanel); // mini-mode does not contain these buttons
-			MusicPlayerPanel.AddOrRemoveChild(recordButton, !smallPanel);
-			MusicPlayerPanel.AddOrRemoveChild(prevButton, !smallPanel);
-			MusicPlayerPanel.AddOrRemoveChild(nextButton, !smallPanel);
-
-			expandButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - expandButton.Width.Pixels - 8f;
-			viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - 20 - 8;
-			playButton.Left.Pixels = (!smallPanel) ? (prevButton.Left.Pixels + playButton.Width.Pixels - 2f) : (MusicPlayerPanel.Width.Pixels - playButton.Width.Pixels - 6f);
-			playButton.Top.Pixels = (!smallPanel) ? (MusicPlayerPanel.Height.Pixels - playButton.Height.Pixels - 4f) : (viewButton.Top.Pixels - playButton.Height.Pixels + 2f);
 		}
 	}
 

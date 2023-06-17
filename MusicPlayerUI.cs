@@ -474,7 +474,7 @@ namespace tMusicPlayer
 			foreach (MusicData data in musicData) {
 				if (!initializing) {
 					MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
-					bool CheckFilterMod = FilterMod != "" && (data.Mod != FilterMod);
+					bool CheckFilterMod = FilterMod != "" && data.Mod != FilterMod;
 					bool CheckObtained = availabililty == ProgressBy.Obtained && !modplayer.BoxIsCollected(data.MusicBox);
 					bool CheckUnobtained = availabililty == ProgressBy.Unobtained && modplayer.BoxIsCollected(data.MusicBox);
 					bool CheckFavorited = viewFavs && !modplayer.BoxIsFavorited(data.MusicBox);
@@ -514,7 +514,7 @@ namespace tMusicPlayer
 					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
 					newRow.Append(songName);
 
-					UIText songMod = new UIText(data.Mod, 0.85f);
+					UIText songMod = new UIText(data.Mod_DisplayName_NoChatTags(), 0.85f);
 					songMod.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
 					songMod.Top.Pixels = (newRow.Height.Pixels / 2f) + 4f;
 					newRow.Append(songMod);

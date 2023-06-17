@@ -157,7 +157,7 @@ namespace tMusicPlayer
 						continue; // If the item does not exist, move onto the next pair
 
 					string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
-					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.DisplayName;
+					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.Name;
 
 					if (!AllMusic.Exists(x => x.MusicBox == music.Key)) {
 						AllMusic.Add(new MusicData(music.Value, music.Key, modSource, name));

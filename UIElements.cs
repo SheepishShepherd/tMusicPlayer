@@ -49,7 +49,7 @@ namespace tMusicPlayer
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 30);
-				Utils.DrawBorderString(spriteBatch, musicRef.Mod, pos, Color.White, 0.75f);
+				Utils.DrawBorderString(spriteBatch, musicRef.Mod_DisplayName_NoChatTags(), pos, Color.White, 0.75f);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
@@ -174,7 +174,8 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);
 				}
 				else if (Id == "filtermod") {
-					MusicUISystem.Instance.UIHoverText = $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}";
+					string value = ModLoader.TryGetMod(UI.FilterMod, out Mod mod) ? MusicUISystem.Instance.AllMusic.Find(x => x.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags() : UI.FilterMod;
+					MusicUISystem.Instance.UIHoverText = $"{(string.IsNullOrEmpty(value) ? "Filter by Mod" : value)}";
 				}
 			}
 		}
@@ -341,7 +342,7 @@ namespace tMusicPlayer
 					Main.cursorOverride = 3; 
 				}
 				else if (IsDisplaySlot && UI.smallPanel) {
-					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed().name}\n{UI.VisualBoxDisplayed().Mod}";
+					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed().name}\n{UI.VisualBoxDisplayed().Mod_DisplayName_NoChatTags()}";
 					MusicUISystem.Instance.UIHoverTextColor = ItemRarity.GetColor(musicBox.rare);
 				}
 				else {

@@ -182,8 +182,9 @@ namespace tMusicPlayer
 			}
 				
 			UI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-			UI.musicData = new List<MusicData>(AllMusic);
+			UI.SortedMusicData = new List<MusicData>(AllMusic);
 			UI.OrganizeSelection(initializing: true);
+			UI.DisplayBox = UI.SortedMusicData[0]; // defaults to first music box
 
 			// Setup the mod list for the Mod Filter
 			// Must occur after all other modded music is established
@@ -191,7 +192,7 @@ namespace tMusicPlayer
 				{ "Terraria", new List<int>() },
 				{ "Terraria Otherworld", new List<int>() }
 			};
-			foreach (MusicData box in UI.musicData) {
+			foreach (MusicData box in UI.SortedMusicData) {
 				RegisteredMusic.TryAdd(box.Mod, new List<int>());
 				RegisteredMusic[box.Mod].Add(box.MusicID);
 			}

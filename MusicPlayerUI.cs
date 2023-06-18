@@ -76,15 +76,14 @@ namespace tMusicPlayer
 		// The Music Player's music box display
 
 		public MusicBoxSlot DisplayMusicSlot;
-		public int DisplayBox = 0;
 
 		/// <summary> The MusicData of the music box being displayed on the music player. </summary>
-		public MusicData DisplayBoxData => MusicUISystem.Instance.AllMusic[DisplayBox];
+		public MusicData DisplayBox = null;
 
 		/// <summary> The MusicData from the natural music being played with <see cref="Main.curMusic"/>. </summary>
 		public MusicData ListenModeData => MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == Main.curMusic);
 
-		public MusicData VisualBoxDisplayed => IsListening ? ListenModeData : DisplayBoxData;
+		public MusicData VisualBoxDisplayed => IsListening ? ListenModeData : DisplayBox;
 
 		private bool playingMusic = false;
 		private bool listening = true;
@@ -112,8 +111,8 @@ namespace tMusicPlayer
 			}
 		}
 
-		/// <summary> What music ID is currentlybeing played by the music player. Return -1 if not playing music. </summary>
-		public int CurrentlyPlaying => IsPlayingMusic ? MusicUISystem.Instance.AllMusic[DisplayBox].MusicID : -1;
+		/// <summary> What music ID is currently being played by the music player. Return -1 if not playing music. </summary>
+		public int CurrentlyPlaying => IsPlayingMusic ? DisplayBox.MusicID : -1;
 
 		/// <summary> Whether or not the music player is outputing music. </summary>
 		public bool IsPlayingMusic {
@@ -180,7 +179,7 @@ namespace tMusicPlayer
 		public SearchBar searchBar;
 
 		// Sort/Filter functionality
-		internal List<MusicData> musicData;
+		internal List<MusicData> SortedMusicData;
 		public SortBy sortType = SortBy.ID;
 		public ProgressBy availabililty = ProgressBy.None;
 		public string FilterMod = "";
@@ -417,40 +416,57 @@ namespace tMusicPlayer
 					IsPlayingMusic = !IsPlayingMusic;
 				}
 				else if (tMusicPlayer.PrevSongHotkey.JustPressed) {
-					ChangeDisplay(false, false);
+					ChangeDisplay(false);
 				}
 				else if (tMusicPlayer.NextSongHotkey.JustPressed) {
-					ChangeDisplay(true, false);
+					ChangeDisplay(true);
 				}
 			}
 		}
 
-		public int FindNextIndex() {
-			for (int i = DisplayBoxData.GetIndex; i < musicData.Count; i++) {
-				if (i != DisplayBoxData.GetIndex && DisplayBoxData.canPlay)
-					return i;
+		public MusicData FindNext() {
+			if (IsListening)
+				return null; // If player is listening, the button is disabled.
+
+			int index = SortedMusicData.FindIndex(data => data.MusicID == DisplayBox.MusicID);
+			if (index == -1 || index == SortedMusicData.Count - 1)
+				return null; // either the music data is the last entry or invalid
+
+			int nextIndex = index + 1;
+			while (nextIndex < SortedMusicData.Count) {
+				if (SortedMusicData[nextIndex].canPlay)
+					return SortedMusicData[nextIndex]; // playable music has been found
+				nextIndex++;
 			}
-			return -1;
+
+			return null; // no playable music can be found next
 		}
 
-		public int FindPrevIndex() {
-			int index = musicData.FindIndex(x => x.MusicID == MusicUISystem.Instance.AllMusic[DisplayBox].MusicID);
-			for (int i = DisplayBoxData.GetIndex; i >= 0; i--) {
-				if (i != DisplayBoxData.GetIndex && DisplayBoxData.canPlay)
-					return i;
+		public MusicData FindPrev() {
+			if (IsListening)
+				return null; // If player is listening, the button is disabled.
+
+			int index = SortedMusicData.FindIndex(data => data.MusicID == DisplayBox.MusicID);
+			if (index == -1 || index == 0)
+				return null; // either the music data is the first entry or invalid
+
+			int prevIndex = index - 1;
+			while (prevIndex >= 0) {
+				if (SortedMusicData[prevIndex].canPlay)
+					return SortedMusicData[prevIndex]; // playable music has been found
+				prevIndex--;
 			}
-			return -1;
+
+			return null; // no playable music can be found previously
 		}
 
 		private void ChangeDisplay(bool next, bool jumpToEnd = false) {
 			if (IsListening)
 				return;
 
-			int newIndex = next ? FindNextIndex() : FindPrevIndex();
-			if (newIndex != -1) { 
-				DisplayBox = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == musicData[newIndex].MusicID);
-				IsPlayingMusic = true;
-			}
+			MusicData newMusic = next ? FindNext() : FindPrev();
+			if (newMusic is not null)
+				DisplayBox = newMusic;
 		}
 
 		internal string ResetModFilter() {
@@ -530,20 +546,20 @@ namespace tMusicPlayer
 					viewFavs = !viewFavs;
 			}
 
-			if (sortType == SortBy.ID) {
-				musicData = musicData.OrderBy(x => x.MusicID).ToList();
+			if (sortType == SortBy.Name) {
+				SortedMusicData = SortedMusicData.OrderBy(x => x.name).ToList();
 			}
-			else if (sortType == SortBy.Name) {
-				musicData = musicData.OrderBy(x => x.name).ToList();
+			else {
+				SortedMusicData = SortedMusicData.OrderBy(x => x.MusicID).ToList(); // default sorting by ID
 			}
-			
+
 			SelectionList.Clear();
 
 			ItemSlotRow newRow = new ItemSlotRow(0);
 			int slotCount = 0;
 			int col = 0;
 			int row = 0;
-			foreach (MusicData data in musicData) {
+			foreach (MusicData data in SortedMusicData) {
 				if (!initializing) {
 					MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 					bool CheckFilterMod = FilterMod != "" && data.Mod != FilterMod;
@@ -620,7 +636,7 @@ namespace tMusicPlayer
 			if (Main.musicVolume <= 0f || !data.canPlay)
 				return;
 
-			DisplayBox = data.GetIndex;
+			DisplayBox = data;
 			IsPlayingMusic = true;
 		}
 

@@ -44,8 +44,7 @@ namespace tMusicPlayer
 			
 			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer) {
-				int musicBoxDisplayed = UI.DisplayBox;
-				MusicData musicRef = MusicUISystem.Instance.AllMusic[musicBoxDisplayed];
+				MusicData musicRef = UI.DisplayBox;
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 30);
@@ -187,9 +186,9 @@ namespace tMusicPlayer
 				"altplay" => !MusicUISystem.Instance.AllMusic[refNum].canPlay || Main.musicVolume <= 0f,
 				"clearfiltermod" => UI.FilterMod == "",
 				"listen" => Main.musicVolume <= 0f,
-				"next" => UI.FindNextIndex() == -1 || UI.IsListening || Main.musicVolume <= 0f,
+				"next" => UI.FindNext() == null || UI.IsListening || Main.musicVolume <= 0f,
 				"play" => UI.IsListening || Main.musicVolume <= 0f,
-				"prev" => UI.FindPrevIndex() == -1 || UI.IsListening || Main.musicVolume <= 0f,
+				"prev" => UI.FindPrev() == null || UI.IsListening || Main.musicVolume <= 0f,
 				"record" => modplayer.musicBoxesStored <= 0 || Main.musicVolume <= 0f,
 				_ => false,
 			};
@@ -308,7 +307,7 @@ namespace tMusicPlayer
 					}
 				}
 				if (!UI.IsListening) {
-					displayID = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicBox;
+					displayID = UI.DisplayBox.MusicBox;
 				}
 			}
 
@@ -420,12 +419,12 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{slotItemID}]", Color.IndianRed);
 					if (!modplayer.BoxResearched(slotItemID)) {
 						musicData.canPlay = false;
-						int next = UI.FindNextIndex();
-						int prev = UI.FindPrevIndex();
-						if (next != -1) {
+						MusicData next = UI.FindNext();
+						MusicData prev = UI.FindPrev();
+						if (next is not null) {
 							UI.DisplayBox = next;
 						}
-						else if (prev != -1) {
+						else if (prev is not null) {
 							UI.DisplayBox = prev;
 						}
 						else {
@@ -443,10 +442,10 @@ namespace tMusicPlayer
 						type = UI.ListenModeData.MusicBox;
 					}
 					else {
-						if (UI.DisplayBox == -1) {
+						if (UI.DisplayBox == null) {
 							return;
 						}
-						type = MusicUISystem.Instance.AllMusic[UI.DisplayBox].MusicBox;
+						type = UI.DisplayBox.MusicBox;
 					}
 				}
 				else {
@@ -525,7 +524,7 @@ namespace tMusicPlayer
 		public void ClearSearchText() {
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			SetText("");
-			UI.musicData = new List<MusicData>(MusicUISystem.Instance.AllMusic);
+			UI.SortedMusicData = new List<MusicData>(MusicUISystem.Instance.AllMusic);
 			UI.OrganizeSelection();
 		}
 
@@ -561,7 +560,7 @@ namespace tMusicPlayer
 						if (searchedData.Count > 0) {
 							currentString = newString;
 							MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-							UI.musicData = searchedData;
+							UI.SortedMusicData = searchedData;
 							UI.OrganizeSelection();
 						}
 					}

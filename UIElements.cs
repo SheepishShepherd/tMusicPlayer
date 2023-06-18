@@ -419,17 +419,19 @@ namespace tMusicPlayer
 					tMusicPlayer.SendDebugText($"Removed Music Box [ID#{slotItemID}]", Color.IndianRed);
 					if (!modplayer.BoxResearched(slotItemID)) {
 						musicData.canPlay = false;
-						MusicData next = UI.FindNext();
-						MusicData prev = UI.FindPrev();
-						if (next is not null) {
-							UI.DisplayBox = next;
-						}
-						else if (prev is not null) {
-							UI.DisplayBox = prev;
-						}
-						else {
-							UI.IsPlayingMusic = false;
-							UI.IsListening = true;
+						if (UI.DisplayBox.MusicBox == slotItemID) {
+							MusicData next = UI.FindNext();
+							MusicData prev = UI.FindPrev();
+							if (prev is not null) {
+								UI.DisplayBox = prev;
+							}
+							else if (next is not null) {
+								UI.DisplayBox = next;
+							}
+							else {
+								UI.IsPlayingMusic = false;
+								UI.IsListening = true;
+							}
 						}
 					}
 				}

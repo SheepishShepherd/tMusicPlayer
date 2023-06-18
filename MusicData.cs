@@ -23,7 +23,7 @@ namespace tMusicPlayer
 		internal string composer;
 
 		/// <summary> Determines if the Music Player is able to play this music. </summary>
-		internal bool canPlay = false;
+		internal bool CanPlay(MusicPlayerPlayer modplayer) => modplayer.BoxIsCollected(MusicBox) || modplayer.BoxResearched(MusicBox);
 
 		/// <summary> Gets the index of this MusicData within <see cref="MusicUISystem.AllMusic"/></summary>
 		internal int GetIndex => MusicUISystem.Instance.AllMusic.IndexOf(this);

@@ -39,15 +39,7 @@ namespace tMusicPlayer
 		}
 
 		public override void OnEnterWorld() {
-			foreach (MusicData data in MusicUISystem.Instance.AllMusic) {
-				if (BoxIsCollected(data.MusicBox))
-					data.canPlay = true; // Add all the player's obtained musicboxes to the canPlay array for the UI
-			}
-
-			if (MusicUISystem.Instance.MusicUI is not MusicPlayerUI UI)
-				return;
-
-			if (tMusicPlayer.tMPConfig.StartWithSmall != UI.MiniModePlayer)
+			if (MusicUISystem.Instance.MusicUI is MusicPlayerUI UI && tMusicPlayer.tMPConfig.StartWithSmall != UI.MiniModePlayer)
 				UI.MiniModePlayer = !UI.MiniModePlayer; // Determine if the player wants to start with the small panel or large panel
 		}
 
@@ -78,7 +70,6 @@ namespace tMusicPlayer
 				}
 				else if (MusicUISystem.Instance.AllMusic.Find(x => x.MusicBox == type) is MusicData data && !BoxResearched(type) && !BoxIsCollected(type)) {
 					MusicBoxList.Add(new ItemDefinition(type));
-					data.canPlay = true;
 					inventory[slot].TurnToAir();
 					SoundEngine.PlaySound(SoundID.Grab);
 					tMusicPlayer.SendDebugText($"[i:{type}] [#{type}] was added (via shift-click)", Colors.RarityGreen);

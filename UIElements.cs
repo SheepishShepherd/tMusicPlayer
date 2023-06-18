@@ -184,7 +184,7 @@ namespace tMusicPlayer
 			MusicPlayerPlayer modplayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
 			MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
 			return Id switch {
-				"altplay" => !MusicUISystem.Instance.AllMusic[refNum].canPlay || Main.musicVolume <= 0f,
+				"altplay" => !MusicUISystem.Instance.AllMusic[refNum].CanPlay(modplayer) || Main.musicVolume <= 0f,
 				"clearfiltermod" => UI.FilterMod == "",
 				"listen" => Main.musicVolume <= 0f,
 				"next" => UI.FindNext() == null || UI.IsListening || Main.musicVolume <= 0f,
@@ -265,8 +265,6 @@ namespace tMusicPlayer
 
 		internal MusicData SlotMusicData { get; set; } = null;
 
-		internal MusicData FetchMainData => MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == SlotMusicData.MusicID);
-
 		internal int SlotItemID => SlotMusicData is null ? ItemID.MusicBox : SlotMusicData.MusicBox; // What the item id the slot is assigned to
 
 		internal Item SlotItem; // The actually item within the slot
@@ -333,31 +331,22 @@ namespace tMusicPlayer
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
-			//TODO: figure this shit out
-			// Create the MusicData needed for the display & entry slots
-			if (SlotMusicData is null) {
-				if (IsDisplaySlot) {
-					SlotMusicData = UI.IsListening ? MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == Main.curMusic) : UI.DisplayBox;
-				}
-			}
-
-			// Create the item to fill the slot // TODO: figure out how to better approach this? (Currently broken with adding music to the entry slot)
-			if (IsDisplaySlot && FetchMainData?.canPlay == true) {
-				SlotItem.SetDefaults(SlotItemID);
+			// Create the item to fill the slot
+			if (IsDisplaySlot) {
+				SlotItem.SetDefaults(UI.VisualBoxDisplayed.MusicBox); // set item default to the UI's visual display music box
 			}
 			else if (IsSelectionSlot) {
-				SlotItem.SetDefaults(FetchMainData?.canPlay == true ? SlotItemID : 0);
+				SlotItem.SetDefaults(SlotMusicData.CanPlay(modplayer) == true ? SlotItemID : 0); // selection slot is either the assigned item or empty
 			}
 			else if (IsEntrySlot && !SlotItem.IsAir) {
 				if (SlotItem.type != ItemID.MusicBox) {
 					modplayer.MusicBoxList.Add(new ItemDefinition(SlotItem.type));
-					MusicUISystem.Instance.AllMusic.Find(data => data.MusicBox == SlotItem.type).canPlay = true;
 					tMusicPlayer.SendDebugText($"[i:{SlotItem.type}] [#{SlotItem.type}] was added (via entry slot)", Colors.RarityGreen);
 				}
 				else if (modplayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
 					modplayer.musicBoxesStored++;
 				}
-				SlotItem.TurnToAir();
+				SlotItem.TurnToAir(); // entry slot should always be empty, but allows unrecorded and unobtained music boxes before turning them into air
 			}
 
 			// Item slot drawing
@@ -366,7 +355,7 @@ namespace tMusicPlayer
 			Main.inventoryScale = scale;
 			TextureAssets.InventoryBack2 = IsEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3;
 			if (IsSelectionSlot && modplayer.BoxIsFavorited(SlotItemID)) {
-				TextureAssets.InventoryBack2 = SlotMusicData.canPlay ? TextureAssets.InventoryBack6 : backup;
+				TextureAssets.InventoryBack2 = SlotMusicData.CanPlay(modplayer) ? TextureAssets.InventoryBack6 : backup;
 			}
 			ItemSlot.Draw(spriteBatch, ref SlotItem, context, inner.TopLeft()); // Draw the item slot!
 			TextureAssets.InventoryBack2 = backup; // reset values
@@ -426,7 +415,6 @@ namespace tMusicPlayer
 					if (IsSelectionSlot) {
 						if (SlotItem.type == SlotItemID && !modplayer.BoxIsCollected(SlotItemID)) {
 							modplayer.MusicBoxList.Add(new ItemDefinition(SlotItemID));
-							FetchMainData.canPlay = true;
 							tMusicPlayer.SendDebugText($"[i:{SlotItemID}] [#{SlotItemID}] was added (via selection panel)", Colors.RarityGreen);
 						}
 						else if (SlotItem.IsAir && modplayer.BoxIsCollected(SlotItemID)) {
@@ -434,7 +422,7 @@ namespace tMusicPlayer
 							modplayer.MusicBoxList.RemoveAll(x => x.Type == SlotItemID);
 							tMusicPlayer.SendDebugText($"[i:{SlotItemID}] [#{SlotItemID}] was removed (via selection panel)", Color.LightCoral);
 							if (!modplayer.BoxResearched(SlotItemID)) {
-								FetchMainData.canPlay = false; // only set to false if the music box is not already researched
+								// only change display box if the music box is not already researched
 								if (UI.DisplayBox.MusicBox == SlotItemID) {
 									if (UI.FindPrev() is MusicData prev) {
 										UI.DisplayBox = prev;

@@ -123,7 +123,7 @@ namespace tMusicPlayer
 					return; // Cannot change if music is turned off
 				}
 
-				if (MusicUISystem.Instance.AllMusic.All(data => data.canPlay == false) || IsListening)
+				if (MusicUISystem.Instance.AllMusic.All(data => !data.CanPlay(Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>())) || IsListening)
 					value = false; // force false if the player has no music boxes to play OR while listening mode is active (play button is disabled)
 
 				playingMusic = value;
@@ -388,8 +388,8 @@ namespace tMusicPlayer
                     SoundEngine.PlaySound(SoundID.Item166);
 					if (!modplayer.BoxIsCollected(musicData.MusicBox)) {
 						// If we don't have it in our music player, automatically add it in.
+						// as soon as it is recorded, the player should be able to play the music
 						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.MusicBox));
-						musicData.canPlay = true; // as soon as it is recorded, the player should be able to play the music
 					}
 					else {
 						// If we do have it already, spawn the item.
@@ -434,7 +434,7 @@ namespace tMusicPlayer
 
 			int nextIndex = index + 1;
 			while (nextIndex < SortedMusicData.Count) {
-				if (SortedMusicData[nextIndex].canPlay)
+				if (SortedMusicData[nextIndex].CanPlay(Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>()))
 					return SortedMusicData[nextIndex]; // playable music has been found
 				nextIndex++;
 			}
@@ -452,7 +452,7 @@ namespace tMusicPlayer
 
 			int prevIndex = index - 1;
 			while (prevIndex >= 0) {
-				if (SortedMusicData[prevIndex].canPlay)
+				if (SortedMusicData[prevIndex].CanPlay(Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>()))
 					return SortedMusicData[prevIndex]; // playable music has been found
 				prevIndex--;
 			}
@@ -629,7 +629,7 @@ namespace tMusicPlayer
 		}
 
 		public void UpdateMusicPlayedViaSelectionMenu(MusicData data) {
-			if (Main.musicVolume <= 0f || !data.canPlay)
+			if (Main.musicVolume <= 0f || !data.CanPlay(Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>()))
 				return;
 
 			DisplayBox = data;

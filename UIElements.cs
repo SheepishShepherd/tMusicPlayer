@@ -424,9 +424,11 @@ namespace tMusicPlayer
 							MusicData prev = UI.FindPrev();
 							if (prev is not null) {
 								UI.DisplayBox = prev;
+								UI.IsPlayingMusic = false;
 							}
 							else if (next is not null) {
 								UI.DisplayBox = next;
+								UI.IsPlayingMusic = false;
 							}
 							else {
 								UI.IsPlayingMusic = false;

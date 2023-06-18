@@ -253,7 +253,7 @@ namespace tMusicPlayer
 			expandButton.OnLeftClick += (a, b) => MiniModePlayer = !MiniModePlayer;
 			MusicPlayerPanel.Append(expandButton);
 			
-			DisplayMusicSlot = new MusicBoxSlot(0, 1f) {
+			DisplayMusicSlot = new MusicBoxSlot(1f) {
 				IsDisplaySlot = true
 			};
 			DisplayMusicSlot.Left.Pixels = 8f;
@@ -342,7 +342,7 @@ namespace tMusicPlayer
 			searchBar.Left.Pixels = 12f;
 			SelectionPanel.Append(searchBar);
 
-			BoxEntrySlot = new MusicBoxSlot(ItemID.MusicBox, 0.85f) {
+			BoxEntrySlot = new MusicBoxSlot(0.85f) {
 				IsEntrySlot = true
 			};
 			BoxEntrySlot.Left.Pixels = closeButton.Left.Pixels - BoxEntrySlot.Width.Pixels - 9f;
@@ -577,9 +577,7 @@ namespace tMusicPlayer
 					newRow = new ItemSlotRow(slotCount);
 
 					// Item Slot
-					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f) {
-						IsSelectionSlot = true
-					};
+					boxSlot = new MusicBoxSlot(data);
 					boxSlot.Left.Pixels = 20f;
 					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
 					newRow.Append(boxSlot);
@@ -608,9 +606,7 @@ namespace tMusicPlayer
 					SelectionList.Add(newRow);
 				}
 				else {
-					boxSlot = new MusicBoxSlot(data.MusicBox, 0.85f) {
-						IsSelectionSlot = true
-					};
+					boxSlot = new MusicBoxSlot(data);
 					boxSlot.Left.Pixels = 20f + (boxSlot.Width.Pixels + 10f) * col;
 					boxSlot.Top.Pixels = (newRow.Height.Pixels / 2f) - (boxSlot.Height.Pixels / 2f);
 					newRow.Append(boxSlot);

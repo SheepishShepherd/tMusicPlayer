@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -75,10 +76,12 @@ namespace tMusicPlayer
 					SoundEngine.PlaySound(SoundID.Grab);
 					return true;
 				}
-				else if (MusicUISystem.Instance.AllMusic.Any(x => x.MusicBox == type) && !BoxResearched(type) && !BoxIsCollected(type)) {
+				else if (MusicUISystem.Instance.AllMusic.Find(x => x.MusicBox == type) is MusicData data && !BoxResearched(type) && !BoxIsCollected(type)) {
 					MusicBoxList.Add(new ItemDefinition(type));
+					data.canPlay = true;
 					inventory[slot].TurnToAir();
 					SoundEngine.PlaySound(SoundID.Grab);
+					tMusicPlayer.SendDebugText($"[i:{type}] [#{type}] was added (via shift-click)", Colors.RarityGreen);
 					return true;
 				}
 			}

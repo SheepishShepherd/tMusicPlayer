@@ -359,20 +359,20 @@ namespace tMusicPlayer
 			ejectButton.OnRightClick += (a, b) => EjectBox(true);
 			SelectionPanel.Append(ejectButton);
 
-			SelectionList = new UIList();
-			SelectionList.Width.Pixels = SelectionPanel.Width.Pixels;
-			SelectionList.Height.Pixels = SelectionPanel.Height.Pixels - 85f;
-			SelectionList.Left.Pixels = 0f;
-			SelectionList.Top.Pixels = 72f;
-			SelectionPanel.Append(SelectionList);
-
 			selectionScrollBar = new FixedUIScrollbar();
 			selectionScrollBar.SetView(10f, 1000f);
 			selectionScrollBar.Top.Pixels = 76f;
 			selectionScrollBar.Left.Pixels = -10f;
 			selectionScrollBar.Height.Set(0f, 0.75f);
 			selectionScrollBar.HAlign = 1f;
-			SelectionPanel.Append(selectionScrollBar);
+			
+			SelectionList = new UIList();
+			SelectionList.Width.Pixels = SelectionPanel.Width.Pixels - (-selectionScrollBar.Left.Pixels * 2) - selectionScrollBar.Width.Pixels;
+			SelectionList.Height.Pixels = SelectionPanel.Height.Pixels - 85f;
+			SelectionList.Left.Pixels = 0f;
+			SelectionList.Top.Pixels = 72f;
+			SelectionPanel.Append(SelectionList);
+			SelectionPanel.Append(selectionScrollBar); // append scrollbar after, so it is on top
 		}
 
 		public override void Update(GameTime gameTime) {

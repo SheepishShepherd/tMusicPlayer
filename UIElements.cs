@@ -489,14 +489,16 @@ namespace tMusicPlayer
 		}
 
 		public override void Update(GameTime gameTime) {
-			Vector2 MousePosition = new Vector2(Main.mouseX, Main.mouseY);
-			if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape) || (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight))) {
-				Unfocus(); // Unfocus search bar when pressing Tab or Esc, or when clicking outside the input box
-			}
+			if (focused) {
+				Vector2 MousePosition = new Vector2(Main.mouseX, Main.mouseY);
+				if (JustPressed(Keys.Tab) || JustPressed(Keys.Escape) || (!ContainsPoint(MousePosition) && (Main.mouseLeft || Main.mouseRight))) {
+					Unfocus(); // Unfocus search bar when pressing Tab or Esc, or when clicking outside the input box
+				}
 
-			if (JustPressed(Keys.Enter)) {
-				Main.drawingPlayerChat = false;
-				Unfocus(); // Pressing enter will also unfocus the search bar, but will also close player chat
+				if (JustPressed(Keys.Enter)) {
+					Main.drawingPlayerChat = false;
+					Unfocus(); // Pressing enter will also unfocus the search bar, but will also close player chat
+				}
 			}
 
 			base.Update(gameTime);

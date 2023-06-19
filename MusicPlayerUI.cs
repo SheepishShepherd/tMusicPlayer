@@ -384,18 +384,18 @@ namespace tMusicPlayer
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
-			if (modplayer.musicBoxesStored > 0 && recording && ListenModeData is not null && Main.rand.NextBool(540)) {
+			if (modplayer.musicBoxesStored > 0 && recording && ListenModeData is MusicData listenData && Main.rand.NextBool(540)) {
                 SoundEngine.PlaySound(SoundID.Item166);
-				if (!modplayer.BoxIsCollected(ListenModeData.MusicBox)) {
+				if (!modplayer.BoxIsCollected(listenData.MusicBox)) {
 					// If we don't have it in our music player, automatically add it in.
 					// as soon as it is recorded, the player should be able to play the music
-					modplayer.MusicBoxList.Add(new ItemDefinition(ListenModeData.MusicBox));
-					tMusicPlayer.SendDebugText($"[i:{ListenModeData.MusicBox}] [#{ListenModeData.MusicBox}] was added (via recording)", Colors.RarityGreen);
+					modplayer.MusicBoxList.Add(new ItemDefinition(listenData.MusicBox));
+					tMusicPlayer.SendDebugText($"[i:{listenData.MusicBox}] [#{listenData.MusicBox}] was added (via recording)", Colors.RarityGreen);
 				}
 				else {
 					// If we do have it already, spawn the item.
-					player.QuickSpawnItem(player.GetSource_OpenItem(ListenModeData.MusicBox), ListenModeData.MusicBox);
-					tMusicPlayer.SendDebugText($"[i:{ListenModeData.MusicBox}] [#{ListenModeData.MusicBox}] was recorded, but is already obtained.", Color.BlanchedAlmond);
+					player.QuickSpawnItem(player.GetSource_OpenItem(listenData.MusicBox), listenData.MusicBox);
+					tMusicPlayer.SendDebugText($"[i:{listenData.MusicBox}] [#{listenData.MusicBox}] was recorded, but is already obtained.", Color.BlanchedAlmond);
 				}
 
 				// Automatically turn recording off and reduce the amount of stored music boxes by 1.

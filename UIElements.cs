@@ -470,7 +470,7 @@ namespace tMusicPlayer
 		}
 
 		public override void RightClick(UIMouseEvent evt) {
-			SetText("");
+			ClearSearchText();
 		}
 
 		public void Unfocus() {

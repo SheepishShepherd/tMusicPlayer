@@ -54,7 +54,7 @@ namespace tMusicPlayer
 			Rectangle rect = GetInnerDimensions().ToRectangle();
 			
 			base.Draw(spriteBatch);
-			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer) {
+			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer && UI.VisualBoxDisplayed is not null) {
 				string Snippet(string text) => text.Length > 22 ? string.Concat(text.AsSpan(0, 22), "...") : text; // limit text size and add '...' for titles too long
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);

@@ -35,7 +35,7 @@ Mods: {
 
 				StartWithListView: {
 					Label: Selection panel defaults to list view
-					Tooltip: ""
+					Tooltip: By default, the selection panel uses grid view.
 				}
 
 				ResetPanels: {

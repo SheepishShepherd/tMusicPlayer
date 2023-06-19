@@ -632,8 +632,14 @@ namespace tMusicPlayer
 			if (Main.musicVolume <= 0f || !data.CanPlay(Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>()))
 				return;
 
-			DisplayBox = data;
-			IsPlayingMusic = true;
+			if (CurrentlyPlaying == data.MusicID) {
+				IsPlayingMusic = false; // if the music box is being played, stop it instead
+			}
+			else {
+				IsListening = false;
+				DisplayBox = data;
+				IsPlayingMusic = true;
+			}
 		}
 
 		private void ToggleButton(MusicMode type) {

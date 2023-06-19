@@ -329,7 +329,7 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			// Create the item to fill the slot
-			if (IsDisplaySlot) {
+			if (IsDisplaySlot && UI.VisualBoxDisplayed is not null) {
 				SlotItem.SetDefaults(UI.VisualBoxDisplayed.MusicBox); // set item default to the UI's visual display music box
 			}
 			else if (IsSelectionSlot) {

@@ -1,7 +1,7 @@
 Mods: {
 	tMusicPlayer: {
 		Keybinds: {
-			HidePlayer.DisplayName: Hide Music Player
+			ToggleListen.DisplayName: Toggle Listen Mode
 			PlayOrStop.DisplayName: Play/Stop Music
 			PreviousSong.DisplayName: Previous Song
 			NextSong.DisplayName: Next Song
@@ -16,9 +16,14 @@ Mods: {
 					Tooltip: While smart cursor is toggled on, most buttons display information about them.
 				}
 
-				ForceUseHotkey: {
-					Label: Hide MusicPlayer until hotkey pressed
-					Tooltip: The MusicPlayer will not show or hide unless the hotkey is pressed to toggle between the states.
+				StartHidden: {
+					Label: Music Player defaults to hidden
+					Tooltip: Use the /musicplayer modcommand to unhide it.
+				}
+
+				DisableStartHiddenPrompt: {
+					Label: Disable hidden status prompt
+					Tooltip: Disables the prompt message for hiding the Music Player when entering a world.
 				}
 
 				Headers.Defaults: Defaults Header

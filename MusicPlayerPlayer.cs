@@ -39,6 +39,9 @@ namespace tMusicPlayer
 		}
 
 		public override void OnEnterWorld() {
+			if (!tMusicPlayer.tMPConfig.DisableStartHiddenPrompt)
+				Main.NewText("Music player is hidden. To unhide it, use mod command: /musicplayer (This message can be disabled in the tMusicPlayer configs)", Color.Khaki);
+
 			if (MusicUISystem.Instance.MusicUI is MusicPlayerUI UI && tMusicPlayer.tMPConfig.StartWithSmall != UI.MiniModePlayer)
 				UI.MiniModePlayer = !UI.MiniModePlayer; // Determine if the player wants to start with the small panel or large panel
 		}

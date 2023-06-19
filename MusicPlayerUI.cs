@@ -24,6 +24,8 @@ namespace tMusicPlayer
 			set {
 				playerVisible = value;
 				this.AddOrRemoveChild(MusicPlayerPanel, value);
+				if (!value)
+					SelectionPanelVisible = false; // Selection panel is hidden if the player is hidden
 			}
 		}
 
@@ -197,8 +199,12 @@ namespace tMusicPlayer
 			MusicPlayerPanel = new BackDrop(panelPlayer) {
 				Id = "MusicPlayerPanel",
 			};
-			MusicPlayerPanel.Left.Pixels = 1115f;
-			MusicPlayerPanel.Top.Pixels = 16f;
+
+			SelectionPanel = new BackDrop(panelSelect) {
+				Id = "SelectionPanel"
+			};
+
+			ResetPanelPositionsToDefault();
 
 			prevButton = new HoverButton(buttonTextures.Value, new Point(0, 0)) {
 				Id = "prev"
@@ -260,12 +266,6 @@ namespace tMusicPlayer
 			DisplayMusicSlot.Left.Pixels = 8f;
 			DisplayMusicSlot.Top.Pixels = MusicPlayerPanel.Height.Pixels / 2f - TextureAssets.InventoryBack.Value.Height / 2;
 			MusicPlayerPanel.Append(DisplayMusicSlot);
-
-			SelectionPanel = new BackDrop(panelSelect) {
-				Id = "SelectionPanel"
-			};
-			SelectionPanel.Left.Pixels = (Main.screenWidth / 2) - SelectionPanel.Width.Pixels / 2f;
-			SelectionPanel.Top.Pixels = (Main.screenHeight / 2) - SelectionPanel.Height.Pixels / 2f;
 
 			// Positioning base for filter buttons
 			float center = (SelectionPanel.Width.Pixels / 2) - 11;
@@ -409,12 +409,18 @@ namespace tMusicPlayer
 			if (Main.gameMenu) {
 				IsListening = true;
 			}
-			else {
-				if (tMusicPlayer.HidePlayerHotkey.JustPressed) {
-					MusicPlayerVisible = !MusicPlayerVisible;
+			else if (MusicPlayerVisible) {
+				if (tMusicPlayer.ListenModeHotkey.JustPressed) {
+					IsListening = !IsListening;
 				}
 				else if (tMusicPlayer.PlayStopHotkey.JustPressed) {
-					IsPlayingMusic = !IsPlayingMusic;
+					if (IsListening) {
+						IsListening = false;
+						IsPlayingMusic = false;
+					}
+					else {
+						IsPlayingMusic = !IsPlayingMusic;
+					}
 				}
 				else if (tMusicPlayer.PrevSongHotkey.JustPressed) {
 					ChangeDisplay(false);
@@ -423,6 +429,13 @@ namespace tMusicPlayer
 					ChangeDisplay(true);
 				}
 			}
+		}
+
+		public void ResetPanelPositionsToDefault() {
+			MusicPlayerPanel.Left.Pixels = 1115f;
+			MusicPlayerPanel.Top.Pixels = 16f;
+			SelectionPanel.Left.Pixels = Main.screenWidth / 2 - SelectionPanel.Width.Pixels / 2f;
+			SelectionPanel.Top.Pixels = Main.screenHeight / 2 - SelectionPanel.Height.Pixels / 2f;
 		}
 
 		public MusicData FindNext() {

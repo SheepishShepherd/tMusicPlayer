@@ -10,7 +10,7 @@ namespace tMusicPlayer
 
 		public static TMPConfig tMPConfig;
 
-		internal static ModKeybind HidePlayerHotkey;
+		internal static ModKeybind ListenModeHotkey;
 		internal static ModKeybind PlayStopHotkey;
 		internal static ModKeybind PrevSongHotkey;
 		internal static ModKeybind NextSongHotkey;
@@ -20,7 +20,7 @@ namespace tMusicPlayer
 
 			// Setup hotkeys and the configs instance.
 			tMPConfig = ModContent.GetInstance<TMPConfig>();
-			HidePlayerHotkey = KeybindLoader.RegisterKeybind(this, "HidePlayer", Keys.Up.ToString());
+			ListenModeHotkey = KeybindLoader.RegisterKeybind(this, "ToggleListen", Keys.Up.ToString());
 			PlayStopHotkey = KeybindLoader.RegisterKeybind(this, "PlayOrStop", Keys.Down.ToString());
 			PrevSongHotkey = KeybindLoader.RegisterKeybind(this, "PreviousSong", Keys.Left.ToString());
 			NextSongHotkey = KeybindLoader.RegisterKeybind(this, "NextSong", Keys.Right.ToString());
@@ -30,7 +30,7 @@ namespace tMusicPlayer
 			instance = null;
 			tMPConfig = null;
 
-			HidePlayerHotkey = null;
+			ListenModeHotkey = null;
 			PlayStopHotkey = null;
 			PrevSongHotkey = null;
 			NextSongHotkey = null;
@@ -39,6 +39,18 @@ namespace tMusicPlayer
 		public static void SendDebugText(string message, Color color = default) {
 			if (tMPConfig.EnableDebugMode)
 				Main.NewText(message, color);
+		}
+	}
+
+	public class ToggleMusicPlayer : ModCommand {
+		public override CommandType Type => CommandType.Chat;
+
+		public override string Command => "musicplayer";
+
+		public override string Description => "Toggle the visibility of the Music Player UI";
+
+		public override void Action(CommandCaller caller, string input, string[] args) {
+			MusicUISystem.Instance.MusicUI.MusicPlayerVisible = !MusicUISystem.Instance.MusicUI.MusicPlayerVisible;
 		}
 	}
 }

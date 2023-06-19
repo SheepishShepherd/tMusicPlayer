@@ -13,9 +13,21 @@ namespace tMusicPlayer
 		[BackgroundColor(23, 25, 81)]
 		public bool EnableMoreTooltips { get; set; }
 
+		private bool HideOnStart;
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
-		public bool ForceUseHotkey { get; set; }
+		public bool StartHidden {
+			get => HideOnStart;
+			set {
+				HideOnStart = value;
+				if (!value)
+					DisableStartHiddenPrompt = false;
+			}
+		}
+
+		[DefaultValue(false)]
+		[BackgroundColor(23, 25, 81)]
+		public bool DisableStartHiddenPrompt { get; set; }
 
 		[Header("Defaults")]
 		[DefaultValue(false)]
@@ -36,11 +48,7 @@ namespace tMusicPlayer
 
 		public override void OnChanged() {
 			if (!Main.gameMenu && !Main.dedServ && ResetPanels) {
-				MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-				UI.MusicPlayerPanel.Left.Pixels = 1115f;
-				UI.MusicPlayerPanel.Top.Pixels = 16f;
-				UI.SelectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.SelectionPanel.Width.Pixels / 2f;
-				UI.SelectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.SelectionPanel.Height.Pixels / 2f;
+				MusicUISystem.Instance.MusicUI.ResetPanelPositionsToDefault();
 				ResetPanels = false;
 			}
 		}

@@ -45,11 +45,11 @@ namespace tMusicPlayer
 			
 			base.Draw(spriteBatch);
 			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer) {
-				MusicData musicRef = UI.DisplayBox;
+				string Snippet(string text) => text.Length > 22 ? string.Concat(text.AsSpan(0, 22), "...") : text; // limit text size and add '...' for titles too long
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
-				Utils.DrawBorderString(spriteBatch, musicRef.name, pos, Color.White, 0.75f);
-				pos = new Vector2(rect.X + 64, rect.Y + 30);
-				Utils.DrawBorderString(spriteBatch, musicRef.Mod_DisplayName_NoChatTags(), pos, Color.White, 0.75f);
+				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
+				pos = new Vector2(rect.X + 64, rect.Y + 28);
+				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()), pos, Color.White, 0.75f);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {

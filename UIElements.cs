@@ -353,9 +353,14 @@ namespace tMusicPlayer
 			float oldScale = Main.inventoryScale; // back up these values to change later
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
 			Main.inventoryScale = scale;
-			TextureAssets.InventoryBack2 = IsEntrySlot ? TextureAssets.InventoryBack7 : TextureAssets.InventoryBack3;
-			if (IsSelectionSlot && modplayer.BoxIsFavorited(SlotItemID)) {
-				TextureAssets.InventoryBack2 = SlotMusicData.CanPlay(modplayer) ? TextureAssets.InventoryBack6 : backup;
+			if (IsEntrySlot) {
+				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack7;
+			}
+			else if (IsDisplaySlot) {
+				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack3;
+			}
+			else {
+				TextureAssets.InventoryBack2 = SlotMusicData.CanPlay(modplayer) ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack4;
 			}
 			ItemSlot.Draw(spriteBatch, ref SlotItem, context, inner.TopLeft()); // Draw the item slot!
 			TextureAssets.InventoryBack2 = backup; // reset values

@@ -6,6 +6,7 @@ using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -593,7 +594,9 @@ namespace tMusicPlayer
 					newRow.Append(playSong);
 
 					// Song name and mod
-					UIText songName = new UIText(data.name, 0.85f);
+					UIText songName = new UIText(data.name, 0.85f) {
+						TextColor = ItemRarity.GetColor(ContentSamples.ItemsByType[boxSlot.SlotItemID].rare)
+					};
 					songName.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
 					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
 					newRow.Append(songName);

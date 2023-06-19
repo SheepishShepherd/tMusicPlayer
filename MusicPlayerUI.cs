@@ -375,32 +375,32 @@ namespace tMusicPlayer
 		}
 
 		public override void Update(GameTime gameTime) {
+			if (Main.curMusic == 0)
+				IsRecording = IsListening = IsPlayingMusic = false; // If the game's music is muted, turn off all music player functions
+
 			// This code mimics the "Music Box Recording" process.
 			// Check if we have music boxes at the ready, if the player is in record mode and music is currently playing.
 			// If all of those apply, we also go a rand check which will trigger the "recording" code.
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
-			if (modplayer.musicBoxesStored > 0 && recording && Main.curMusic > 0 && Main.rand.NextBool(540)) {
-				int index = MusicUISystem.Instance.AllMusic.FindIndex(x => x.MusicID == Main.curMusic); // Make sure curMusic is a music box.
-				if (index != -1) {
-					MusicData musicData = MusicUISystem.Instance.AllMusic[index];
-                    SoundEngine.PlaySound(SoundID.Item166);
-					if (!modplayer.BoxIsCollected(musicData.MusicBox)) {
-						// If we don't have it in our music player, automatically add it in.
-						// as soon as it is recorded, the player should be able to play the music
-						modplayer.MusicBoxList.Add(new ItemDefinition(musicData.MusicBox));
-					}
-					else {
-						// If we do have it already, spawn the item.
-						player.QuickSpawnItem(player.GetSource_OpenItem(musicData.MusicBox), musicData.MusicBox);
-					}
-					tMusicPlayer.SendDebugText($"Music Box ({musicData.name}) obtained!", Color.BlanchedAlmond);
-
-					// Automatically turn recording off and reduce the amount of stored music boxes by 1.
-					IsRecording = false;
-					modplayer.musicBoxesStored--;
+			if (modplayer.musicBoxesStored > 0 && recording && ListenModeData is not null && Main.rand.NextBool(540)) {
+                SoundEngine.PlaySound(SoundID.Item166);
+				if (!modplayer.BoxIsCollected(ListenModeData.MusicBox)) {
+					// If we don't have it in our music player, automatically add it in.
+					// as soon as it is recorded, the player should be able to play the music
+					modplayer.MusicBoxList.Add(new ItemDefinition(ListenModeData.MusicBox));
+					tMusicPlayer.SendDebugText($"[i:{ListenModeData.MusicBox}] [#{ListenModeData.MusicBox}] was added (via recording)", Colors.RarityGreen);
 				}
+				else {
+					// If we do have it already, spawn the item.
+					player.QuickSpawnItem(player.GetSource_OpenItem(ListenModeData.MusicBox), ListenModeData.MusicBox);
+					tMusicPlayer.SendDebugText($"[i:{ListenModeData.MusicBox}] [#{ListenModeData.MusicBox}] was recorded, but is already obtained.", Color.BlanchedAlmond);
+				}
+
+				// Automatically turn recording off and reduce the amount of stored music boxes by 1.
+				IsRecording = false;
+				modplayer.musicBoxesStored--;
 			}
 
 			base.Update(gameTime);

@@ -92,6 +92,7 @@ namespace tMusicPlayer
 		private bool listening = true;
 		private bool recording = false;
 		private bool smallPanel = true;
+		private bool viewMode = false;
 
 		public bool MiniModePlayer {
 			get => smallPanel;
@@ -171,7 +172,16 @@ namespace tMusicPlayer
 			}
 		}
 
-		internal bool viewMode = false;
+		internal bool IsGridMode => viewMode == false;
+		internal bool IsListMode => viewMode == true;
+		internal bool ViewMode {
+			get => viewMode;
+			set {
+				viewMode = value;
+				OrganizeSelection();
+			}
+		}
+
 		internal bool viewFavs = false;
 
 		// Selection Panel content and functionality
@@ -333,7 +343,7 @@ namespace tMusicPlayer
 			};
 			viewModeButton.Left.Pixels = SelectionPanel.Width.Pixels - closeButton.Width.Pixels - 13f;
 			viewModeButton.Top.Pixels = closeButton.Top.Pixels + closeButton.Height.Pixels + 4f;
-			viewModeButton.OnLeftClick += (a, b) => UpdateViewMode();
+			viewModeButton.OnLeftClick += (a, b) => ViewMode = !ViewMode;
 			SelectionPanel.Append(viewModeButton);
 
 			searchBar = new SearchBar("Search...", "");
@@ -514,11 +524,6 @@ namespace tMusicPlayer
 			return FilterMod;
 		}
 
-		internal void UpdateViewMode() {
-			viewMode = !viewMode;
-			OrganizeSelection();
-		}
-
 		internal void EjectBox(bool ejectAll) {
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
@@ -587,7 +592,7 @@ namespace tMusicPlayer
 
 				MusicBoxSlot boxSlot = SelectionSlots[slotCount];
 
-				if (viewMode) {
+				if (IsListMode) {
 					newRow = new ItemSlotRow(slotCount);
 
 					// Item Slot

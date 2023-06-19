@@ -210,7 +210,7 @@ namespace tMusicPlayer
                 "listen" => UI.IsListening ? 24 : 0,
 				"play" => UI.IsPlayingMusic ? 24 : 0,
 				"record" => !UI.IsRecording ? 24 : 0,
-                "viewmode" => !UI.viewMode ? 24 : 0,
+                "viewmode" => UI.IsGridMode ? 24 : 0,
                 _ => 0,
             };
         }
@@ -237,7 +237,7 @@ namespace tMusicPlayer
                 "sortbyname" => "Sort by name",
                 "filtermod" => $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}",
                 "clearfiltermod" => "Clear mod filter",
-                "viewmode" => UI.viewMode ? "Change to Grid mode" : "Change to List mode",
+                "viewmode" => UI.IsListMode ? "Change to Grid mode" : "Change to List mode",
 				"ejectMusicBoxes" =>
 					"Stored music boxes can record songs if recording is enabled\n" +
 					"Up to 20 music boxes can be held at once\n" +
@@ -322,7 +322,7 @@ namespace tMusicPlayer
 
 		public override void RightClick(UIMouseEvent evt) {
 			if (IsSelectionSlot) {
-				if (!UI.viewMode)
+				if (UI.IsGridMode)
 					UI.UpdateMusicPlayedViaSelectionMenu(SlotMusicData); // Right-clicking a slot in grid view will play that music
 			}
 		}

@@ -254,7 +254,7 @@ namespace tMusicPlayer
 	}
 
 	internal class ItemSlotRow : MusicPlayerElement {
-		private int order;
+		private readonly int order;
 
 		public ItemSlotRow(int order) {
 			this.order = order;

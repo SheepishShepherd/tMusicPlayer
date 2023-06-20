@@ -508,7 +508,7 @@ namespace tMusicPlayer
 				FilterMod = ModList[0];
 			}
 			else if (!next && indexOfCurrent == 0) {
-				FilterMod = ModList[ModList.Count - 1];
+				FilterMod = ModList[^1];
 			}
 			else {
 				int nextOrPrev = next ? 1 : -1;

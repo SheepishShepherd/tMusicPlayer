@@ -14,7 +14,7 @@ namespace tMusicPlayer
 		public bool EnableMoreTooltips { get; set; }
 
 		private bool HideOnStart;
-		[DefaultValue(false)]
+		[DefaultValue(true)]
 		[BackgroundColor(23, 25, 81)]
 		public bool StartHidden {
 			get => HideOnStart;
@@ -25,9 +25,16 @@ namespace tMusicPlayer
 			}
 		}
 
+		private bool PromptOnStart;
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
-		public bool DisableStartHiddenPrompt { get; set; }
+		public bool DisableStartHiddenPrompt { 
+			get => PromptOnStart;
+			set {
+				if (StartHidden || !value)
+					PromptOnStart = value;
+			}
+		}
 
 		[Header("Defaults")]
 		[DefaultValue(false)]

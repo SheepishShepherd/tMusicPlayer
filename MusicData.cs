@@ -19,9 +19,9 @@ namespace tMusicPlayer
 		internal string Mod { get; init; }
 
 		/// <summary> The name provided to the music box. </summary>
-		internal LocalizedText name;
+		internal LocalizedText LocalizedName;
 
-		internal string Name => name.Value.Contains('(') ? name.Value.Substring(name.Value.IndexOf("(") + 1).Replace(")", "") : name.Value;
+		internal string Name => LocalizedName.Value.Contains('(') ? LocalizedName.Value.Substring(LocalizedName.Value.IndexOf("(") + 1).Replace(")", "") : LocalizedName.Value;
 
 		/// <summary> If applicable, the name of the composer that made this music. </summary>
 		internal string composer;
@@ -66,6 +66,16 @@ namespace tMusicPlayer
 
 		public override string ToString() => $"[i:{MusicBox}] [{Mod}] {Name}{(string.IsNullOrEmpty(composer) ? " " : $" by {composer} ")}(MusicID: #{MusicID})";
 
+		// Unknown method; used as a substitute for music without assigned music boxes
+		internal MusicData() {
+			this.MusicID = -1;
+			this.OutputValue = -1;
+			this.MusicBox = ItemID.MusicBox;
+
+			this.Mod = "???";
+			this.LocalizedName = Language.GetText("Mods.tMusicPlayer.MusicData.UnknownBox");
+		}
+
 		// Vanilla method
 		internal MusicData(int music, int musicbox, int mainMusicBox2) {
 			this.MusicID = music;
@@ -73,7 +83,7 @@ namespace tMusicPlayer
 			this.MusicBox = musicbox;
 
 			this.Mod = music >= 58 && music <= 84 ? "Terraria Otherworld" : "Terraria";
-			this.name = Lang.GetItemName(musicbox);
+			this.LocalizedName = Lang.GetItemName(musicbox);
 		}
 
 		// Mod method
@@ -83,7 +93,7 @@ namespace tMusicPlayer
 			this.MusicBox = musicbox;
 
 			this.Mod = mod;
-			this.name = name;
+			this.LocalizedName = name;
 		}
 	}
 }

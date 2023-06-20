@@ -84,7 +84,7 @@ namespace tMusicPlayer
 		public MusicData DisplayBox = null;
 
 		/// <summary> The MusicData from the natural music being played with <see cref="Main.curMusic"/>. </summary>
-		public MusicData ListenModeData => MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == Main.curMusic);
+		public MusicData ListenModeData => MusicUISystem.Instance.AllMusic.Find(data => data.MusicID == Main.curMusic) is MusicData data ? data : MusicUISystem.Instance.UnknownMusic;
 
 		public MusicData VisualBoxDisplayed => IsListening ? ListenModeData : DisplayBox;
 

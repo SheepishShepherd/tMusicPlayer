@@ -18,6 +18,7 @@ namespace tMusicPlayer
 		internal UserInterface MP_UserInterface;
 		internal MusicPlayerUI MusicUI;
 
+		internal MusicData UnknownMusic;
 		internal List<MusicData> AllMusic;
 		public Dictionary<int, int> itemToMusicReference;
 		internal Dictionary<string, List<int>> RegisteredMusic;
@@ -38,6 +39,8 @@ namespace tMusicPlayer
 			// This grabs the entire dictionary of MODDED music-to-musicbox correlations. Code provided by Jopojelly. Thank you, Jopo!
 			FieldInfo itemToMusicField = typeof(MusicLoader).GetField("itemToMusic", BindingFlags.Static | BindingFlags.NonPublic);
 			itemToMusicReference = (Dictionary<int, int>)itemToMusicField.GetValue(null);
+
+			UnknownMusic = new MusicData();
 
 			// A list that contains all the MusicData we need, including mod and name.
 			AllMusic = new List<MusicData> {

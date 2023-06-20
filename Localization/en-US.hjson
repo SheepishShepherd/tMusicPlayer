@@ -50,6 +50,8 @@ Mods: {
 			}
 		}
 
+		MusicData.UnknownBox: No assigned music box
+
 		HoverButton: {
 			Enable: Enable
 			Disable: Disable

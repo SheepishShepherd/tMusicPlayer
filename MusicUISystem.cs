@@ -151,7 +151,7 @@ namespace tMusicPlayer
 				MP_UserInterface?.Update(gameTime);
 		}
 
-		public override void PostAddRecipes() {
+		public override void PostSetupContent() {
 			if (itemToMusicReference != null) {
 				// Go through each key in the Modded MusicBox dictionary and attempt to add them to MusicData.
 				foreach (KeyValuePair<int, int> music in itemToMusicReference) {

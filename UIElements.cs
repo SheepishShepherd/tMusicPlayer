@@ -326,10 +326,8 @@ namespace tMusicPlayer
 		}
 
 		public override void RightClick(UIMouseEvent evt) {
-			if (IsSelectionSlot) {
-				if (UI.IsGridMode)
-					UI.UpdateMusicPlayedViaSelectionMenu(SlotMusicData); // Right-clicking a slot in grid view will play that music
-			}
+			if (IsSelectionSlot && UI.IsGridMode)
+				UI.UpdateMusicPlayedViaSelectionMenu(SlotMusicData); // Right-clicking a slot in grid view will play that music
 		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
@@ -426,21 +424,19 @@ namespace tMusicPlayer
 							Main.playerInventory = true; // when removing a music box, the inventory should be open
 							LocalModPlayer.MusicBoxList.RemoveAll(x => x.Type == SlotItemID);
 							tMusicPlayer.SendDebugText(SlotItemID, "Removed", "Via.SelectionPanel", Color.LightCoral);
-							if (!LocalModPlayer.BoxResearched(SlotItemID)) {
+							if (UI.DisplayBox.MusicBox == SlotItemID && !LocalModPlayer.BoxResearched(SlotItemID)) {
 								// only change display box if the music box is not already researched
-								if (UI.DisplayBox.MusicBox == SlotItemID) {
-									if (UI.FindPrev() is MusicData prev) {
-										UI.DisplayBox = prev;
-										UI.IsPlayingMusic = false;
-									}
-									else if (UI.FindNext() is MusicData next) {
-										UI.DisplayBox = next;
-										UI.IsPlayingMusic = false;
-									}
-									else {
-										UI.IsPlayingMusic = false;
-										UI.IsListening = true;
-									}
+								if (UI.FindPrev() is MusicData prev) {
+									UI.DisplayBox = prev;
+									UI.IsPlayingMusic = false;
+								}
+								else if (UI.FindNext() is MusicData next) {
+									UI.DisplayBox = next;
+									UI.IsPlayingMusic = false;
+								}
+								else {
+									UI.IsPlayingMusic = false;
+									UI.IsListening = true;
 								}
 							}
 						}
@@ -536,18 +532,16 @@ namespace tMusicPlayer
 				PlayerInput.WritingText = true;
 				Main.instance.HandleIME();
 				string newString = Main.GetInputText(currentString).ToLower();
-				if (FontAssets.MouseText.Value.MeasureString(newString).X < Width.Pixels - 10f) {
-					if (!newString.Equals(currentString)) {
-						// Check for a music box that contains the searchbar text within its name.
-						// This will stop the user from typing a name that doesn't exist preventing a hard-lock.
-						// If there is an existing music box name with the new text, update the search filter selection to reflect it
-						List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.Name.ToLower().Contains(newString)).ToList();
-						if (searchedData.Count > 0) {
-							currentString = newString;
-							MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-							UI.SortedMusicData = searchedData;
-							UI.OrganizeSelection();
-						}
+				if (!newString.Equals(currentString) && FontAssets.MouseText.Value.MeasureString(newString).X < Width.Pixels - 10f) {
+					// Check for a music box that contains the searchbar text within its name.
+					// This will stop the user from typing a name that doesn't exist preventing a hard-lock.
+					// If there is an existing music box name with the new text, update the search filter selection to reflect it
+					List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.Name.ToLower().Contains(newString)).ToList();
+					if (searchedData.Count > 0) {
+						currentString = newString;
+						MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
+						UI.SortedMusicData = searchedData;
+						UI.OrganizeSelection();
 					}
 				}
 

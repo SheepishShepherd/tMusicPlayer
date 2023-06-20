@@ -13,6 +13,7 @@ using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -153,6 +154,7 @@ namespace tMusicPlayer
 
 		internal Texture2D texture;
 		internal Rectangle src;
+		private const string LangButton = "Mods.tMusicPlayer.HoverButton";
 
 		public HoverButton(Texture2D texture, Point coord) {
 			this.texture = texture;
@@ -216,31 +218,36 @@ namespace tMusicPlayer
 		public string SetHoverItemName(string ID) {
 			if (Id == "availability") {
 				return UI.availabililty switch {
-					ProgressBy.Obtained => "Showing obtained music boxes",
-					ProgressBy.Unobtained => "Showing unobtained music boxes",
-					_ => "No availability filter"
+					ProgressBy.Obtained => Language.GetTextValue(LangButton + ".Obtained"),
+					ProgressBy.Unobtained => Language.GetTextValue(LangButton + ".Unobtained"),
+					_ => Language.GetTextValue(LangButton + ".NoFilter")
 				};
+			}
+			else if (Id == "filtermod") {
+				if (string.IsNullOrEmpty(UI.FilterMod)) {
+					return Language.GetTextValue(LangButton + ".FilterMod");
+				}
+				else {
+					return MusicUISystem.Instance.AllMusic.Find(data => data.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags();
+				}
 			}
 
             return ID switch {
-                "expand" => UI.MiniModePlayer ? "Maximize" : "Minimize",
-                "play" => UI.IsPlayingMusic ? "Stop" : "Play",
-                "listen" => $"{(UI.IsListening ? "Disable" : "Enable")} Listening",
-				"record" => $"{(UI.IsRecording ? "Disable" : "Enable")} Recording",
-                "prev" => "Previous Song",
-                "next" => "Next Song",
-                "view" => $"{(UI.SelectionPanelVisible ? "Close" : "Open")} Selection List",
-				"showFavorites" => "Show favorited music",
-				"sortbyid" => "Sort by ID",
-                "sortbyname" => "Sort by name",
-                "filtermod" => UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}",
-                "clearfiltermod" => "Clear mod filter",
-                "viewmode" => $"Change to {(UI.IsListMode ? "Grid" : "List")} view",
-				"ejectMusicBoxes" =>
-					"Stored music boxes can record songs if recording is enabled\n" +
-					"Up to 20 music boxes can be held at once\n" +
-					"Left-click to eject one music box into your inventory\n" +
-					"Right click to place all of your stored music boxes in your inventory",
+				"expand" => Language.GetTextValue(LangButton + (UI.MiniModePlayer ? ".Max" : ".Min")),
+				"play" => Language.GetTextValue(LangButton + (UI.IsPlayingMusic ? ".Stop" : ".Play")),
+				"altplay" => Language.GetTextValue(LangButton + (UI.CurrentlyPlaying == MusicUISystem.Instance.AllMusic[refNum].MusicID ? ".Stop" : ".Play")),
+				"listen" => Language.GetTextValue(LangButton + ".Listen", Language.GetTextValue(LangButton + (UI.IsListening ? ".Disable" : ".Enable"))),
+				"record" => Language.GetTextValue(LangButton + ".Record", Language.GetTextValue(LangButton + (UI.IsRecording ? ".Disable" : ".Enable"))),
+				"prev" => Language.GetTextValue(LangButton + ".Prev"),
+				"next" => Language.GetTextValue(LangButton + ".Next"),
+				"view" => Language.GetTextValue(LangButton + ".Selection", Language.GetTextValue(LangButton + (UI.SelectionPanelVisible ? ".Close" : ".Open"))),
+				"select_close" => Language.GetTextValue(LangButton + ".Selection", Language.GetTextValue(LangButton + ".Close")),
+				"showFavorites" => Language.GetTextValue(LangButton + (UI.viewFavs ? ".All" : ".Fav")),
+				"sortbyid" => Language.GetTextValue(LangButton + ".SortID"),
+				"sortbyname" => Language.GetTextValue(LangButton + ".SortName"),
+				"clearfiltermod" => Language.GetTextValue(LangButton + ".ClearMod"),
+				"viewmode" => Language.GetTextValue(LangButton + ".ViewMode", Language.GetTextValue(LangButton + (UI.ViewMode ? ".Grid" : ".List")).ToLower()),
+				"ejectMusicBoxes" => Language.GetTextValue(LangButton + ".Eject"),
                 _ => ""
             };
         }
@@ -395,7 +402,7 @@ namespace tMusicPlayer
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				// Hover Text Handling
 				if (IsEntrySlot && tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
-					MusicUISystem.Instance.UIHoverText = "Insert a music box you do not already own!";
+					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
 				}
 				else if (IsDisplaySlot && UI.MiniModePlayer) {
 					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed.name}\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";

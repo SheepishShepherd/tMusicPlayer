@@ -50,6 +50,44 @@ Mods: {
 			}
 		}
 
+		HoverButton: {
+			Enable: Enable
+			Disable: Disable
+			Close: Close
+			Open: Open
+			Grid: Grid
+			List: List
+			Max: Maximize
+			Min: Minimize
+			Play: Play
+			Stop: Stop
+			Listen: "{0} listening"
+			Record: "{0} recording"
+			Selection: "{0} selection list"
+			ViewMode: Change to {0} view
+			Prev: Previous song
+			Next: Next song
+			Fav: Show favorited music
+			All: Show all music
+			SortID: Sort by ID
+			SortName: Sort by name
+			FilterMod: Filter by mod
+			ClearMod: Clear mod filter
+			Obtained: Showing obtained music boxes
+			Unobtained: Showing unobtained music boxes
+			NoFilter: No availability filter
+			EntrySlot:
+				'''
+				Insert a music box you do not already own
+				or store up to 20 empty music boxes to record music
+				'''
+			Eject:
+				'''
+				Left-click to eject one music box into your inventory
+				Right-click to place all of your stored music boxes in your inventory
+				'''
+		}
+
 		DebugMessages: {
 			EntryState: "[i:{0}] [#{0}] was {1} ({2})"
 			Added: added

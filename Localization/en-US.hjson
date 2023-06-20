@@ -49,5 +49,20 @@ Mods: {
 				}
 			}
 		}
+
+		DebugMessages: {
+			EntryState: "[i:{0}] [#{0}] was {1} ({2})"
+			Added: added
+			Removed: removed
+			Recorded: recorded
+
+			Via: {
+				EntrySlot: via entry slot
+				Recording: via recording
+				SelectionPanel: via selection panel
+				ShiftClick: via shift-click from inventory
+				NotAccepted: but is already obtained
+			}
+		}
 	}
 }

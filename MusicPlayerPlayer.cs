@@ -77,7 +77,7 @@ namespace tMusicPlayer
 					MusicBoxList.Add(new ItemDefinition(type));
 					inventory[slot].TurnToAir();
 					SoundEngine.PlaySound(SoundID.Grab);
-					tMusicPlayer.SendDebugText($"[i:{type}] [#{type}] was added (via shift-click)", Colors.RarityGreen);
+					tMusicPlayer.SendDebugText(type, "Added", "Via.ShiftClick", Colors.RarityGreen);
 					return true;
 				}
 			}

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace tMusicPlayer
@@ -36,9 +37,11 @@ namespace tMusicPlayer
 			NextSongHotkey = null;
 		}
 
-		public static void SendDebugText(string message, Color color = default) {
+		public static void SendDebugText(int itemID, string status, string via, Color color) {
+			string LangDebug = "Mods.tMusicPlayer.DebugMessages";
+			string GetLang(string endKey) => Language.GetTextValue(LangDebug + "." + endKey);
 			if (tMPConfig.EnableDebugMode)
-				Main.NewText(message, color);
+				Main.NewText(Language.GetTextValue(LangDebug + ".EntryState", itemID, GetLang(status), GetLang(via)), color);
 		}
 	}
 

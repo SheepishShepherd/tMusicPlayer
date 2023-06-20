@@ -223,19 +223,19 @@ namespace tMusicPlayer
 			}
 
             return ID switch {
-                "expand" => (UI.MiniModePlayer ? "Maximize" : "Minimize") ?? "",
-                "play" => (UI.IsPlayingMusic ? "Stop" : "Play") ?? "",
-                "listen" => (UI.IsPlayingMusic ? "Stop" : "Play") ?? "",
-                "record" => (UI.IsListening ? "Disable" : "Enable") + " Listening",
+                "expand" => UI.MiniModePlayer ? "Maximize" : "Minimize",
+                "play" => UI.IsPlayingMusic ? "Stop" : "Play",
+                "listen" => $"{(UI.IsListening ? "Disable" : "Enable")} Listening",
+				"record" => $"{(UI.IsRecording ? "Disable" : "Enable")} Recording",
                 "prev" => "Previous Song",
                 "next" => "Next Song",
-                "view" => (UI.SelectionPanelVisible ? "Close" : "Open") + " Selection List",
+                "view" => $"{(UI.SelectionPanelVisible ? "Close" : "Open")} Selection List",
 				"showFavorites" => "Show favorited music",
 				"sortbyid" => "Sort by ID",
                 "sortbyname" => "Sort by name",
-                "filtermod" => $"{(UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}")}",
+                "filtermod" => UI.FilterMod == "" ? "Filter by Mod" : $"{UI.FilterMod}",
                 "clearfiltermod" => "Clear mod filter",
-                "viewmode" => UI.IsListMode ? "Change to Grid mode" : "Change to List mode",
+                "viewmode" => $"Change to {(UI.IsListMode ? "Grid" : "List")} view",
 				"ejectMusicBoxes" =>
 					"Stored music boxes can record songs if recording is enabled\n" +
 					"Up to 20 music boxes can be held at once\n" +
@@ -336,7 +336,7 @@ namespace tMusicPlayer
 			else if (IsEntrySlot && !SlotItem.IsAir) {
 				if (SlotItem.type != ItemID.MusicBox) {
 					LocalModPlayer.MusicBoxList.Add(new ItemDefinition(SlotItem.type));
-					tMusicPlayer.SendDebugText($"[i:{SlotItem.type}] [#{SlotItem.type}] was added (via entry slot)", Colors.RarityGreen);
+					tMusicPlayer.SendDebugText(SlotItem.type, "Added", "Via.EntrySlot", Colors.RarityGreen);
 				}
 				else if (LocalModPlayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes) {
 					LocalModPlayer.musicBoxesStored++;
@@ -413,12 +413,12 @@ namespace tMusicPlayer
 					if (IsSelectionSlot) {
 						if (SlotItem.type == SlotItemID && !LocalModPlayer.BoxIsCollected(SlotItemID)) {
 							LocalModPlayer.MusicBoxList.Add(new ItemDefinition(SlotItemID));
-							tMusicPlayer.SendDebugText($"[i:{SlotItemID}] [#{SlotItemID}] was added (via selection panel)", Colors.RarityGreen);
+							tMusicPlayer.SendDebugText(SlotItemID, "Added", "Via.SelectionPanel", Colors.RarityGreen);
 						}
 						else if (SlotItem.IsAir && LocalModPlayer.BoxIsCollected(SlotItemID)) {
 							Main.playerInventory = true; // when removing a music box, the inventory should be open
 							LocalModPlayer.MusicBoxList.RemoveAll(x => x.Type == SlotItemID);
-							tMusicPlayer.SendDebugText($"[i:{SlotItemID}] [#{SlotItemID}] was removed (via selection panel)", Color.LightCoral);
+							tMusicPlayer.SendDebugText(SlotItemID, "Removed", "Via.SelectionPanel", Color.LightCoral);
 							if (!LocalModPlayer.BoxResearched(SlotItemID)) {
 								// only change display box if the music box is not already researched
 								if (UI.DisplayBox.MusicBox == SlotItemID) {

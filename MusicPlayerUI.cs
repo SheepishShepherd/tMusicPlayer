@@ -318,7 +318,7 @@ namespace tMusicPlayer
 			};
 			clearFilterModButton.Left.Pixels = center + 20 + 8 - 4;
 			clearFilterModButton.Top.Pixels = 42;
-			clearFilterModButton.OnLeftClick += (a, b) => OrganizeSelection(filterMod: ResetModFilter());
+			clearFilterModButton.OnLeftClick += (a, b) => OrganizeSelection(filterMod: "");
 			SelectionPanel.Append(clearFilterModButton);
 
 			availabilityButton = new HoverButton(buttonTextures.Value, new Point(4, 2)) {
@@ -401,12 +401,12 @@ namespace tMusicPlayer
 					// If we don't have it in our music player, automatically add it in.
 					// as soon as it is recorded, the player should be able to play the music
 					modplayer.MusicBoxList.Add(new ItemDefinition(listenData.MusicBox));
-					tMusicPlayer.SendDebugText($"[i:{listenData.MusicBox}] [#{listenData.MusicBox}] was added (via recording)", Colors.RarityGreen);
+					tMusicPlayer.SendDebugText(listenData.MusicBox, "Added", "Via.Recording", Colors.RarityGreen);
 				}
 				else {
 					// If we do have it already, spawn the item.
 					player.QuickSpawnItem(player.GetSource_OpenItem(listenData.MusicBox), listenData.MusicBox);
-					tMusicPlayer.SendDebugText($"[i:{listenData.MusicBox}] [#{listenData.MusicBox}] was recorded, but is already obtained.", Color.BlanchedAlmond);
+					tMusicPlayer.SendDebugText(listenData.MusicBox, "Recorded", "Via.NotAccepted", Color.BlanchedAlmond);
 				}
 
 				// Automatically turn recording off and reduce the amount of stored music boxes by 1.
@@ -493,12 +493,6 @@ namespace tMusicPlayer
 				DisplayBox = newMusic;
 		}
 
-		internal string ResetModFilter() {
-			FilterMod = "";
-			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
-			return FilterMod;
-		}
-
 		internal ProgressBy UpdateAvailabilityFilter(bool next) {
 			return availabililty switch {
 				ProgressBy.None => next ? ProgressBy.Obtained : ProgressBy.Unobtained,
@@ -520,7 +514,6 @@ namespace tMusicPlayer
 				int nextOrPrev = next ? 1 : -1;
 				FilterMod = ModList[indexOfCurrent + nextOrPrev];
 			}
-			tMusicPlayer.SendDebugText($"FilterMod: " + FilterMod);
 			return FilterMod;
 		}
 
@@ -558,7 +551,7 @@ namespace tMusicPlayer
 				if (progressBy.HasValue)
 					availabililty = progressBy.Value;
 
-				if (!string.IsNullOrEmpty(filterMod))
+				if (filterMod is not null)
 					FilterMod = filterMod;
 
 				if (clickedFavorites)
@@ -660,13 +653,6 @@ namespace tMusicPlayer
 				IsListening = false;
 				DisplayBox = data;
 				IsPlayingMusic = true;
-			}
-		}
-
-		private void ToggleButton(MusicMode type) {
-			if (tMusicPlayer.tMPConfig.EnableDebugMode) {
-				string GetHex(bool condition) => condition ? Utils.Hex3(Color.ForestGreen) : Utils.Hex3(Color.IndianRed);
-				tMusicPlayer.SendDebugText($"[c/{GetHex(IsPlayingMusic)}:Playing] - [c/{GetHex(IsListening)}:Listening] - [c/{GetHex(IsRecording)}:Recording]");
 			}
 		}
 	}

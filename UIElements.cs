@@ -102,9 +102,9 @@ namespace tMusicPlayer
 
 		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
-			if (IsMouseHovering) {
+			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface)
 				PlayerInput.LockVanillaMouseScroll("tMusicPlayer panel");
-			}
+
 			if (dragging) {
 				Left.Set(Main.mouseX - offset.X, 0f);
 				Top.Set(Main.mouseY - offset.Y, 0f);

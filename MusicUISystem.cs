@@ -171,19 +171,17 @@ namespace tMusicPlayer
 			}
 
 			// Setup UI's item slot count.
-			MusicPlayerUI UI = Instance.MusicUI;
-
-			if (UI.sortType == SortBy.ID) {
+			if (MusicUI.sortType == SortBy.ID) {
 				AllMusic = AllMusic.OrderBy(x => x.MusicID).ToList();
 			}
-			if (UI.sortType == SortBy.Name) {
+			if (MusicUI.sortType == SortBy.Name) {
 				AllMusic = AllMusic.OrderBy(x => x.Name).ToList();
 			}
-				
-			UI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
-			UI.SortedMusicData = new List<MusicData>(AllMusic);
-			UI.OrganizeSelection(initializing: true);
-			UI.DisplayBox = UI.SortedMusicData[0]; // defaults to first music box
+
+			MusicUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
+			MusicUI.SortedMusicData = new List<MusicData>(AllMusic);
+			MusicUI.OrganizeSelection(initializing: true);
+			MusicUI.DisplayBox = MusicUI.SortedMusicData[0]; // defaults to first music box
 
 			// Setup the mod list for the Mod Filter
 			// Must occur after all other modded music is established
@@ -191,12 +189,12 @@ namespace tMusicPlayer
 				{ "Terraria", new List<int>() },
 				{ "Terraria Otherworld", new List<int>() }
 			};
-			foreach (MusicData box in UI.SortedMusicData) {
+			foreach (MusicData box in MusicUI.SortedMusicData) {
 				RegisteredMusic.TryAdd(box.Mod, new List<int>());
 				RegisteredMusic[box.Mod].Add(box.MusicID);
 			}
 
-			UI.ModList = RegisteredMusic.Keys.ToList();
+			MusicUI.ModList = RegisteredMusic.Keys.ToList();
 		}
 
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
@@ -206,9 +204,9 @@ namespace tMusicPlayer
 				layers.Insert(index, new LegacyGameInterfaceLayer(
 					"tMusicPlayer: Music Player",
 					delegate {
-						if (MusicUI.MusicPlayerVisible) {
+						if (MusicUI.MusicPlayerVisible)
 							MP_UserInterface.Draw(Main.spriteBatch, new GameTime());
-						}
+
 						return true;
 					},
 					InterfaceScaleType.UI)
@@ -217,11 +215,10 @@ namespace tMusicPlayer
 				layers.Insert(++index, new LegacyGameInterfaceLayer(
 					"tMusicPlayer: Custom UI Hover Text",
 					delegate {
-						// Detect if the hover text is a single localization key and draw the hover text accordingly
 						if (!string.IsNullOrEmpty(UIHoverText))
 							DrawTooltipBackground(Language.GetTextValue(UIHoverText), UIHoverTextColor);
-						// Reset text and color back to default state
-						UIHoverText = "";
+
+						UIHoverText = ""; // Reset text and color back to default state
 						UIHoverTextColor = Main.MouseTextColorReal;
 						return true;
 					},

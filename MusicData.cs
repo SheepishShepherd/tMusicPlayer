@@ -19,12 +19,9 @@ namespace tMusicPlayer
 		internal string Mod { get; init; }
 
 		/// <summary> The name provided to the music box. </summary>
-		internal LocalizedText LocalizedName;
+		internal LocalizedText LocalizedName { get; init; }
 
 		internal string Name => LocalizedName.Value.Contains('(') ? LocalizedName.Value.Substring(LocalizedName.Value.IndexOf("(") + 1).Replace(")", "") : LocalizedName.Value;
-
-		/// <summary> If applicable, the name of the composer that made this music. </summary>
-		internal string composer;
 
 		/// <summary> Determines if the Music Player is able to play this music. </summary>
 		internal bool CanPlay(MusicPlayerPlayer modplayer) => modplayer.BoxIsCollected(MusicBox) || modplayer.BoxResearched(MusicBox);
@@ -64,7 +61,7 @@ namespace tMusicPlayer
 			return editedName;
 		}
 
-		public override string ToString() => $"[i:{MusicBox}] [{Mod}] {Name}{(string.IsNullOrEmpty(composer) ? " " : $" by {composer} ")}(MusicID: #{MusicID})";
+		public override string ToString() => $"[#{MusicID}] [i:{MusicBox}] [{Mod}] {Name}";
 
 		// Unknown method; used as a substitute for music without assigned music boxes
 		internal MusicData() {

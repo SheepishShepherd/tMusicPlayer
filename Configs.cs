@@ -45,9 +45,13 @@ namespace tMusicPlayer
 		[BackgroundColor(23, 25, 81)]
 		public bool StartWithListView { get; set; }
 
+		private bool ResetPosition;
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
-		public bool ResetPanels { get; set; }
+		public bool ResetPanels {
+			get => ResetPosition;
+			set => ResetPosition = !Main.gameMenu && value; // do not allow change if not in a world
+		}
 
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]

@@ -53,6 +53,19 @@ namespace tMusicPlayer
 		public static Asset<Texture2D> panelMini;
 		public static Asset<Texture2D> panelSelect;
 
+		/// <summary>
+		/// Similarly to <see cref="Main.invBottom"/>, this is the X value of the inventory's right most position.
+		/// <list type="bullet">
+		/// <item> 497f -> The X value of the first ammo inventory slot. </item>
+		/// <item> 52f -> The width of the inventory slot texture. </item>
+		/// <item> 4f -> The offset between drawn slots. </item>
+		/// <item> 2 -> Two inventory slots accounted for (1 coin slot and 1 ammo slot). </item>
+		/// <item> 4f -> An additional offset to separate from the final slot. </item>
+		/// <item> 0.6f -> The inventoryScale value when these inventory slots are drawn. </item>
+		/// </list>
+		/// </summary>
+		const int invRight = (int)(497f + ((52f + 4f) * 2 + 4f) * 0.6f);
+
 		// Musicplayer buttons
 		public HoverButton prevButton;
 		public HoverButton playButton;
@@ -442,10 +455,9 @@ namespace tMusicPlayer
 		}
 
 		public void ResetPanelPositionsToDefault() {
-			MusicPlayerPanel.Left.Pixels = 1115f;
-			MusicPlayerPanel.Top.Pixels = 16f;
-			SelectionPanel.Left.Pixels = Main.screenWidth / 2 - SelectionPanel.Width.Pixels / 2f;
-			SelectionPanel.Top.Pixels = Main.screenHeight / 2 - SelectionPanel.Height.Pixels / 2f;
+			MusicPlayerPanel.Left.Pixels = SelectionPanel.Left.Pixels = invRight + 12f;
+			MusicPlayerPanel.Top.Pixels = 20f; // 20f is what is used for the first inventory slot's Y position
+			SelectionPanel.Top.Pixels = 20f + MusicPlayerPanel.Height.Pixels + 12f;
 		}
 
 		public MusicData FindNext() {

@@ -173,12 +173,10 @@ namespace tMusicPlayer
 
 		public override void Draw(SpriteBatch spriteBatch) {
 			bool hovering = ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface;
-
 			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (hovering && !Disabled()) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			spriteBatch.Draw(texture, Inner, push, Disabled() ? new Color(60, 60, 60, 60) : Color.White);
 
 			if (hovering) {
-				LocalPlayer.mouseInterface = true;
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !Disabled()) {
 					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);
 				}
@@ -395,8 +393,6 @@ namespace tMusicPlayer
 			}
 
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-				LocalPlayer.mouseInterface = true;
-
 				// Hover Text Handling
 				if (IsEntrySlot && tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
 					MusicUISystem.Instance.UIHoverText = "Insert a music box you do not already own!";
@@ -527,9 +523,6 @@ namespace tMusicPlayer
 		private static bool JustPressed(Keys key) => Main.inputText.IsKeyDown(key) && !Main.oldInputText.IsKeyDown(key);
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
-			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface)
-				Main.LocalPlayer.mouseInterface = true;
-
 			spriteBatch.Draw(searchBar.Value, GetDimensions().Position(), Color.White);
 
 			if (focused) {

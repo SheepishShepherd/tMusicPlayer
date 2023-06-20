@@ -559,7 +559,7 @@ namespace tMusicPlayer
 			}
 
 			if (sortType == SortBy.Name) {
-				SortedMusicData = SortedMusicData.OrderBy(x => x.name).ToList();
+				SortedMusicData = SortedMusicData.OrderBy(x => x.Name).ToList();
 			}
 			else {
 				SortedMusicData = SortedMusicData.OrderBy(x => x.MusicID).ToList(); // default sorting by ID
@@ -605,7 +605,7 @@ namespace tMusicPlayer
 					newRow.Append(playSong);
 
 					// Song name and mod
-					UIText songName = new UIText(data.name, 0.85f) {
+					UIText songName = new UIText(data.Name, 0.85f) {
 						TextColor = ItemRarity.GetColor(ContentSamples.ItemsByType[boxSlot.SlotItemID].rare)
 					};
 					songName.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;

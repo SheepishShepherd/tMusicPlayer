@@ -155,7 +155,7 @@ namespace tMusicPlayer
 					if (!ContentSamples.ItemsByType.TryGetValue(music.Key, out Item item))
 						continue; // If the item does not exist, move onto the next pair
 
-					string name = item.Name.Contains("(") ? item.Name.Substring(item.Name.IndexOf("(") + 1).Replace(")", "") : item.Name;
+					LocalizedText name = item.ModItem == null ? Lang.GetItemName(music.Key) : item.ModItem.GetLocalization("DisplayName");
 					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.Name;
 
 					if (!AllMusic.Exists(x => x.MusicBox == music.Key)) {
@@ -177,7 +177,7 @@ namespace tMusicPlayer
 				AllMusic = AllMusic.OrderBy(x => x.MusicID).ToList();
 			}
 			if (UI.sortType == SortBy.Name) {
-				AllMusic = AllMusic.OrderBy(x => x.name).ToList();
+				AllMusic = AllMusic.OrderBy(x => x.Name).ToList();
 			}
 				
 			UI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];

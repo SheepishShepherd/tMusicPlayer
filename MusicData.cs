@@ -1,4 +1,6 @@
 ﻿using Terraria;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace tMusicPlayer
@@ -17,7 +19,9 @@ namespace tMusicPlayer
 		internal string Mod { get; init; }
 
 		/// <summary> The name provided to the music box. </summary>
-		internal string name;
+		internal LocalizedText name;
+
+		internal string Name => name.Value.Contains('(') ? name.Value.Substring(name.Value.IndexOf("(") + 1).Replace(")", "") : name.Value;
 
 		/// <summary> If applicable, the name of the composer that made this music. </summary>
 		internal string composer;
@@ -60,7 +64,7 @@ namespace tMusicPlayer
 			return editedName;
 		}
 
-		public override string ToString() => $"[i:{MusicBox}] [{Mod}] {name}{(string.IsNullOrEmpty(composer) ? " " : $" by {composer} ")}(MusicID: #{MusicID})";
+		public override string ToString() => $"[i:{MusicBox}] [{Mod}] {Name}{(string.IsNullOrEmpty(composer) ? " " : $" by {composer} ")}(MusicID: #{MusicID})";
 
 		// Vanilla method
 		internal MusicData(int music, int musicbox, int mainMusicBox2) {
@@ -68,13 +72,12 @@ namespace tMusicPlayer
 			this.OutputValue = mainMusicBox2;
 			this.MusicBox = musicbox;
 
-			string itemNameValue = Lang.GetItemNameValue(musicbox);
-			this.Mod = itemNameValue.Contains("Otherworldly") ? "Terraria Otherworld" : "Terraria";
-			this.name = itemNameValue.Substring(itemNameValue.IndexOf("(") + 1).Replace(")", "");
+			this.Mod = music >= 58 && music <= 84 ? "Terraria Otherworld" : "Terraria";
+			this.name = Lang.GetItemName(musicbox);
 		}
 
 		// Mod method
-		public MusicData(int music, int musicbox, string mod, string name) {
+		public MusicData(int music, int musicbox, string mod, LocalizedText name) {
 			this.MusicID = music;
 			this.OutputValue = music;
 			this.MusicBox = musicbox;

@@ -58,7 +58,7 @@ namespace tMusicPlayer
 			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer && UI.VisualBoxDisplayed is not null) {
 				string Snippet(string text) => text.Length > 22 ? string.Concat(text.AsSpan(0, 22), "...") : text; // limit text size and add '...' for titles too long
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
-				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
+				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 28);
 				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()), pos, Color.White, 0.75f);
 			}
@@ -405,7 +405,7 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
 				}
 				else if (IsDisplaySlot && UI.MiniModePlayer) {
-					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed.name}\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";
+					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed.Name}\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";
 					MusicUISystem.Instance.UIHoverTextColor = ItemRarity.GetColor(SlotItem.rare);
 				}
 
@@ -541,7 +541,7 @@ namespace tMusicPlayer
 						// Check for a music box that contains the searchbar text within its name.
 						// This will stop the user from typing a name that doesn't exist preventing a hard-lock.
 						// If there is an existing music box name with the new text, update the search filter selection to reflect it
-						List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.name.ToLower().Contains(newString)).ToList();
+						List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.Name.ToLower().Contains(newString)).ToList();
 						if (searchedData.Count > 0) {
 							currentString = newString;
 							MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;

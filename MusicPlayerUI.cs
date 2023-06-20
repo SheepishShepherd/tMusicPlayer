@@ -539,24 +539,17 @@ namespace tMusicPlayer
 		}
 
 		internal void OrganizeSelection(bool initializing = false, SortBy? sortBy = null, ProgressBy? progressBy = null, string filterMod = null, bool clickedFavorites = false) {
-			if (initializing) {
-				sortType = SortBy.ID;
-				availabililty = ProgressBy.None;
-				FilterMod = "";
-			}
-			else {
-				if (sortBy.HasValue)
-					sortType = sortBy.Value;
+			if (sortBy.HasValue)
+				sortType = sortBy.Value;
 
-				if (progressBy.HasValue)
-					availabililty = progressBy.Value;
+			if (progressBy.HasValue)
+				availabililty = progressBy.Value;
 
-				if (filterMod is not null)
-					FilterMod = filterMod;
+			if (filterMod is not null)
+				FilterMod = filterMod;
 
-				if (clickedFavorites)
-					viewFavs = !viewFavs;
-			}
+			if (clickedFavorites)
+				viewFavs = !viewFavs;
 
 			if (sortType == SortBy.Name) {
 				SortedMusicData = SortedMusicData.OrderBy(x => x.Name).ToList();

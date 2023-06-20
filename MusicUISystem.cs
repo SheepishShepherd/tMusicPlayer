@@ -173,17 +173,9 @@ namespace tMusicPlayer
 				tMusicPlayer.instance.Logger.Error($"itemToMusicReference failed and has a null value. Modded music will not be added to the music player.");
 			}
 
-			// Setup UI's item slot count.
-			if (MusicUI.sortType == SortBy.ID) {
-				AllMusic = AllMusic.OrderBy(x => x.MusicID).ToList();
-			}
-			if (MusicUI.sortType == SortBy.Name) {
-				AllMusic = AllMusic.OrderBy(x => x.Name).ToList();
-			}
-
 			MusicUI.SelectionSlots = new MusicBoxSlot[AllMusic.Count];
 			MusicUI.SortedMusicData = new List<MusicData>(AllMusic);
-			MusicUI.OrganizeSelection(initializing: true);
+			MusicUI.OrganizeSelection(initializing: true, SortBy.ID, ProgressBy.None, filterMod: "");
 			MusicUI.DisplayBox = MusicUI.SortedMusicData[0]; // defaults to first music box
 
 			// Setup the mod list for the Mod Filter

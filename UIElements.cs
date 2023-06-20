@@ -224,8 +224,8 @@ namespace tMusicPlayer
 
             return ID switch {
                 "expand" => (UI.MiniModePlayer ? "Maximize" : "Minimize") ?? "",
-                "play" => ((UI.IsPlayingMusic) ? "Stop" : "Play") ?? "",
-                "listen" => ((UI.IsPlayingMusic) ? "Stop" : "Play") ?? "",
+                "play" => (UI.IsPlayingMusic ? "Stop" : "Play") ?? "",
+                "listen" => (UI.IsPlayingMusic ? "Stop" : "Play") ?? "",
                 "record" => (UI.IsListening ? "Disable" : "Enable") + " Listening",
                 "prev" => "Previous Song",
                 "next" => "Next Song",

@@ -222,7 +222,7 @@ namespace tMusicPlayer
 			}
 		}
 
-		public string RemoveChatTags(string text) {
+		public static string RemoveChatTags(string text) {
 			string editedName = "";
 
 			for (int c = 0; c < text.Length; c++) {

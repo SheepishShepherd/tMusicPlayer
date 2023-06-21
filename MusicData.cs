@@ -35,7 +35,7 @@ namespace tMusicPlayer
 		/// <summary> The display name of the mod. </summary>
 		internal string Mod_DisplayName => ModLoader.TryGetMod(Mod, out Mod mod) ? mod.DisplayName : Mod;
 
-		internal string Mod_DisplayName_NoChatTags() => MusicUISystem.Instance.RemoveChatTags(Mod_DisplayName);
+		internal string Mod_DisplayName_NoChatTags => MusicUISystem.RemoveChatTags(Mod_DisplayName);
 
 		internal Color MusicBox_Rarity => ItemRarity.GetColor(ContentSamples.ItemsByType[MusicBox].rare);
 

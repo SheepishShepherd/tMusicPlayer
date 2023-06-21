@@ -60,7 +60,7 @@ namespace tMusicPlayer
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
 				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 28);
-				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()), pos, Color.White, 0.75f);
+				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags), pos, Color.White, 0.75f);
 			}
 			
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
@@ -183,7 +183,7 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);
 				}
 				else if (Id == "filtermod") {
-					string value = ModLoader.TryGetMod(UI.FilterMod, out Mod mod) ? MusicUISystem.Instance.AllMusic.Find(x => x.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags() : UI.FilterMod;
+					string value = ModLoader.TryGetMod(UI.FilterMod, out Mod mod) ? MusicUISystem.Instance.AllMusic.Find(x => x.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags : UI.FilterMod;
 					MusicUISystem.Instance.UIHoverText = $"{(string.IsNullOrEmpty(value) ? "Filter by Mod" : value)}";
 				}
 			}
@@ -228,7 +228,7 @@ namespace tMusicPlayer
 					return Language.GetTextValue(LangButton + ".FilterMod");
 				}
 				else {
-					return MusicUISystem.Instance.AllMusic.Find(data => data.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags();
+					return MusicUISystem.Instance.AllMusic.Find(data => data.Mod == UI.FilterMod).Mod_DisplayName_NoChatTags;
 				}
 			}
 
@@ -279,14 +279,14 @@ namespace tMusicPlayer
 
 			if (HoveringText) {
 				titleColor.A = modColor.A = (byte)255f;
-				MusicUISystem.Instance.UIHoverText = $"[c/{MusicDataRef.MusicBox_Rarity.Hex3()}:{MusicDataRef.Name}]\n{MusicDataRef.Mod_DisplayName_NoChatTags()}";
+				MusicUISystem.Instance.UIHoverText = $"[c/{MusicDataRef.MusicBox_Rarity.Hex3()}:{MusicDataRef.Name}]\n{MusicDataRef.Mod_DisplayName_NoChatTags}";
 			}
 
 			Vector2 pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 - 15));
 			Utils.DrawBorderString(spriteBatch, MusicDataRef.Name, pos, titleColor, 0.85f);
 
 			pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 + 4));
-			Utils.DrawBorderString(spriteBatch, MusicDataRef.Mod_DisplayName_NoChatTags(), pos, modColor, 0.85f);
+			Utils.DrawBorderString(spriteBatch, MusicDataRef.Mod_DisplayName_NoChatTags, pos, modColor, 0.85f);
 		}
 	}
 
@@ -425,7 +425,7 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
 				}
 				else if (IsDisplaySlot && UI.MiniModePlayer) {
-					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";
+					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags}";
 				}
 
 				// Item & Music Box Handling

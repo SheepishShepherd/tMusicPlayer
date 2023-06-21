@@ -20,7 +20,6 @@ namespace tMusicPlayer
 			instance = this;
 
 			// Setup hotkeys and the configs instance.
-			tMPConfig = ModContent.GetInstance<TMPConfig>();
 			ListenModeHotkey = KeybindLoader.RegisterKeybind(this, "ToggleListen", Keys.Up.ToString());
 			PlayStopHotkey = KeybindLoader.RegisterKeybind(this, "PlayOrStop", Keys.Down.ToString());
 			PrevSongHotkey = KeybindLoader.RegisterKeybind(this, "PreviousSong", Keys.Left.ToString());

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.CodeAnalysis;
+using System.ComponentModel;
 using Terraria;
 using Terraria.ModLoader.Config;
 
@@ -7,36 +8,42 @@ namespace tMusicPlayer
 	[BackgroundColor(55, 59, 80)]
 	public class TMPConfig : ModConfig {
 		public override ConfigScope Mode => ConfigScope.ClientSide;
+		public override void OnLoaded() => tMusicPlayer.tMPConfig = this;
 
-		//[Header("[i:576] [c/ffeb6e:Configs]")]
-		[DefaultValue(true)]
+		private bool ResetPanels_value;
+		private bool StartHidden_value;
+		private bool DisableStartHiddenPrompt_value;
+
+		[Header("Defaults")]
+
+		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
-		public bool EnableMoreTooltips { get; set; }
+		public bool ResetPanels {
+			get => ResetPanels_value;
+			set => ResetPanels_value = !Main.gameMenu && value; // do not allow change if not in a world
+		}
 
-		private bool HideOnStart;
 		[DefaultValue(true)]
 		[BackgroundColor(23, 25, 81)]
 		public bool StartHidden {
-			get => HideOnStart;
+			get => StartHidden_value;
 			set {
-				HideOnStart = value;
+				StartHidden_value = value;
 				if (!value)
-					DisableStartHiddenPrompt = false;
+					DisableStartHiddenPrompt = false; // if false, disable the prompt as well
 			}
 		}
 
-		private bool PromptOnStart;
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
 		public bool DisableStartHiddenPrompt { 
-			get => PromptOnStart;
+			get => DisableStartHiddenPrompt_value;
 			set {
 				if (StartHidden || !value)
-					PromptOnStart = value;
+					DisableStartHiddenPrompt_value = value; // only allow this to be true if StartHidden is also true
 			}
 		}
 
-		[Header("Defaults")]
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
 		public bool StartWithSmall { get; set; }
@@ -45,13 +52,11 @@ namespace tMusicPlayer
 		[BackgroundColor(23, 25, 81)]
 		public bool StartWithListView { get; set; }
 
-		private bool ResetPosition;
-		[DefaultValue(false)]
+		[Header("Accessibility")]
+
+		[DefaultValue(true)]
 		[BackgroundColor(23, 25, 81)]
-		public bool ResetPanels {
-			get => ResetPosition;
-			set => ResetPosition = !Main.gameMenu && value; // do not allow change if not in a world
-		}
+		public bool EnableMoreTooltips { get; set; }
 
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]

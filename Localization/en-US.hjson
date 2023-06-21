@@ -11,25 +11,32 @@ Mods: {
 			TMPConfig: {
 				DisplayName: Personalize your music player!
 
-				EnableMoreTooltips: {
-					Label: Smart Cursor: Enable button tooltips
-					Tooltip: While smart cursor is toggled on, most buttons display information about them.
+				Headers: {
+					Defaults: "[c/ffeb6e:Default Preferences]"
+					Accessibility: "[c/ffeb6e:Accessibility]"
+				}
+
+				ResetPanels: {
+					Label: Reset panel positions
+					Tooltip: Only accepts changes while in-game
 				}
 
 				StartHidden: {
-					Label: Music Player defaults to hidden
+					Label: Music player defaults to hidden
 					Tooltip: Use the /musicplayer modcommand to unhide it.
 				}
 
 				DisableStartHiddenPrompt: {
 					Label: Disable hidden status prompt
-					Tooltip: Disables the prompt message for hiding the Music Player when entering a world.
+					Tooltip:
+						'''
+						Disables the prompt message for hiding the Music Player when entering a world.
+						Cannot be disabled if the music player is not hidden by default.
+						'''
 				}
 
-				Headers.Defaults: Defaults Header
-
 				StartWithSmall: {
-					Label: Music Player defaults to mini-mode
+					Label: Music player defaults to mini-mode
 					Tooltip: ""
 				}
 
@@ -38,9 +45,9 @@ Mods: {
 					Tooltip: By default, the selection panel uses grid view.
 				}
 
-				ResetPanels: {
-					Label: Reset Panels
-					Tooltip: ""
+				EnableMoreTooltips: {
+					Label: Smart Cursor: Enable button tooltips
+					Tooltip: While smart cursor is toggled on, most buttons display information about them.
 				}
 
 				EnableDebugMode: {

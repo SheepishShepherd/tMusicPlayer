@@ -222,6 +222,35 @@ namespace tMusicPlayer
 			}
 		}
 
+		public string RemoveChatTags(string text) {
+			string editedName = "";
+
+			for (int c = 0; c < text.Length; c++) {
+				// Add each character one by one to find chattags in order
+				// Chat tags cannot be contained inside other chat tags so no need to worry about overlap
+				editedName += text[c];
+				if (editedName.Contains("[i:") && editedName.EndsWith("]")) {
+					// Update return name if a complete item chat tag is found
+					editedName = editedName.Substring(0, editedName.IndexOf("[i:"));
+					continue;
+				}
+				if (editedName.Contains("[i/") && editedName.EndsWith("]")) {
+					// Update return name if a complete item chat tag is found
+					editedName = editedName.Substring(0, editedName.IndexOf("[i/"));
+					continue;
+				}
+				if (editedName.Contains("[c/") && editedName.Contains(":") && editedName.EndsWith("]")) {
+					// Color chat tags are edited differently as we want to keep the text that's nested inside them
+					string part1 = editedName.Substring(0, editedName.IndexOf("[c/"));
+					string part2 = editedName.Substring(editedName.IndexOf(":") + 1);
+					part2 = part2.Substring(0, part2.Length - 1);
+					editedName = part1 + part2;
+					continue;
+				}
+			}
+			return editedName;
+		}
+
 		/// <summary>
 		/// <para>Draws backgrounds for texts similar to the ones used for item tooltips.</para>
 		/// <para>ModifyInterfaceLayers will use this method when hovering over an element that changes the <see cref="UIHoverText"/></para>
@@ -231,7 +260,7 @@ namespace tMusicPlayer
 				return;
 
 			int padd = 20;
-			Vector2 stringVec = FontAssets.MouseText.Value.MeasureString(text);
+			Vector2 stringVec = FontAssets.MouseText.Value.MeasureString(RemoveChatTags(text));
 			Rectangle bgPos = new Rectangle(Main.mouseX + 20, Main.mouseY + 20, (int)stringVec.X + padd, (int)stringVec.Y + padd - 5);
 			bgPos.X = Utils.Clamp(bgPos.X, 0, Main.screenWidth - bgPos.Width);
 			bgPos.Y = Utils.Clamp(bgPos.Y, 0, Main.screenHeight - bgPos.Height);

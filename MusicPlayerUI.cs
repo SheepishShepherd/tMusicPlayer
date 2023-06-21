@@ -591,7 +591,9 @@ namespace tMusicPlayer
 				MusicBoxSlot boxSlot = SelectionSlots[slotCount];
 
 				if (IsListMode) {
-					newRow = new ItemSlotRow(slotCount);
+					newRow = new ItemSlotRow(slotCount) {
+						MusicDataRef = data
+					};
 
 					// Item Slot
 					boxSlot = new MusicBoxSlot(data);
@@ -608,19 +610,6 @@ namespace tMusicPlayer
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
 					playSong.OnLeftClick += (a, b) => UpdateMusicPlayedViaSelectionMenu(data);
 					newRow.Append(playSong);
-
-					// Song name and mod
-					UIText songName = new UIText(data.Name, 0.85f) {
-						TextColor = ItemRarity.GetColor(ContentSamples.ItemsByType[boxSlot.SlotItemID].rare)
-					};
-					songName.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
-					songName.Top.Pixels = (newRow.Height.Pixels / 2f) - 15f;
-					newRow.Append(songName);
-
-					UIText songMod = new UIText(data.Mod_DisplayName_NoChatTags(), 0.85f);
-					songMod.Left.Pixels = playSong.Left.Pixels + playSong.Width.Pixels + 8f;
-					songMod.Top.Pixels = (newRow.Height.Pixels / 2f) + 4f;
-					newRow.Append(songMod);
 
 					SelectionList.Add(newRow);
 				}

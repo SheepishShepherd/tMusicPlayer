@@ -58,6 +58,10 @@ namespace tMusicPlayer
 		[BackgroundColor(23, 25, 81)]
 		public bool EnableMoreTooltips { get; set; }
 
+		[DefaultValue(true)]
+		[BackgroundColor(23, 25, 81)]
+		public bool HoverTextPopOut { get; set; }
+
 		[DefaultValue(false)]
 		[BackgroundColor(23, 25, 81)]
 		public bool EnableDebugMode { get; set; }

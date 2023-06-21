@@ -1,4 +1,6 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.GameContent.UI;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -21,6 +23,7 @@ namespace tMusicPlayer
 		/// <summary> The name provided to the music box. </summary>
 		internal LocalizedText LocalizedName { get; init; }
 
+		/// <summary> The display name provided by the item's localization. </summary>
 		internal string Name => LocalizedName.Value.Contains('(') ? LocalizedName.Value.Substring(LocalizedName.Value.IndexOf("(") + 1).Replace(")", "") : LocalizedName.Value;
 
 		/// <summary> Determines if the Music Player is able to play this music. </summary>
@@ -32,34 +35,9 @@ namespace tMusicPlayer
 		/// <summary> The display name of the mod. </summary>
 		internal string Mod_DisplayName => ModLoader.TryGetMod(Mod, out Mod mod) ? mod.DisplayName : Mod;
 
-		internal string Mod_DisplayName_NoChatTags() {
-			string editedName = "";
+		internal string Mod_DisplayName_NoChatTags() => MusicUISystem.Instance.RemoveChatTags(Mod_DisplayName);
 
-			for (int c = 0; c < Mod_DisplayName.Length; c++) {
-				// Add each character one by one to find chattags in order
-				// Chat tags cannot be contained inside other chat tags so no need to worry about overlap
-				editedName += Mod_DisplayName[c];
-				if (editedName.Contains("[i:") && editedName.EndsWith("]")) {
-					// Update return name if a complete item chat tag is found
-					editedName = editedName.Substring(0, editedName.IndexOf("[i:"));
-					continue;
-				}
-				if (editedName.Contains("[i/") && editedName.EndsWith("]")) {
-					// Update return name if a complete item chat tag is found
-					editedName = editedName.Substring(0, editedName.IndexOf("[i/"));
-					continue;
-				}
-				if (editedName.Contains("[c/") && editedName.Contains(":") && editedName.EndsWith("]")) {
-					// Color chat tags are edited differently as we want to keep the text that's nested inside them
-					string part1 = editedName.Substring(0, editedName.IndexOf("[c/"));
-					string part2 = editedName.Substring(editedName.IndexOf(":") + 1);
-					part2 = part2.Substring(0, part2.Length - 1);
-					editedName = part1 + part2;
-					continue;
-				}
-			}
-			return editedName;
-		}
+		internal Color MusicBox_Rarity => ItemRarity.GetColor(ContentSamples.ItemsByType[MusicBox].rare);
 
 		public override string ToString() => $"[#{MusicID}] [i:{MusicBox}] [{Mod}] {Name}";
 

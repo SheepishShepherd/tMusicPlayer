@@ -50,9 +50,22 @@ Mods: {
 					Tooltip: While smart cursor is toggled on, most buttons display information about them.
 				}
 
+				HoverTextPopOut: {
+					Label: Pop-out text in list view
+					Tooltip:
+						'''
+						If using list view, hovering over the entry text will make it pop out.
+						This can be useful if the name of the music box name or mod is too long.
+						'''
+				}
+
 				EnableDebugMode: {
 					Label: Enable Debug Mode
-					Tooltip: ""
+					Tooltip:
+						'''
+						Features of debug mode:
+						* Chat messages of when a music box is added or removed from the playable list
+						'''
 				}
 			}
 		}

@@ -255,6 +255,8 @@ namespace tMusicPlayer
 
 	internal class ItemSlotRow : MusicPlayerElement {
 		private readonly int order;
+		internal MusicData MusicDataRef { get; init; } = null;
+		private bool HoveringText => tMusicPlayer.tMPConfig.HoverTextPopOut && Main.mouseItem.IsAir && new Rectangle(Inner.X + 100, Inner.Y + 8, Inner.Width - 100, Inner.Height - 8).Contains(Main.MouseScreen.ToPoint());
 
 		public ItemSlotRow(int order) {
 			this.order = order;
@@ -265,6 +267,26 @@ namespace tMusicPlayer
 		public override int CompareTo(object obj) {
 			ItemSlotRow other = obj as ItemSlotRow;
 			return order.CompareTo(other.order);
+		}
+
+		public override void Draw(SpriteBatch spriteBatch) {
+			base.Draw(spriteBatch);
+			if (MusicDataRef is null)
+				return;
+
+			Color titleColor = MusicDataRef.MusicBox_Rarity * (HoveringText ? 0.5f : 1f);
+			Color modColor = Color.White * (HoveringText ? 0.5f : 1f);
+
+			if (HoveringText) {
+				titleColor.A = modColor.A = (byte)255f;
+				MusicUISystem.Instance.UIHoverText = $"[c/{MusicDataRef.MusicBox_Rarity.Hex3()}:{MusicDataRef.Name}]\n{MusicDataRef.Mod_DisplayName_NoChatTags()}";
+			}
+
+			Vector2 pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 - 15));
+			Utils.DrawBorderString(spriteBatch, MusicDataRef.Name, pos, titleColor, 0.85f);
+
+			pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 + 4));
+			Utils.DrawBorderString(spriteBatch, MusicDataRef.Mod_DisplayName_NoChatTags(), pos, modColor, 0.85f);
 		}
 	}
 
@@ -403,8 +425,7 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
 				}
 				else if (IsDisplaySlot && UI.MiniModePlayer) {
-					MusicUISystem.Instance.UIHoverText = $"{UI.VisualBoxDisplayed.Name}\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";
-					MusicUISystem.Instance.UIHoverTextColor = ItemRarity.GetColor(SlotItem.rare);
+					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags()}";
 				}
 
 				// Item & Music Box Handling

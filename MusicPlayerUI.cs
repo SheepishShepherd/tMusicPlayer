@@ -408,7 +408,7 @@ namespace tMusicPlayer
 			Player player = Main.LocalPlayer;
 			MusicPlayerPlayer modplayer = player.GetModPlayer<MusicPlayerPlayer>();
 
-			if (modplayer.musicBoxesStored > 0 && recording && ListenModeData is MusicData listenData && Main.rand.NextBool(540)) {
+			if (modplayer.musicBoxesStored > 0 && IsRecording && Main.rand.NextBool(540) && ListenModeData is MusicData listenData) {
                 SoundEngine.PlaySound(SoundID.Item166);
 				if (!modplayer.BoxIsCollected(listenData.MusicBox)) {
 					// If we don't have it in our music player, automatically add it in.
@@ -547,7 +547,7 @@ namespace tMusicPlayer
 			}
 
 			if (modplayer.musicBoxesStored == 0)
-				recording = false;
+				IsRecording = false;
 		}
 
 		internal void OrganizeSelection(bool initializing = false, SortBy? sortBy = null, ProgressBy? progressBy = null, string filterMod = null, bool clickedFavorites = false) {

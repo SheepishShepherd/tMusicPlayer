@@ -150,7 +150,7 @@ namespace tMusicPlayer
 	
 	internal class HoverButton : MusicPlayerElement {
 		public string Id { get; init; } = "";
-		public int refNum = -1; // used for the altplay feature
+		public MusicData refData { get; set; } // used for the altplay feature
 
 		internal Texture2D texture;
 		internal Rectangle src;
@@ -191,7 +191,7 @@ namespace tMusicPlayer
 
 		public bool Disabled() {
 			return Id switch {
-				"altplay" => !MusicUISystem.Instance.AllMusic[refNum].CanPlay(LocalModPlayer) || Main.musicVolume <= 0f,
+				"altplay" => !refData.CanPlay(LocalModPlayer) || Main.musicVolume <= 0f,
 				"clearfiltermod" => UI.FilterMod == "",
 				"listen" => Main.musicVolume <= 0f,
 				"next" => UI.FindNext() == null || UI.IsListening || Main.musicVolume <= 0f,
@@ -204,7 +204,7 @@ namespace tMusicPlayer
 
 		public int UseAlternateTexture() {
 			return Id switch {
-				"altplay" => UI.CurrentlyPlaying == MusicUISystem.Instance.AllMusic[refNum].MusicID ? 24 : 0,
+				"altplay" => UI.CurrentlyPlaying == refData.MusicID ? 24 : 0,
 				"availability" => 24 * (int)UI.availabililty,
                 "expand" => !UI.MiniModePlayer ? 20 : 0,
                 "listen" => UI.IsListening ? 24 : 0,
@@ -235,7 +235,7 @@ namespace tMusicPlayer
             return ID switch {
 				"expand" => Language.GetTextValue(LangButton + (UI.MiniModePlayer ? ".Max" : ".Min")),
 				"play" => Language.GetTextValue(LangButton + (UI.IsPlayingMusic ? ".Stop" : ".Play")),
-				"altplay" => Language.GetTextValue(LangButton + (UI.CurrentlyPlaying == MusicUISystem.Instance.AllMusic[refNum].MusicID ? ".Stop" : ".Play")),
+				"altplay" => Language.GetTextValue(LangButton + (UI.CurrentlyPlaying == refData.MusicID ? ".Stop" : ".Play")),
 				"listen" => Language.GetTextValue(LangButton + ".Listen", Language.GetTextValue(LangButton + (UI.IsListening ? ".Disable" : ".Enable"))),
 				"record" => Language.GetTextValue(LangButton + ".Record", Language.GetTextValue(LangButton + (UI.IsRecording ? ".Disable" : ".Enable"))),
 				"prev" => Language.GetTextValue(LangButton + ".Prev"),

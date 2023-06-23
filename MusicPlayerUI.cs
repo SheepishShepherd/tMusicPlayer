@@ -603,7 +603,7 @@ namespace tMusicPlayer
 					// Play button
 					HoverButton playSong = new HoverButton(buttonTextures.Value, new Point(1, 0)) {
 						Id = "altplay",
-						refData = data
+						RefData = data
 					};
 					playSong.Left.Pixels = boxSlot.Left.Pixels + boxSlot.Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);

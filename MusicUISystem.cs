@@ -25,7 +25,7 @@ namespace tMusicPlayer
 		internal const int MaxUnrecordedBoxes = 20;
 
 		internal string UIHoverText = "";
-		internal Color UIHoverTextColor = default;
+		internal Color? UIHoverTextColor = null;
 
 		public override void Load() {
 			Instance = this;
@@ -211,7 +211,7 @@ namespace tMusicPlayer
 					"tMusicPlayer: Custom UI Hover Text",
 					delegate {
 						if (!string.IsNullOrEmpty(UIHoverText))
-							DrawTooltipBackground(Language.GetTextValue(UIHoverText), UIHoverTextColor);
+							DrawTooltipBackground();
 
 						UIHoverText = ""; // Reset text and color back to default state
 						UIHoverTextColor = Main.MouseTextColorReal;
@@ -239,7 +239,7 @@ namespace tMusicPlayer
 					editedName = editedName.Substring(0, editedName.IndexOf("[i/"));
 					continue;
 				}
-				if (editedName.Contains("[c/") && editedName.Contains(":") && editedName.EndsWith("]")) {
+				if (editedName.Contains("[c/") && editedName.Contains(':') && editedName.EndsWith("]")) {
 					// Color chat tags are edited differently as we want to keep the text that's nested inside them
 					string part1 = editedName.Substring(0, editedName.IndexOf("[c/"));
 					string part2 = editedName.Substring(editedName.IndexOf(":") + 1);
@@ -255,7 +255,8 @@ namespace tMusicPlayer
 		/// <para>Draws backgrounds for texts similar to the ones used for item tooltips.</para>
 		/// <para>ModifyInterfaceLayers will use this method when hovering over an element that changes the <see cref="UIHoverText"/></para>
 		/// </summary>
-		private void DrawTooltipBackground(string text, Color textColor = default) {
+		private void DrawTooltipBackground() {
+			string text = Language.GetTextValue(UIHoverText);
 			if (text == "")
 				return;
 
@@ -266,11 +267,11 @@ namespace tMusicPlayer
 			bgPos.Y = Utils.Clamp(bgPos.Y, 0, Main.screenHeight - bgPos.Height);
 
 			Vector2 textPos = new Vector2(bgPos.X + padd / 2, bgPos.Y + padd / 2);
-			if (textColor == default)
-				textColor = Main.MouseTextColorReal;
+			if (UIHoverTextColor == null)
+				UIHoverTextColor = Main.MouseTextColorReal; // if no value for color, default to the text color real
 
 			Utils.DrawInvBG(Main.spriteBatch, bgPos, new Color(23, 25, 81, 255) * 0.925f);
-			Utils.DrawBorderString(Main.spriteBatch, text, textPos, textColor);
+			Utils.DrawBorderString(Main.spriteBatch, text, textPos, UIHoverTextColor.Value);
 		}
 	}
 }

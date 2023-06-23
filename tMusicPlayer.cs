@@ -9,7 +9,7 @@ namespace tMusicPlayer
 	public class tMusicPlayer : Mod {
 		internal static tMusicPlayer instance;
 
-		public static TMPConfig tMPConfig;
+		internal static TMPConfig tMPConfig;
 
 		internal static ModKeybind ListenModeHotkey;
 		internal static ModKeybind PlayStopHotkey;

@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Terraria;
 using Terraria.ModLoader.Config;
 

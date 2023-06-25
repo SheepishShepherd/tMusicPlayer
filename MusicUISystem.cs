@@ -107,7 +107,7 @@ namespace tMusicPlayer
 				new MusicData(MusicID.UndergroundDesert, ItemID.MusicBoxUndergroundDesert, 57),
 				new MusicData(MusicID.Credits, ItemID.MusicBoxCredits, 85),
 				new MusicData(MusicID.Deerclops, ItemID.MusicBoxDeerclops, 86),
-				//new MusicData(MusicID.Shimmer, ItemID.MusicBoxShimmer, 87),
+				new MusicData(MusicID.Shimmer, ItemID.MusicBoxShimmer, 87),
 				#endregion
 				#region Otherworld Music
 				new MusicData(MusicID.OtherworldlyRain, ItemID.MusicBoxOWRain, 58),
@@ -158,11 +158,11 @@ namespace tMusicPlayer
 					if (!ContentSamples.ItemsByType.TryGetValue(music.Key, out Item item))
 						continue; // If the item does not exist, move onto the next pair
 
-					string name = item.ModItem == null ? item.Name : item.ModItem.Name;
+					LocalizedText name = item.ModItem == null ? Lang.GetItemName(music.Key) : item.ModItem.GetLocalization("DisplayName");
 					string modSource = item.ModItem == null ? "Terraria" : item.ModItem.Mod.Name;
 
 					if (!AllMusic.Exists(x => x.MusicBox == music.Key)) {
-						AllMusic.Add(new MusicData(music.Value, music.Key, modSource, item.Name));
+						AllMusic.Add(new MusicData(music.Value, music.Key, modSource, name));
 					}
 					else {
 						tMusicPlayer.instance.Logger.Info($"Prevented a vanilla overwrite for {name} [#{music.Key}]. Selection may play undesired music.");

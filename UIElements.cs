@@ -58,7 +58,7 @@ namespace tMusicPlayer
 			if (Id == "MusicPlayerPanel" && !UI.MiniModePlayer && UI.VisualBoxDisplayed is not null) {
 				string Snippet(string text) => text.Length > 22 ? string.Concat(text.AsSpan(0, 22), "...") : text; // limit text size and add '...' for titles too long
 				Vector2 pos = new Vector2(rect.X + 64, rect.Y + 10);
-				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.DisplayName), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
+				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Name), pos, ItemRarity.GetColor(UI.DisplayMusicSlot.SlotItem.rare), 0.75f);
 				pos = new Vector2(rect.X + 64, rect.Y + 28);
 				Utils.DrawBorderString(spriteBatch, Snippet(UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags), pos, Color.White, 0.75f);
 			}
@@ -74,14 +74,14 @@ namespace tMusicPlayer
 			}
 		}
 
-		public override void MouseDown(UIMouseEvent evt) {
-			base.MouseDown(evt);
+		public override void LeftMouseDown(UIMouseEvent evt) {
+			base.LeftMouseDown(evt);
 			if (Elements.All((UIElement x) => !x.ContainsPoint(Main.MouseScreen)))
 				DragStart(evt);
 		}
 
-		public override void MouseUp(UIMouseEvent evt) {
-			base.MouseUp(evt);
+		public override void LeftMouseUp(UIMouseEvent evt) {
+			base.LeftMouseUp(evt);
 			if (dragging)
 				DragEnd(evt);
 		}
@@ -134,10 +134,10 @@ namespace tMusicPlayer
 			UserInterface.ActiveInstance = temp;
 		}
 
-		public override void MouseDown(UIMouseEvent evt) {
+		public override void LeftMouseDown(UIMouseEvent evt) {
 			UserInterface temp = UserInterface.ActiveInstance;
 			UserInterface.ActiveInstance = MusicUISystem.Instance.MP_UserInterface;
-			base.MouseDown(evt);
+			base.LeftMouseDown(evt);
 			UserInterface.ActiveInstance = temp;
 		}
 
@@ -279,11 +279,11 @@ namespace tMusicPlayer
 
 			if (HoveringText) {
 				titleColor.A = modColor.A = (byte)255f;
-				MusicUISystem.Instance.UIHoverText = $"[c/{MusicDataRef.MusicBox_Rarity.Hex3()}:{MusicDataRef.DisplayName}]\n{MusicDataRef.Mod_DisplayName_NoChatTags}";
+				MusicUISystem.Instance.UIHoverText = $"[c/{MusicDataRef.MusicBox_Rarity.Hex3()}:{MusicDataRef.Name}]\n{MusicDataRef.Mod_DisplayName_NoChatTags}";
 			}
 
 			Vector2 pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 - 15));
-			Utils.DrawBorderString(spriteBatch, MusicDataRef.DisplayName, pos, titleColor, 0.85f);
+			Utils.DrawBorderString(spriteBatch, MusicDataRef.Name, pos, titleColor, 0.85f);
 
 			pos = new Vector2(Inner.X + 102, (int)(Inner.Y + Height.Pixels / 2 + 4));
 			Utils.DrawBorderString(spriteBatch, MusicDataRef.Mod_DisplayName_NoChatTags, pos, modColor, 0.85f);
@@ -336,7 +336,7 @@ namespace tMusicPlayer
 			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * scale), 0f);
 		}
 
-		public override void Click(UIMouseEvent evt) {
+		public override void LeftClick(UIMouseEvent evt) {
 			if (IsSelectionSlot && Main.keyState.IsKeyDown(Keys.LeftAlt)) {
 				if (LocalModPlayer.BoxIsFavorited(SlotItemID)) {
 					LocalModPlayer.MusicBoxFavs.RemoveAll(x => x.Type == SlotItemID);
@@ -425,7 +425,7 @@ namespace tMusicPlayer
 					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
 				}
 				else if (IsDisplaySlot && UI.MiniModePlayer) {
-					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.DisplayName}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags}";
+					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags}";
 				}
 
 				// Item & Music Box Handling
@@ -487,7 +487,7 @@ namespace tMusicPlayer
 			BorderColor = Color.White;
 		}
 
-		public override void Click(UIMouseEvent evt) {
+		public override void LeftClick(UIMouseEvent evt) {
 			Focus();
 		}
 
@@ -557,7 +557,7 @@ namespace tMusicPlayer
 					// Check for a music box that contains the searchbar text within its name.
 					// This will stop the user from typing a name that doesn't exist preventing a hard-lock.
 					// If there is an existing music box name with the new text, update the search filter selection to reflect it
-					List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.DisplayName.ToLower().Contains(newString)).ToList();
+					List<MusicData> searchedData = MusicUISystem.Instance.AllMusic.Where(data => data.Name.ToLower().Contains(newString)).ToList();
 					if (searchedData.Count > 0) {
 						currentString = newString;
 						MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;

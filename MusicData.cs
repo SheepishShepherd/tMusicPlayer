@@ -21,10 +21,10 @@ namespace tMusicPlayer
 		internal string Mod { get; init; }
 
 		/// <summary> The name provided to the music box. </summary>
-		internal string Name { get; init; }
+		internal LocalizedText LocalizedName { get; init; }
 
 		/// <summary> The display name provided by the item's localization. </summary>
-		internal string DisplayName => Name.Contains('(') ? Name.Substring(Name.IndexOf("(") + 1).Replace(")", "") : Name;
+		internal string Name => LocalizedName.Value.Contains('(') ? LocalizedName.Value.Substring(LocalizedName.Value.IndexOf("(") + 1).Replace(")", "") : LocalizedName.Value;
 
 		/// <summary> Determines if the Music Player is able to play this music. </summary>
 		internal bool CanPlay(MusicPlayerPlayer modplayer) => modplayer.BoxIsCollected(MusicBox) || modplayer.BoxResearched(MusicBox);
@@ -39,7 +39,7 @@ namespace tMusicPlayer
 
 		internal Color MusicBox_Rarity => ItemRarity.GetColor(ContentSamples.ItemsByType[MusicBox].rare);
 
-		public override string ToString() => $"[#{MusicID}] [i:{MusicBox}] [{Mod}] {DisplayName}";
+		public override string ToString() => $"[#{MusicID}] [i:{MusicBox}] [{Mod}] {Name}";
 
 		// Unknown method; used as a substitute for music without assigned music boxes
 		internal MusicData() {
@@ -48,7 +48,7 @@ namespace tMusicPlayer
 			this.MusicBox = ItemID.MusicBox;
 
 			this.Mod = "???";
-			this.Name = Language.GetText("Mods.tMusicPlayer.MusicData.UnknownBox").Value;
+			this.LocalizedName = Language.GetText("Mods.tMusicPlayer.MusicData.UnknownBox");
 		}
 
 		// Vanilla method
@@ -58,17 +58,17 @@ namespace tMusicPlayer
 			this.MusicBox = musicbox;
 
 			this.Mod = music >= 58 && music <= 84 ? "Terraria Otherworld" : "Terraria";
-			this.Name = Lang.GetItemName(musicbox).Value;
+			this.LocalizedName = Lang.GetItemName(musicbox);
 		}
 
 		// Mod method
-		public MusicData(int music, int musicbox, string mod, string name) {
+		public MusicData(int music, int musicbox, string mod, LocalizedText name) {
 			this.MusicID = music;
 			this.OutputValue = music;
 			this.MusicBox = musicbox;
 
 			this.Mod = mod;
-			this.Name = ItemLoader.GetItem(musicbox).DisplayName.GetTranslation(Language.ActiveCulture);
+			this.LocalizedName = name;
 		}
 	}
 }

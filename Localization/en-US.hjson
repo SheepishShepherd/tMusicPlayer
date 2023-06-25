@@ -1,0 +1,128 @@
+Mods: {
+	tMusicPlayer: {
+		Keybinds: {
+			ToggleListen.DisplayName: Toggle Listen Mode
+			PlayOrStop.DisplayName: Play/Stop Music
+			PreviousSong.DisplayName: Previous Song
+			NextSong.DisplayName: Next Song
+		}
+
+		Configs: {
+			TMPConfig: {
+				DisplayName: Personalize your music player!
+
+				Headers: {
+					Defaults: "[c/ffeb6e:Default Preferences]"
+					Accessibility: "[c/ffeb6e:Accessibility]"
+				}
+
+				ResetPanels: {
+					Label: Reset panel positions
+					Tooltip: Only accepts changes while in-game
+				}
+
+				StartHidden: {
+					Label: Music player defaults to hidden
+					Tooltip: Use the /musicplayer modcommand to unhide it.
+				}
+
+				DisableStartHiddenPrompt: {
+					Label: Disable hidden status prompt
+					Tooltip:
+						'''
+						Disables the prompt message for hiding the Music Player when entering a world.
+						Cannot be disabled if the music player is not hidden by default.
+						'''
+				}
+
+				StartWithSmall: {
+					Label: Music player defaults to mini-mode
+					Tooltip: ""
+				}
+
+				StartWithListView: {
+					Label: Selection panel defaults to list view
+					Tooltip: By default, the selection panel uses grid view.
+				}
+
+				EnableMoreTooltips: {
+					Label: Smart Cursor: Enable button tooltips
+					Tooltip: While smart cursor is toggled on, most buttons display information about them.
+				}
+
+				HoverTextPopOut: {
+					Label: Pop-out text in list view
+					Tooltip:
+						'''
+						If using list view, hovering over the entry text will make it pop out.
+						This can be useful if the name of the music box name or mod is too long.
+						'''
+				}
+
+				EnableDebugMode: {
+					Label: Enable Debug Mode
+					Tooltip:
+						'''
+						Features of debug mode:
+						* Chat messages of when a music box is added or removed from the playable list
+						'''
+				}
+			}
+		}
+
+		MusicData.UnknownBox: No assigned music box
+
+		HoverButton: {
+			Enable: Enable
+			Disable: Disable
+			Close: Close
+			Open: Open
+			Grid: Grid
+			List: List
+			Max: Maximize
+			Min: Minimize
+			Play: Play
+			Stop: Stop
+			Listen: "{0} listening"
+			Record: "{0} recording"
+			Selection: "{0} selection list"
+			ViewMode: Change to {0} view
+			Prev: Previous song
+			Next: Next song
+			Fav: Show favorited music
+			All: Show all music
+			SortID: Sort by ID
+			SortName: Sort by name
+			FilterMod: Filter by mod
+			ClearMod: Clear mod filter
+			Obtained: Showing obtained music boxes
+			Unobtained: Showing unobtained music boxes
+			NoFilter: No availability filter
+			EntrySlot:
+				'''
+				Insert a music box you do not already own
+				or store up to 20 empty music boxes to record music
+				'''
+			Eject:
+				'''
+				Left-click to eject one music box into your inventory
+				Right-click to place all of your stored music boxes in your inventory
+				'''
+		}
+
+		DebugMessages: {
+			EntryState: "[i:{0}] [#{0}] was {1} ({2})"
+			Added: added
+			Removed: removed
+			Recorded: recorded
+
+			Via: {
+				EntrySlot: via entry slot
+				Recording: via recording
+				SelectionPanel: via selection panel
+				ShiftClick: via shift-click from inventory
+				NotAccepted: but is already obtained
+			}
+		}
+	}
+}

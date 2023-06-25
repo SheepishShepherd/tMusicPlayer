@@ -233,7 +233,7 @@ namespace tMusicPlayer
 			};
 			prevButton.Left.Pixels = 100f;
 			prevButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - prevButton.Height.Pixels - 4f;
-			prevButton.OnLeftClick += (a, b) => ChangeDisplay(false);
+			prevButton.OnClick += (a, b) => ChangeDisplay(false);
 			prevButton.OnRightClick += (a, b) => ChangeDisplay(false, true);
 
 			playButton = new HoverButton(buttonTextures.Value, new Point(1, 0)) {
@@ -241,7 +241,7 @@ namespace tMusicPlayer
 			};
 			playButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - playButton.Width.Pixels - 6f;
 			playButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - playButton.Height.Pixels * 2f - 4f;
-			playButton.OnLeftClick += (a, b) => IsPlayingMusic = !IsPlayingMusic;
+			playButton.OnClick += (a, b) => IsPlayingMusic = !IsPlayingMusic;
 			MusicPlayerPanel.Append(playButton);
 
 			nextButton = new HoverButton(buttonTextures.Value, new Point(3, 0)) {
@@ -249,7 +249,7 @@ namespace tMusicPlayer
 			};
 			nextButton.Left.Pixels = prevButton.Left.Pixels + playButton.Width.Pixels - 2f + nextButton.Width.Pixels - 2f;
 			nextButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - nextButton.Height.Pixels - 4f;
-			nextButton.OnLeftClick += (a, b) => ChangeDisplay(true);
+			nextButton.OnClick += (a, b) => ChangeDisplay(true);
 			nextButton.OnRightClick += (a, b) => ChangeDisplay(true, true);
 
 			viewButton = new HoverButton(buttonTextures.Value, new Point(6, 0)) {
@@ -257,7 +257,7 @@ namespace tMusicPlayer
 			};
 			viewButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - viewButton.Width.Pixels - 6f;
 			viewButton.Top.Pixels = MusicPlayerPanel.Height.Pixels - viewButton.Height.Pixels - 4f;
-			viewButton.OnLeftClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
+			viewButton.OnClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
 			MusicPlayerPanel.Append(viewButton);
 
 			detectButton = new HoverButton(buttonTextures.Value, new Point(4, 0)) {
@@ -265,21 +265,21 @@ namespace tMusicPlayer
 			};
 			detectButton.Left.Pixels = viewButton.Left.Pixels - detectButton.Width.Pixels - 2f;
 			detectButton.Top.Pixels = viewButton.Top.Pixels;
-			detectButton.OnLeftClick += (a, b) => IsListening = !IsListening;
+			detectButton.OnClick += (a, b) => IsListening = !IsListening;
 
 			recordButton = new HoverButton(buttonTextures.Value, new Point(7, 0)) {
 				Id = "record"
 			};
 			recordButton.Left.Pixels = detectButton.Left.Pixels - recordButton.Width.Pixels - 4f;
 			recordButton.Top.Pixels = viewButton.Top.Pixels;
-			recordButton.OnLeftClick += (a, b) => IsRecording = !IsRecording;
+			recordButton.OnClick += (a, b) => IsRecording = !IsRecording;
 
 			expandButton = new HoverButton(closeTextures.Value, new Point(1, 0)) {
 				Id = "expand"
 			};
 			expandButton.Left.Pixels = MusicPlayerPanel.Width.Pixels - expandButton.Width.Pixels - 8f;
 			expandButton.Top.Pixels = 4f;
-			expandButton.OnLeftClick += (a, b) => MiniModePlayer = !MiniModePlayer;
+			expandButton.OnClick += (a, b) => MiniModePlayer = !MiniModePlayer;
 			MusicPlayerPanel.Append(expandButton);
 			
 			DisplayMusicSlot = new MusicBoxSlot(1f) {
@@ -297,7 +297,7 @@ namespace tMusicPlayer
 			};
 			favoritesButton.Left.Pixels = center - (20 * 3) - (8 * 2) + 4;
 			favoritesButton.Top.Pixels = 42;
-			favoritesButton.OnLeftClick += (a, b) => OrganizeSelection(clickedFavorites: true);
+			favoritesButton.OnClick += (a, b) => OrganizeSelection(clickedFavorites: true);
 			SelectionPanel.Append(favoritesButton);
 
 			sortIDButton = new HoverButton(buttonTextures.Value, new Point(0, 2)) {
@@ -305,7 +305,7 @@ namespace tMusicPlayer
 			};
 			sortIDButton.Left.Pixels = center - (20 * 2) - 8 + 4;
 			sortIDButton.Top.Pixels = 42;
-			sortIDButton.OnLeftClick += (a, b) => OrganizeSelection(sortBy: SortBy.ID);
+			sortIDButton.OnClick += (a, b) => OrganizeSelection(sortBy: SortBy.ID);
 			SelectionPanel.Append(sortIDButton);
 
 			sortNameButton = new HoverButton(buttonTextures.Value, new Point(1, 2)) {
@@ -313,7 +313,7 @@ namespace tMusicPlayer
 			};
 			sortNameButton.Left.Pixels = center - 20 - 8 + 4;
 			sortNameButton.Top.Pixels = 42;
-			sortNameButton.OnLeftClick += (a, b) => OrganizeSelection(sortBy: SortBy.Name);
+			sortNameButton.OnClick += (a, b) => OrganizeSelection(sortBy: SortBy.Name);
 			SelectionPanel.Append(sortNameButton);
 
 			filterModButton = new HoverButton(buttonTextures.Value, new Point(2, 2)) {
@@ -321,7 +321,7 @@ namespace tMusicPlayer
 			};
 			filterModButton.Left.Pixels = center + 8 - 4;
 			filterModButton.Top.Pixels = 42;
-			filterModButton.OnLeftClick += (a, b) => OrganizeSelection(filterMod: UpdateModFilter(true));
+			filterModButton.OnClick += (a, b) => OrganizeSelection(filterMod: UpdateModFilter(true));
 			filterModButton.OnRightClick += (a, b) => OrganizeSelection(filterMod: UpdateModFilter(false));
 			SelectionPanel.Append(filterModButton);
 
@@ -330,7 +330,7 @@ namespace tMusicPlayer
 			};
 			clearFilterModButton.Left.Pixels = center + 20 + 8 - 4;
 			clearFilterModButton.Top.Pixels = 42;
-			clearFilterModButton.OnLeftClick += (a, b) => OrganizeSelection(filterMod: "");
+			clearFilterModButton.OnClick += (a, b) => OrganizeSelection(filterMod: "");
 			SelectionPanel.Append(clearFilterModButton);
 
 			availabilityButton = new HoverButton(buttonTextures.Value, new Point(4, 2)) {
@@ -338,7 +338,7 @@ namespace tMusicPlayer
 			};
 			availabilityButton.Left.Pixels = center + (20 * 2) + (8 * 2) - 4;
 			availabilityButton.Top.Pixels = 42;
-			availabilityButton.OnLeftClick += (a, b) => OrganizeSelection(progressBy: UpdateAvailabilityFilter(true));
+			availabilityButton.OnClick += (a, b) => OrganizeSelection(progressBy: UpdateAvailabilityFilter(true));
 			availabilityButton.OnRightClick += (a, b) => OrganizeSelection(progressBy: UpdateAvailabilityFilter(false));
 			SelectionPanel.Append(availabilityButton);
 
@@ -347,7 +347,7 @@ namespace tMusicPlayer
 			};
 			closeButton.Left.Pixels = SelectionPanel.Width.Pixels - closeButton.Width.Pixels - 11f;
 			closeButton.Top.Pixels = 12f;
-			closeButton.OnLeftClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
+			closeButton.OnClick += (a, b) => SelectionPanelVisible = !SelectionPanelVisible;
 			SelectionPanel.Append(closeButton);
 
 			viewModeButton = new HoverButton(buttonTextures.Value, new Point(0, 4)) {
@@ -355,7 +355,7 @@ namespace tMusicPlayer
 			};
 			viewModeButton.Left.Pixels = SelectionPanel.Width.Pixels - closeButton.Width.Pixels - 13f;
 			viewModeButton.Top.Pixels = closeButton.Top.Pixels + closeButton.Height.Pixels + 4f;
-			viewModeButton.OnLeftClick += (a, b) => ViewMode = !ViewMode;
+			viewModeButton.OnClick += (a, b) => ViewMode = !ViewMode;
 			SelectionPanel.Append(viewModeButton);
 
 			searchBar = new SearchBar("Search...", "");
@@ -377,7 +377,7 @@ namespace tMusicPlayer
 			};
 			ejectButton.Left.Pixels = BoxEntrySlot.Left.Pixels + (BoxEntrySlot.Width.Pixels / 2) - (ejectButton.Width.Pixels / 2);
 			ejectButton.Top.Pixels = 42;
-			ejectButton.OnLeftClick += (a, b) => EjectBox(false);
+			ejectButton.OnClick += (a, b) => EjectBox(false);
 			ejectButton.OnRightClick += (a, b) => EjectBox(true);
 			SelectionPanel.Append(ejectButton);
 
@@ -563,7 +563,7 @@ namespace tMusicPlayer
 				viewFavs = !viewFavs;
 
 			if (sortType == SortBy.Name) {
-				SortedMusicData = SortedMusicData.OrderBy(x => x.Name).ToList();
+				SortedMusicData = SortedMusicData.OrderBy(x => x.Displayname).ToList();
 			}
 			else {
 				SortedMusicData = SortedMusicData.OrderBy(x => x.MusicID).ToList(); // default sorting by ID
@@ -607,7 +607,7 @@ namespace tMusicPlayer
 					};
 					playSong.Left.Pixels = boxSlot.Left.Pixels + boxSlot.Width.Pixels + 8f;
 					playSong.Top.Pixels = (newRow.Height.Pixels / 2f) - (playSong.Height.Pixels / 2f);
-					playSong.OnLeftClick += (a, b) => UpdateMusicPlayedViaSelectionMenu(data);
+					playSong.OnClick += (a, b) => UpdateMusicPlayedViaSelectionMenu(data);
 					newRow.Append(playSong);
 
 					SelectionList.Add(newRow);

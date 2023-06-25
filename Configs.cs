@@ -4,53 +4,71 @@ using Terraria.ModLoader.Config;
 
 namespace tMusicPlayer
 {
-	[BackgroundColor(55, 59, 80, 255)]
-	[Label("Personal Configs")]
+	[BackgroundColor(55, 59, 80)]
 	public class TMPConfig : ModConfig {
 		public override ConfigScope Mode => ConfigScope.ClientSide;
+		public override void OnLoaded() => tMusicPlayer.tMPConfig = this;
 
-		[Header("[i:576] [c/ffeb6e:Configs]")]
+		private bool ResetPanels_value;
+		private bool StartHidden_value;
+		private bool DisableStartHiddenPrompt_value;
+
+		[Header("Defaults")]
+
+		[DefaultValue(false)]
+		[BackgroundColor(23, 25, 81)]
+		public bool ResetPanels {
+			get => ResetPanels_value;
+			set => ResetPanels_value = !Main.gameMenu && value; // do not allow change if not in a world
+		}
+
 		[DefaultValue(true)]
-		[Label("Smart Cursor: Enable extra tooltips")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("While smart cursor is toggled, most buttons show extra information about them")]
-		public bool EnableMoreTooltips { get; set; }
+		[BackgroundColor(23, 25, 81)]
+		public bool StartHidden {
+			get => StartHidden_value;
+			set {
+				StartHidden_value = value;
+				if (!value)
+					DisableStartHiddenPrompt = false; // if false, disable the prompt as well
+			}
+		}
 
 		[DefaultValue(false)]
-		[Label("Hide MusicPlayer until hotkey pressed")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("The MusicPlayer will not show or hide unless the hotkey is pressed to toggle between the states.")]
-		public bool ForceUseHotkey { get; set; }
+		[BackgroundColor(23, 25, 81)]
+		public bool DisableStartHiddenPrompt { 
+			get => DisableStartHiddenPrompt_value;
+			set {
+				if (StartHidden || !value)
+					DisableStartHiddenPrompt_value = value; // only allow this to be true if StartHidden is also true
+			}
+		}
 
 		[DefaultValue(false)]
-		[Label("Start with the small panel")]
-		[BackgroundColor(76, 168, 84, 255)]
-		[Tooltip("")]
+		[BackgroundColor(23, 25, 81)]
 		public bool StartWithSmall { get; set; }
 
-		[Header("[i:3625] [c/ffeb6e:Debugging]")]
 		[DefaultValue(false)]
-		[Label("Enable Debug Messages")]
-		[BackgroundColor(189, 183, 107, 255)]
+		[BackgroundColor(23, 25, 81)]
+		public bool StartWithListView { get; set; }
+
+		[Header("Accessibility")]
+
+		[DefaultValue(true)]
+		[BackgroundColor(23, 25, 81)]
+		public bool EnableMoreTooltips { get; set; }
+
+		[DefaultValue(true)]
+		[BackgroundColor(23, 25, 81)]
+		public bool HoverTextPopOut { get; set; }
+
+		[DefaultValue(false)]
+		[BackgroundColor(23, 25, 81)]
 		public bool EnableDebugMode { get; set; }
 
-		[DefaultValue(false)]
-		[Label("Reset Music Player panel positions")]
-		[BackgroundColor(189, 183, 107, 255)]
-		public bool ResettingPanels { get; set; }
-
 		public override void OnChanged() {
-			if (!Main.gameMenu && !Main.dedServ) {
-				MusicPlayerUI UI = MusicUISystem.Instance.MusicUI;
-				if (ResettingPanels) {
-					UI.MusicPlayerPanel.Left.Pixels = 1115f;
-					UI.MusicPlayerPanel.Top.Pixels = 16f;
-					UI.selectionPanel.Left.Pixels = (Main.screenWidth / 2) - UI.selectionPanel.Width.Pixels / 2f;
-					UI.selectionPanel.Top.Pixels = (Main.screenHeight / 2) - UI.selectionPanel.Height.Pixels / 2f;
-					UI.musicEntryPanel.Left.Pixels = UI.selectionPanel.Left.Pixels + UI.selectionPanel.Width.Pixels - UI.musicEntryPanel.Width.Pixels - 10f;
-					UI.musicEntryPanel.Top.Pixels = UI.selectionPanel.Top.Pixels - UI.musicEntryPanel.Height.Pixels;
-					ResettingPanels = false;
-				}
+			if (!Main.gameMenu && !Main.dedServ && ResetPanels) {
+				MusicUISystem.Instance.MusicUI.ResetPanelPositionsToDefault();
+				ResetPanels = false;
 			}
 		}
 	}

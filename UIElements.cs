@@ -328,7 +328,7 @@ namespace tMusicPlayer
 
 		public MusicBoxSlot(MusicData musicData) {
 			IsSelectionSlot = true;
-			ValidItems = (Item item) => item.IsAir || item.type == SlotItemID; 
+			ValidItems = (Item item) => item.IsAir || item.type == SlotItemID;
 			this.scale = 0.85f;
 			this.SlotMusicData = musicData;
 			SlotItem = new Item(0);
@@ -350,6 +350,11 @@ namespace tMusicPlayer
 		public override void RightClick(UIMouseEvent evt) {
 			if (IsSelectionSlot && UI.IsGridMode)
 				UI.UpdateMusicPlayedViaSelectionMenu(SlotMusicData); // Right-clicking a slot in grid view will play that music
+		}
+
+		public override void Update(GameTime gameTime) {
+			if (IsDisplaySlot && SlotMusicData?.MusicBox != SlotItem.type)
+				SlotMusicData = MusicUISystem.Instance.AllMusic.Find(x => x.MusicBox == SlotItem.type);
 		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
@@ -378,11 +383,8 @@ namespace tMusicPlayer
 			if (IsEntrySlot) {
 				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack7;
 			}
-			else if (IsDisplaySlot) {
-				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack3;
-			}
 			else {
-				TextureAssets.InventoryBack2 = SlotMusicData.CanPlay(LocalModPlayer) ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack4;
+				TextureAssets.InventoryBack2 = SlotMusicData?.CanPlay(LocalModPlayer) is true ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack4;
 			}
 			ItemSlot.Draw(spriteBatch, ref SlotItem, context, Inner.TopLeft()); // Draw the item slot!
 			TextureAssets.InventoryBack2 = backup; // reset values

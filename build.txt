@@ -1,4 +1,4 @@
 displayName = tMusicPlayer
 author = SheepishShepherd
-version = 1.0
+version = 1.1
 homepage = https://forums.terraria.org/index.php?threads/tmusicplayer.85830/

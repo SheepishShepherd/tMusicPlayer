@@ -1,1 +1,1 @@
-tMusicPlayer gives players their own built-in Audio player. Automatically detects all registered Music Boxes and unlocks as you record them.
+tMusicPlayer gives players their own built-in Audio player. Automatically detects all registered Music Boxes and unlocks as you record them. To access the Music Player, click on the music box icon located on the left side of the inventory.

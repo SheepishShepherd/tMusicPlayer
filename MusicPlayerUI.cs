@@ -17,9 +17,10 @@ namespace tMusicPlayer
 {
 	internal class MusicPlayerUI : UIState
 	{
+		/*
 		private bool playerVisible;
 		public bool MusicPlayerVisible {
-			get => playerVisible;
+			get => ModContent.GetInstance<MusicPlayer_BuilderToggle>().Active() && ModContent.GetInstance<MusicPlayer_BuilderToggle>().CurrentState == 0;
 			set {
 				playerVisible = value;
 				this.AddOrRemoveChild(MusicPlayerPanel, value);
@@ -27,6 +28,9 @@ namespace tMusicPlayer
 					SelectionPanelVisible = false; // Selection panel is hidden if the player is hidden
 			}
 		}
+		*/
+
+		//public bool MusicPlayerVisible => ModContent.GetInstance<MusicPlayer_BuilderToggle>().Active() && ModContent.GetInstance<MusicPlayer_BuilderToggle>().CurrentState == 0;
 
 		private bool selectionVisible;
 		public bool SelectionPanelVisible {
@@ -398,6 +402,11 @@ namespace tMusicPlayer
 		}
 
 		public override void Update(GameTime gameTime) {
+			bool visible = ModContent.GetInstance<MusicPlayer_BuilderToggle>().MusicPlayerVisible;
+			this.AddOrRemoveChild(MusicPlayerPanel, visible);
+			if (!visible && !SelectionPanelVisible)
+				SelectionPanelVisible = false;
+
 			if (Main.curMusic == 0)
 				IsRecording = IsListening = IsPlayingMusic = false; // If the game's music is muted, turn off all music player functions
 
@@ -431,7 +440,7 @@ namespace tMusicPlayer
 			if (Main.gameMenu) {
 				IsListening = true;
 			}
-			else if (MusicPlayerVisible) {
+			else if (visible) {
 				if (tMusicPlayer.ListenModeHotkey.JustPressed) {
 					IsListening = !IsListening;
 				}

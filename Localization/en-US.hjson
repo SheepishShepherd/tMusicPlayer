@@ -7,6 +7,13 @@ Mods: {
 			NextSong.DisplayName: Next Song
 		}
 
+		BuilderToggles: {
+			MusicPlayer_BuilderToggle: {
+				OnText: Music Player Visible
+				OffText: Music Player Hidden
+			}
+		}
+
 		Configs: {
 			TMPConfig: {
 				DisplayName: Personalize your music player!
@@ -19,20 +26,6 @@ Mods: {
 				ResetPanels: {
 					Label: Reset panel positions
 					Tooltip: Only accepts changes while in-game
-				}
-
-				StartHidden: {
-					Label: Music player defaults to hidden
-					Tooltip: Use the /musicplayer modcommand to unhide it.
-				}
-
-				DisableStartHiddenPrompt: {
-					Label: Disable hidden status prompt
-					Tooltip:
-						'''
-						Disables the prompt message for hiding the Music Player when entering a world.
-						Cannot be disabled if the music player is not hidden by default.
-						'''
 				}
 
 				StartWithSmall: {

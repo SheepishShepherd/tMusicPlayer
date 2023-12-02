@@ -44,15 +44,23 @@ namespace tMusicPlayer
 		}
 	}
 
-	public class ToggleMusicPlayer : ModCommand {
-		public override CommandType Type => CommandType.Chat;
+	internal class MusicPlayer_BuilderToggle : BuilderToggle {
+		public static LocalizedText OnText { get; private set; }
+		public static LocalizedText OffText { get; private set; }
 
-		public override string Command => "musicplayer";
-
-		public override string Description => "Toggle the visibility of the Music Player UI";
-
-		public override void Action(CommandCaller caller, string input, string[] args) {
-			MusicUISystem.Instance.MusicUI.MusicPlayerVisible = !MusicUISystem.Instance.MusicUI.MusicPlayerVisible;
+		public override void SetStaticDefaults() {
+			OnText = this.GetLocalization(nameof(OnText));
+			OffText = this.GetLocalization(nameof(OffText));
 		}
+
+		public override string DisplayValue() => CurrentState == 0 ? OnText.Value : OffText.Value;
+		public override Color DisplayColorTexture() => CurrentState == 0 ? Color.White : new Color(150, 150, 150);
+
+		public override string Texture => "tMusicPlayer/UI/BuilderToggle_MusicPlayer";
+		public override string HoverTexture => "tMusicPlayer/UI/BuilderToggle_MusicPlayer_Hover";
+
+		public override bool Active() => true;
+
+		public bool MusicPlayerVisible => Active() && CurrentState == 0;
 	}
 }

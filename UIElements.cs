@@ -178,6 +178,9 @@ namespace tMusicPlayer
 			Rectangle push = new Rectangle(src.X + UseAlternateTexture(), (hovering && !Disabled()) ? (src.Y + src.Height + 2) : src.Y, src.Width, src.Height);
 			spriteBatch.Draw(texture, Inner, push, Disabled() ? new Color(60, 60, 60, 60) : Color.White);
 
+			if (Id == "listen" && UI.IsListening)
+				spriteBatch.Draw(texture, Inner, new Rectangle(2 * (src.Width + 2), (IsMouseHovering ? 5 : 4) * (src.Height + 2), src.Width, src.Height) , new Color(169, 129, 0) * Main.masterColor);
+
 			if (hovering) {
 				if (tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed && !Disabled()) {
 					MusicUISystem.Instance.UIHoverText = SetHoverItemName(Id);

@@ -425,7 +425,7 @@ namespace tMusicPlayer
 			}
 
 			// Item & Music Box Handling
-			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+			if (IsMouseHovering) {
 				if (!(IsSelectionSlot && Main.keyState.IsKeyDown(Keys.LeftAlt)) && !Main.mouseRight && (ValidItems == null || ValidItems(Main.mouseItem))) {
 					ItemSlot.Handle(ref SlotItem, Context); // right-click disabled
 

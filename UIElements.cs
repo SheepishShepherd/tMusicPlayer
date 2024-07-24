@@ -299,44 +299,31 @@ namespace tMusicPlayer
 		public bool IsSelectionSlot { get; init; } = false;
 
 		internal MusicData SlotMusicData { get; set; } = null;
+		public int Context { get; init; } = ItemSlot.Context.BankItem;
+		internal Func<Item, bool> ValidItems { get; init; } = (Item item) => false;
 
 		internal int SlotItemID => SlotMusicData is null ? ItemID.MusicBox : SlotMusicData.MusicBox; // What the item id the slot is assigned to
 
 		internal Item SlotItem; // The actually item within the slot
 
-		internal Func<Item, bool> ValidItems;
+		public float Scale { get; init; } = 0.85f;
 
-		private readonly int context = ItemSlot.Context.BankItem;
-		private readonly float scale;
-
-		public MusicBoxSlot(float scale) {
-			this.scale = scale;
+		public MusicBoxSlot() {
 			SlotItem = new Item(0);
-			Width.Set((int)(TextureAssets.InventoryBack.Value.Width * scale), 0f);
-			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * scale), 0f);
 
-			if (scale == 1f) {
-				IsDisplaySlot = true;
-				ValidItems = (Item item) => false;
-			}
-			else {
-				IsEntrySlot = true;
-				ValidItems = delegate (Item item) {
-					bool ValidEntryBox = !LocalModPlayer.BoxIsCollected(item.type) && MusicUISystem.Instance.AllMusic.Any(y => y.MusicBox == item.type);
-					bool isUnrecordedAndNotMax = item.type == ItemID.MusicBox && LocalModPlayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
-					return item.IsAir || ValidEntryBox || isUnrecordedAndNotMax;
-				};
-			}
+			Width.Set((int)(TextureAssets.InventoryBack.Value.Width * Scale), 0f);
+			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * Scale), 0f);
 		}
 
+		/// <param name="musicData">Music data defines this item slot as a selection slot. The music data provided should be of the desired music box slot.</param>
 		public MusicBoxSlot(MusicData musicData) {
 			IsSelectionSlot = true;
-			ValidItems = (Item item) => item.IsAir || item.type == SlotItemID;
-			this.scale = 0.85f;
 			this.SlotMusicData = musicData;
+			ValidItems = (Item item) => item.IsAir || item.type == SlotItemID;
 			SlotItem = new Item(0);
-			Width.Set((int)(TextureAssets.InventoryBack.Value.Width * scale), 0f);
-			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * scale), 0f);
+
+			Width.Set((int)(TextureAssets.InventoryBack.Value.Width * Scale), 0f);
+			Height.Set((int)(TextureAssets.InventoryBack.Value.Height * Scale), 0f);
 		}
 
 		public override void LeftClick(UIMouseEvent evt) {
@@ -395,14 +382,14 @@ namespace tMusicPlayer
 			// Item slot drawing
 			float oldScale = Main.inventoryScale; // back up these values to change later
 			Asset<Texture2D> backup = TextureAssets.InventoryBack2;
-			Main.inventoryScale = scale;
+			Main.inventoryScale = Scale;
 			if (IsEntrySlot) {
 				TextureAssets.InventoryBack2 = TextureAssets.InventoryBack7;
 			}
 			else {
 				TextureAssets.InventoryBack2 = SlotMusicData?.CanPlay(LocalModPlayer) is true ? TextureAssets.InventoryBack3 : TextureAssets.InventoryBack4;
 			}
-			ItemSlot.Draw(spriteBatch, ref SlotItem, context, Inner.TopLeft()); // Draw the item slot!
+			ItemSlot.Draw(spriteBatch, ref SlotItem, Context, Inner.TopLeft()); // Draw the item slot!
 			TextureAssets.InventoryBack2 = backup; // reset values
 			Main.inventoryScale = oldScale;
 
@@ -410,9 +397,9 @@ namespace tMusicPlayer
 			if (SlotItem.IsAir) {
 				string texturePath = SlotItemID < ItemID.Count ? $"Terraria/Images/Item_{SlotItemID}" : ItemLoader.GetItem(SlotItemID).Texture;
 				Texture2D musicBoxTexture = ModContent.Request<Texture2D>(texturePath, AssetRequestMode.ImmediateLoad).Value;
-				float x2 = Inner.X + Inner.Width / 2 - musicBoxTexture.Width * scale / 2f;
-				float y2 = Inner.Y + Inner.Height / 2 - musicBoxTexture.Height * scale / 2f;
-				spriteBatch.Draw(musicBoxTexture, new Vector2(x2, y2), musicBoxTexture.Bounds, new Color(75, 75, 75, 75), 0f, Vector2.Zero, scale, 0, 0f);
+				float x2 = Inner.X + Inner.Width / 2 - musicBoxTexture.Width * Scale / 2f;
+				float y2 = Inner.Y + Inner.Height / 2 - musicBoxTexture.Height * Scale / 2f;
+				spriteBatch.Draw(musicBoxTexture, new Vector2(x2, y2), musicBoxTexture.Bounds, new Color(75, 75, 75, 75), 0f, Vector2.Zero, Scale, 0, 0f);
 			}
 
 			// Draws extra bits over the item slot
@@ -420,7 +407,7 @@ namespace tMusicPlayer
 			// Selection slots will have a star if the music box was favorite
 			if (IsEntrySlot && SlotItem.IsAir) {
 				string text = LocalModPlayer.musicBoxesStored.ToString();
-				Vector2 pos = new Vector2((int)(Inner.Right - (FontAssets.MouseText.Value.MeasureString(text).X * scale)) - 4, Inner.Top + 2);
+				Vector2 pos = new Vector2((int)(Inner.Right - (FontAssets.MouseText.Value.MeasureString(text).X * Scale)) - 4, Inner.Top + 2);
 				Color textColor = new Color(150, 150, 150, 50);
 				if (LocalModPlayer.musicBoxesStored == MusicUISystem.MaxUnrecordedBoxes) {
 					textColor = new Color(150, 150, 50, 50);
@@ -429,7 +416,7 @@ namespace tMusicPlayer
 					textColor = new Color(150, 50, 50, 50);
 				}
 
-				Utils.DrawBorderString(spriteBatch, text, pos, textColor, scale);
+				Utils.DrawBorderString(spriteBatch, text, pos, textColor, Scale);
 			}
 			else if (IsSelectionSlot && LocalModPlayer.BoxIsFavorited(SlotItemID)) {
 				Texture2D texture = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Rank_Light", AssetRequestMode.ImmediateLoad).Value;
@@ -440,7 +427,7 @@ namespace tMusicPlayer
 			// Item & Music Box Handling
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
 				if (!(IsSelectionSlot && Main.keyState.IsKeyDown(Keys.LeftAlt)) && !Main.mouseRight && (ValidItems == null || ValidItems(Main.mouseItem))) {
-					ItemSlot.Handle(ref SlotItem, context); // right-click disabled
+					ItemSlot.Handle(ref SlotItem, Context); // right-click disabled
 
 					// Determine if it was added or removed if from a selection slot
 					if (IsSelectionSlot) {

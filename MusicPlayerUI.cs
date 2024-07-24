@@ -286,8 +286,10 @@ namespace tMusicPlayer
 			expandButton.OnLeftClick += (a, b) => MiniModePlayer = !MiniModePlayer;
 			MusicPlayerPanel.Append(expandButton);
 			
-			DisplayMusicSlot = new MusicBoxSlot(1f) {
-				IsDisplaySlot = true
+			DisplayMusicSlot = new MusicBoxSlot() {
+				IsDisplaySlot = true,
+				Context = ItemSlot.Context.CraftingMaterial, // makes the item inside not interactable (with a blue background)
+				Scale = 1f
 			};
 			DisplayMusicSlot.Left.Pixels = 8f;
 			DisplayMusicSlot.Top.Pixels = MusicPlayerPanel.Height.Pixels / 2f - TextureAssets.InventoryBack.Value.Height / 2;
@@ -369,8 +371,14 @@ namespace tMusicPlayer
 			searchBar.Left.Pixels = 12f;
 			SelectionPanel.Append(searchBar);
 
-			BoxEntrySlot = new MusicBoxSlot(0.85f) {
-				IsEntrySlot = true
+			BoxEntrySlot = new MusicBoxSlot() {
+				IsEntrySlot = true,
+				ValidItems = delegate (Item item) {
+					MusicPlayerPlayer modPlayer = Main.LocalPlayer.GetModPlayer<MusicPlayerPlayer>();
+					bool ValidEntryBox = !modPlayer.BoxIsCollected(item.type) && MusicUISystem.Instance.AllMusic.Any(y => y.MusicBox == item.type);
+					bool isUnrecordedAndNotMax = item.type == ItemID.MusicBox && modPlayer.musicBoxesStored < MusicUISystem.MaxUnrecordedBoxes;
+					return item.IsAir || ValidEntryBox || isUnrecordedAndNotMax;
+				}
 			};
 			BoxEntrySlot.Left.Pixels = closeButton.Left.Pixels - BoxEntrySlot.Width.Pixels - 9f;
 			BoxEntrySlot.Top.Pixels = closeButton.Top.Pixels;

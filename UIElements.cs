@@ -358,6 +358,19 @@ namespace tMusicPlayer
 		public override void Update(GameTime gameTime) {
 			if (IsDisplaySlot && SlotMusicData?.MusicBox != SlotItem.type)
 				SlotMusicData = MusicUISystem.Instance.AllMusic.Find(x => x.MusicBox == SlotItem.type);
+
+			if (IsSelectionSlot && IsMouseHovering && Main.keyState.IsKeyDown(Keys.LeftAlt))
+				Main.cursorOverride = 3; // Holding alt over a selection slot will allow you to favorite it, instead of picking it up
+
+			// Hover Text Handling
+			if (IsMouseHovering) {
+				if (IsEntrySlot && tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
+					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
+				}
+				else if (IsDisplaySlot && UI.MiniModePlayer) {
+					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags}";
+				}
+			}
 		}
 
 		public override void Draw(SpriteBatch spriteBatch) {
@@ -424,20 +437,9 @@ namespace tMusicPlayer
 				spriteBatch.Draw(texture, pos, Color.White);
 			}
 
+			// Item & Music Box Handling
 			if (ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-				// Hover Text Handling
-				if (IsEntrySlot && tMusicPlayer.tMPConfig.EnableMoreTooltips && Main.SmartCursorIsUsed) {
-					MusicUISystem.Instance.UIHoverText = "Mods.tMusicPlayer.HoverButton.EntrySlot";
-				}
-				else if (IsDisplaySlot && UI.MiniModePlayer) {
-					MusicUISystem.Instance.UIHoverText = $"[c/{UI.VisualBoxDisplayed.MusicBox_Rarity.Hex3()}:{UI.VisualBoxDisplayed.Name}]\n{UI.VisualBoxDisplayed.Mod_DisplayName_NoChatTags}";
-				}
-
-				// Item & Music Box Handling
-				if (IsSelectionSlot && Main.keyState.IsKeyDown(Keys.LeftAlt)) {
-					Main.cursorOverride = 3; // Holding alt over a selection slot will allow you to favorite it, instead of picking it up
-				}
-				else if (!Main.mouseRight && (ValidItems == null || ValidItems(Main.mouseItem))) {
+				if (!(IsSelectionSlot && Main.keyState.IsKeyDown(Keys.LeftAlt)) && !Main.mouseRight && (ValidItems == null || ValidItems(Main.mouseItem))) {
 					ItemSlot.Handle(ref SlotItem, context); // right-click disabled
 
 					// Determine if it was added or removed if from a selection slot

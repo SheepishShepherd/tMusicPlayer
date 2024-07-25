@@ -62,7 +62,7 @@ namespace tMusicPlayer
 		public override bool ShiftClickSlot(Item[] inventory, int context, int slot) {
 			// This contains the logic for shift-clicking music boxes into the UI
 			// The Selection panel must be open and no chests can be open for the shift click to work
-			if (MusicUISystem.Instance.MusicUI.SelectionPanelVisible && Player.chest == -1) {
+			if (MusicUISystem.Instance.MusicUI.SelectionPanelVisible && Player.chest == -1 && context == ItemSlot.Context.InventoryItem) {
 				int type = inventory[slot].type;
 				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
 					musicBoxesStored++;
@@ -78,11 +78,12 @@ namespace tMusicPlayer
 					return true;
 				}
 			}
+
 			return false;
 		}
 
 		public override bool HoverSlot(Item[] inventory, int context, int slot) {
-			if (MusicUISystem.Instance.MusicUI.SelectionPanelVisible && Player.chest == -1 && ItemSlot.ShiftInUse) {
+			if (MusicUISystem.Instance.MusicUI.SelectionPanelVisible && Player.chest == -1 && context == ItemSlot.Context.InventoryItem && ItemSlot.ShiftInUse) {
 				int type = inventory[slot].type;
 				if (type == ItemID.MusicBox && musicBoxesStored < 20) {
 					Main.cursorOverride = 9;

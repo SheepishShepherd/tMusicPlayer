@@ -54,7 +54,7 @@ namespace tMusicPlayer
 		}
 
 		public override string DisplayValue() => CurrentState == 0 ? OnText.Value : OffText.Value;
-		public override Color DisplayColorTexture() => CurrentState == 0 ? Color.White : new Color(150, 150, 150);
+		//public override Color DisplayColorTexture()/* tModPorter Note: Removed. Use BuilderToggle.Draw */ => CurrentState == 0 ? Color.White : new Color(150, 150, 150);
 
 		public override string Texture => "tMusicPlayer/UI/BuilderToggle_MusicPlayer";
 		public override string HoverTexture => "tMusicPlayer/UI/BuilderToggle_MusicPlayer_Hover";
